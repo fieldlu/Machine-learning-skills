@@ -1,0 +1,73 @@
+{
+  "skill": "ml-llm-evaluation",
+  "version": "0.1.0",
+  "source_book": "经典文献共识（Brown《GPT-3》、2021-2023 评估方法论文献）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "选型的时候看 MMLU 榜单，模型 A 比模型 B 高 4 分，我们就直接采购 A 了。结果拿我们自己的客服语料一测，B 反而好不少。为什么榜单排名和实测对不上？",
+      "expected_behavior": "应激活 ml-llm-evaluation，解释 benchmark 分布与真实任务分布的鸿沟（榜单分数是参照物不是成绩单），给出自有分布抽测补鸿沟的动作。",
+      "notes": "正面场景: 榜单与实测不一致（A2 场景 1，命中『榜单/leaderboard 为什么实测不一样』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我们微调的小模型在自建测试集上赢了 GPT-4 十几个点！准备发内部通报了。等等——这个测试集是不是得先检查一下？万一题目网上都有呢？",
+      "expected_behavior": "应激活 ml-llm-evaluation，触发三探针污染检查：测试题是否泄入大模型预训练语料、自建集构造是否有偏（难度/分布/答案模式）、并提醒『赢了大模型』结论须先过污染关再通报。",
+      "notes": "正面场景: 自建测试集疑似背过答案 + 赢大模型的兴奋需要降温（A2 场景 4，命中『数据污染/背过答案』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "想用 GPT-4 当裁判给我们几十个 prompt 版本的输出批量打分。这靠谱吗？听说它有啥偏差？要不要再加几个人工评的做对照？人工评估的话标注指南怎么写？",
+      "expected_behavior": "应激活 ml-llm-evaluation，讲清 LLM-as-judge 的已知偏差（位置偏差/自偏爱/长度偏好）及校正手段（换序平均/匿名化/长度控制），并给人工评估协议：rubric 先行+多人盲评+一致性校验（Kappa）。",
+      "notes": "正面场景: LLM-as-judge 与人工评估协议（A2 场景 3，命中『GPT 打分靠谱吗』『人工评估怎么做』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "老板让我证明我们新上的对话模型比上一代好。跑公开 benchmark 吧怕被说没代表性，自己攒评测集吧又不知道怎么攒才服人。有没有一套做法？",
+      "expected_behavior": "应激活 ml-llm-evaluation，给出能力度量的科学流程：自有分布抽测设计、防污染措施、judge 协议与一致性校验——把『谁更好』变成可辩护的证据链而非单一榜单数字。",
+      "notes": "正面场景: 组织一次可信的能力验收（A2 场景 1+3 综合）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "两个传统梯度提升模型要做对比，各跑 10 折交叉验证，最后用 Friedman 检验比一下。这套比较流程具体怎么操作？",
+      "expected_behavior": "不应激活 ml-llm-evaluation——这是传统 ML 的交叉验证与统计比较，属于通用三层评估设计（切数据/定尺子/比较检验），应激活 ml-evaluation-design；本 skill 的 LLM 特有补丁（污染/judge 偏差/分布鸿沟）在这里无处安放。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-evaluation-design 的分界——通用骨架在那边，LLM 特化补丁在这边；此问是纯传统语境"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我改了一版系统提示词，想让输出更简洁。帮我看看这版改得好不好？就这一个 prompt，不用搞什么大规模评测吧？",
+      "expected_behavior": "不应激活 ml-llm-evaluation——单个 prompt 应用的日常回归是开发态问题，应激活 ml-prompting-methodology（小回归测试集驱动迭代）；把能力评估流程套在每次措辞改动上是杀鸡用牛刀。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-prompting-methodology 的分界——prompt 回归迭代（开发态）vs 能力科学度量（选型态/验收态）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我们要上线一个内容审核模型，红队要专门测越狱和偏见这些安全问题。这块的评估该按什么规范来？",
+      "expected_behavior": "不应激活 ml-llm-evaluation 作为主责——B 段明确安全/对齐专项评估（越狱、偏见红队）有专门协议体系，超出本 skill 覆盖；合理动作是如实声明边界，仅通用纪律层面可参考。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): B 段排除项——考察不把 LLM 评估当成无所不包的大筐"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们想给客服机器人建一个只有两百条的小评测集日常用。这么小的规模，是走你们说的那种严谨能力评估，还是随便点点就行？",
+      "expected_behavior": "合理判断: 骑在 llm-evaluation 与 prompting-methodology 分界线上的典型场景——规模小、频率高、服务单个应用的日常回归偏向 prompting-methodology 的回归测试集打法；但若其结论将用于对外宣称『模型变好了』则须升级为 llm-evaluation 的防污染与 judge 校正纪律。合理输出是按用途分流并说明各自底线。",
+      "notes": "边界: 小评测集的双重身份（开发回归工具 vs 能力证据）——考察按『结论用途』而非按『规模』分流"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "榜单上排名靠前的模型，在我们中文法律文书任务上惨不忍睹。我想跟法务团队解释清楚这事，需要一个有说服力的框架而不是一句『榜单不准』。",
+      "expected_behavior": "合理判断: 应激活 ml-llm-evaluation，且调用其理论根基——benchmark 与真实任务的分布鸿沟是 NFL 教训在 LLM 时代的重演（外推无效）；合理输出是用『训练/评测分布 vs 部署分布』的语言组织论证，并附自有抽测方案让结论可复现。",
+      "notes": "边界: 需要把直觉翻译成可辩护框架的场景——考察 skill 是否给出结构化论证而非口号式否定榜单"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 通用三层(ml-evaluation-design)、开发态回归(ml-prompting-methodology)、专项红队(B 段排除)。should-not-trigger 全部必须通过。"
+}

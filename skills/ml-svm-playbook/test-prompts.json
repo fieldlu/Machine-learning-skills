@@ -1,0 +1,73 @@
+{
+  "skill": "ml-svm-playbook",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "决定用 SVM 做这个二分类任务了，但参数完全不会设：C 取多少？用 linear kernel 还是 RBF？gamma 又是什么东西？从哪开始下手？",
+      "expected_behavior": "应激活 ml-svm-playbook，走其决策树：默认软间隔（C 是违约惩罚）→核选型纪律（文本/高维稀疏用线性核，不明先试高斯核）→C 与 γ 的调优方向。",
+      "notes": "正面场景: SVM 参数入门决策（A2 场景 1，命中『C 和 gamma 怎么设』『kernel choice』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我把数据升到 RBF 核的高维空间之后训练集完美分开了，一个错都没有！准备汇报了。这算大成功吧？",
+      "expected_behavior": "应激活 ml-svm-playbook，触发『完美可分=过拟合假象』警报（x26）：升维总能使训练集可分，但这种可分可能是记住了噪声、间隔被离群点挟持；须在验证集复核而非庆祝。",
+      "notes": "正面场景: 完美可分的泼冷水（A2 场景 2，本 skill 核心纪律的标准话术）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "五十万条样本上跑 RBF 核的 SVC 训练直接卡死了，跑了一晚上没出结果。这是参数问题吗？还是 SVM 根本不适合这个量级？",
+      "expected_behavior": "应激活 ml-svm-playbook，指出大规模复杂度陷阱：对偶问题规模正比于样本数、非线性核不低于 O(m²)，大数据硬跑非线性核是算力黑洞；给出现实替代（线性核/LIBLINEAR/核近似或换模型族）。",
+      "notes": "正面场景: 大规模复杂度卡死（A2 场景 3，命中『SVM 大数据集太慢』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "做文本分类，特征是 TF-IDF 的稀疏高维向量。同事说上 RBF 核能增强非线性能力，我有点犹豫。文本这种数据该用什么核？",
+      "expected_behavior": "应激活 ml-svm-playbook，拦住高维稀疏文本上的 RBF 误用：文本场景线性核是共识正解（维度已高、样本通常够、RBF 无益且贵），并说明理由。",
+      "notes": "正面场景: 文本+RBF 的误用拦截（A2 场景 4，skill 明确的拦截条款）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "项目刚开始定技术方案：中小规模的表格数据二分类，候选有 SVM、XGBoost、逻辑回归。到底该选哪个当主力模型？有没有客观的比较方法？",
+      "expected_behavior": "不应激活 ml-svm-playbook——尚未完成模型族横向选型（SVM vs 树模型 vs 线性），B 段明确此关归 ml-task-matching（NFL：先刻画任务再匹配归纳偏好）；SVM 已被选定后的内部施工才归本 skill。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-task-matching 的分界——『该不该选 SVM』vs『SVM 内部怎么配』"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我们的 SVM 要解决一个 15 类的商品分类问题。SVM 不是只能做二分类吗？这么多类该怎么处理？",
+      "expected_behavior": "不应激活 ml-svm-playbook 作为主责——多分类拆解的外层架构（OvO/OvR/ECOC 选型与开销判断）归 ml-multiclass-strategies；本 skill 只负责标记『SVM 需要外接拆解』这一事实，拆解工程细节在那边。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-multiclass-strategies 的分界——内核施工 vs 外层拆解架构"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "sklearn 的 SVC 里 kernel='rbf' 时 gamma 如果不填默认是多少？'scale' 和 'auto' 有什么区别？",
+      "expected_behavior": "不应激活任何方法论 skill——纯 API 默认值查询，直接回答，不走路由。",
+      "notes": "诱饵: 纯 API 问题（gamma/kernel 词汇高频出现，考验 router 边界回退检查）"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "业务方要求模型输出每个预测的概率置信度，好让他们设置人工审核阈值。SVM 能输出概率吗？听说要加什么 Platt 缩放？靠不靠谱？",
+      "expected_behavior": "合理判断: 应激活 ml-svm-playbook 且执行其 B 段边界条款——SVM 输出无自然概率意义，Platt 缩放是事后校准补丁；若概率是核心诉求，对率回归更对口（优化目标相近性能相当）；考察给出诚实边界与替代路线而非硬凑方案。",
+      "notes": "边界: 概率输出需求撞上 SVM 的天然短板——B 段明确写了这条出口，考察是否转介而非硬补"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我的数据两类比例是 200:1，SVM 训出来把所有样本都判成多数类了，训练集 accuracy 99.5%。是不是 C 设小了？加大 C 能不能救回来？",
+      "expected_behavior": "合理判断: 应先识别这是极端类别不平衡吞掉少数类的问题（B 段明确指向 ml-imbalanced-learning 先行确认度量与再平衡策略），而非 SVM 参数问题——加大 C 只会更狠地拟合多数类；合理动作是双跳路由：imbalanced-learning 处理失衡，回到本 skill 再谈核与参数。",
+      "notes": "边界: 不平衡症状借 SVM 参数问题的外壳出现——考察先分流到对口专项再回施工的顺序感"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 横向选型上游(ml-task-matching)、多分类外层(ml-multiclass-strategies)、不平衡前置(ml-imbalanced-learning)。『完美可分是红旗』与『线性核管文本』是两大独门纪律考点。should-not-trigger 全部必须通过。"
+}

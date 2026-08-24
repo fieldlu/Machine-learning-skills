@@ -1,0 +1,73 @@
+{
+  "skill": "ml-leakage-defense",
+  "version": "0.1.0",
+  "source_book": "工程实践共识（业界公开文献与社区共识，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "交叉验证 AUC 稳定在 0.95，模型一上线真实数据上只有 0.7，线下线上差得离谱。代码逻辑我检查过没 bug，到底哪出了问题？",
+      "expected_behavior": "应激活 ml-leakage-defense，启动三大类型定位流程（特征-目标泄漏/训练-测试污染/过程泄漏），逐项核对信号：目标编码是否折外、切分前是否 fit 过变换器、时序是否被 shuffle。",
+      "notes": "正面场景: 线下虚高线上暴跌的经典症状（A2 场景 1，命中『offline-online gap』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "有个『账户注册后 24 小时内充值金额』的特征，feature importance 占了 85%，模型精度高得吓人。同事都夸这特征找得好，我总觉得哪里不对劲。",
+      "expected_behavior": "应激活 ml-leakage-defense，识别疑似 target leakage：该特征与标签可能存在时间因果倒置或定义重叠（如充值行为本身构成流失/逾期判定依据），触发 too-good-to-be-true 审查并给出验证手段（剔除该特征看降幅、追溯特征生成时间戳）。",
+      "notes": "正面场景: 特征重要性一骑绝尘的红旗（A2 场景 2）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "写预处理 pipeline 的时候吵起来了：StandardScaler 应该 fit 在全量数据上还是只 fit 训练集？SMOTE 过采样放在切分前面还是后面？有没有个统一说法？",
+      "expected_behavior": "应激活 ml-leakage-defense，给出事前防漏纪律：一切依赖训练集统计量的变换器（归一化/填充/target encoding/重采样）必须在切分之后、只在训练折内 fit——这是过程泄漏防御的标准答案。",
+      "notes": "正面场景: 搭管道的事前防漏提问（A2 场景 3，命中『划分前还是划分后』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "接手了一个离职同事的销量预测项目，测试集分数好得不真实。帮我审一遍这段代码有没有泄漏：他把整个 df 先 fillna 再按时间切的 train/test，特征选择也是在全量数据上跑的 RFE。",
+      "expected_behavior": "应激活 ml-leakage-defense，执行逐项审计：全量 fillna 是过程泄漏（测试集统计泄入训练）、全量跑 RFE 是特征选择偷看测试集、再核对时间切分的边界处理——输出审计报告式结论。",
+      "notes": "正面场景: 复现他人代码的系统性找漏（A2 场景 5，命中『audit my pipeline』句式）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "上线三个月效果慢慢变差了，最近一个月 AUC 从 0.8 掉到 0.74。用户群体好像也在变。这是不是当初管道里埋了什么雷？",
+      "expected_behavior": "不应激活 ml-leakage-defense——B 段明确排除分布漂移：训练与线上的数据分布本身随时间变了，不是训练时接触了未来信息；处置方向是监控与再训练，不是查管道。此问应按分布漂移问题处理（超出本合集专项覆盖的部分如实声明）。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): B 段排除项——『未来不再像过去』不是泄漏；泄漏是虚高且从第一天就存在，漂移是缓慢恶化"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "新项目要上线了，想做个全面体检：采样方式有没有偏、评估协议独不独立、分布假设站不站得住……有没有一套完整的检查清单？",
+      "expected_behavior": "不应激活 ml-leakage-defense——诉求是六问前提的整体审查（无偏采样/独立采样/分布形式/信息泄露等全覆盖），应激活 ml-pitfall-audit；本 skill 是泄漏单项的深挖专项，六问总审归对方。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-pitfall-audit 的分界——专项 vs 六问总审；audit 问 6 审完仍存疑才移交本 skill 深挖"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我的模型验证集 F1 只有 0.55，感觉偏低，是不是哪里配置错了导致学不动？帮我看看该怎么排查？",
+      "expected_behavior": "不应激活 ml-leakage-defense——B 段指出泄漏通常造成虚高而非偏低，『效果偏低』的常规诊断是欠拟合/过拟合归因问题，应激活 ml-diagnosis。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-diagnosis 的分界——偏高且不可信走本 skill，偏低走诊断"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我怀疑我们模型有泄漏，但具体说不上来在哪。代码在另一个仓库还没拉权限，你先给我讲讲一般都有哪几种泄漏呗？",
+      "expected_behavior": "合理判断: 可激活 ml-leakage-defense 但须按其 B 段降级为科普模式——没有具体管道可查时只能讲类型学与信号清单，不能假装完成了审计；合理输出是三大类型讲解+待拿到代码后的审计步骤预告。",
+      "notes": "边界: 无代码可审时的资格线——skill 自己声明『只有一句我觉得有泄漏就别假装审计』，考察降级而非硬跑流程"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "时序数据我用 train_test_split(shuffle=True) 切的，然后按周做了滚动窗口特征。有人提醒我说时序不能随便 shuffle，但也有人说只要特征都是滞后的就没问题。到底谁对？",
+      "expected_behavior": "合理判断: 骑在 leakage-defense 与 feature-engineering 分界线上的典型场景——shuffle 是否可行取决于切分纪律（leakage-defense 领地），滞后特征对齐纪律（feature-engineering 领地）；任一 skill 接手都应先给正确处方（有真时间结构的预测任务禁止 shuffle 切分、窗口只聚合严格早于预测点的信息），归属之争不影响结论正确性。",
+      "notes": "边界: 时序切分纪律横跨两 skill 的共同交界处——考察给出正确处方而不纠结路由归属"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 六问总审(ml-pitfall-audit)、分布漂移(B 段排除项)、偏低诊断(ml-diagnosis)。『虚高 vs 偏低』『穿越 vs 漂移』是两条最锐利的分界语。should-not-trigger 全部必须通过。"
+}

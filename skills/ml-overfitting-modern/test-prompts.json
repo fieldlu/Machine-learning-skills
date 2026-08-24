@@ -1,0 +1,73 @@
+{
+  "skill": "ml-overfitting-modern",
+  "version": "0.1.0",
+  "source_book": "经典文献共识（Goodfellow《Deep Learning》及 2014-2020 深度学习奠基论文）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "搭 ViT 做分类，正则这块完全没头绪：Dropout 该放哪些层？p 取多少？weight decay 设多少合适？label smoothing 要不要开？有没有个配置的先后思路？",
+      "expected_behavior": "应激活 ml-overfitting-modern，按工具箱给出各手段的定位与默认档（Dropout 层位与比例、weight decay 与 L2 的区别、label smoothing 的适用），并强调先单手段消融再组合。",
+      "notes": "正面场景: 正则配置无从下手（A2 场景 1，命中『dropout 比例』『weight decay』『label smoothing』多个语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "训练精度已经 100% 了，验证集还低 15 个点。这是教科书里说的过拟合吧？深度模型这种情况一般都上什么手段？数据增强怎么配？",
+      "expected_behavior": "应激活 ml-overfitting-modern，确诊 train-val gap 后进入深度正则工具箱（Dropout/weight decay/增强/早停），并给增强策略的搭配建议；同时保持双下降意识——gap 大通常仍是过拟合，但需留意插值区间的新形态。",
+      "notes": "正面场景: 训练满分+大 gap 的标准过拟合处置（A2 场景 2）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "遇到怪事：我把模型从 4 层加深到 16 层，测试误差不升反降！还有个实验训到 loss=0 之后继续训，泛化居然还在变好。这跟书上说的一模一样吗？我是不是搞错了什么？",
+      "expected_behavior": "应激活 ml-overfitting-modern，触发双下降甄别：插值训练集却泛化良好是过参数化区间的已知现象，经典『训练 loss=0 = 过拟合红旗』的直觉需要重新标定；给出甄别步骤而非直接判为 bug。",
+      "notes": "正面场景: 双下降现象的甄别（A2 场景 3，命中『double descent』语境，本 skill 独有考点）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "我叠了 dropout 0.5 + weight decay 1e-2 + mixup + 早停四件套，结果比啥都不加还差。是不是这些正则打架了？该怎么排查？",
+      "expected_behavior": "应激活 ml-overfitting-modern，执行其纪律条款：正则叠加可能冲突甚至过度正则导致欠拟合，须回到单手段消融逐项归因，再按增益组合。",
+      "notes": "正面场景: 正则叠加翻车（A2 场景 4，核心纪律『先单手段消融再组合』的标准考题）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我的 Transformer 训练 loss 从第 3 个 epoch 开始就不降了，一直是 8.7 左右纹丝不动，还没轮到考虑过不过拟合的问题。这种训不动的情况怎么办？",
+      "expected_behavior": "不应激活 ml-overfitting-modern——问题出在优化端（loss 不降/平台期），正则手段治不了优化失败，应激活 ml-deep-training-playbook；一线之隔：症状在优化端走 playbook，在泛化端（train-val gap）才走本 skill。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-deep-training-playbook 的分界——优化端 vs 泛化端"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我的随机森林在小数据上过拟合得厉害，树深是不是该限制一下？剪枝和限制 max_depth 哪个好？",
+      "expected_behavior": "不应激活 ml-overfitting-modern——传统模型（决策树/RF/SVM/GBDT）的过拟合旋钮（剪枝/C/树深）不在本 skill 工具箱内，应激活 ml-diagnosis 走偏差-方差归因后用传统手段处置。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): B 段排除项——传统模型的过拟合归 diagnosis/原书章节，深度工具箱不通用"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我只有五百条标注数据想做文本分类，同事建议直接拿预训练模型来微调而不是从头训。这个方向对吗？微调的话要注意什么？",
+      "expected_behavior": "不应激活 ml-overfitting-modern 作为主责——范式未定（从头训练 vs 微调预训练）是档位决策问题，应激活 ml-pretraining-paradigm；且微调路径的正则主力（低 LR/冻结/LoRA 秩）与传统 Dropout/增强不同源。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-pretraining-paradigm 的分界——范式未定时先走那边，微调场景本工具箱大部分让位"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "训练 loss 精确等于 0 了，一个错都没有，但验证集表现其实还行，只差 2 个点。这到底是好事还是坏事？要不要赶紧停掉防止过拟合？",
+      "expected_behavior": "合理判断: 应激活 ml-overfitting-modern 并调用双下降重新标定——插值区间内小 gap 可能不是病（过参数化的新形态），经典『训练满分必是红旗』直觉在此需谨慎；合理输出是看 gap 幅度与曲线形态再决定是否干预，而非条件反射式早停。",
+      "notes": "边界: 插值但泛化尚可的重新标定——本 skill 最独特的考点，考察是否机械套用经典红旗论"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我加了数据增强之后训练集 accuracy 反而从 99% 掉到 92%，验证集倒是没变。增强是不是把模型搞坏了？要不要撤掉？",
+      "expected_behavior": "合理判断: 可激活 ml-overfitting-modern 处理，但正确解读方向相反——训练精度因任务变难而下降是增强生效的正常表现，判断依据应是验证集/测试集变化而非训练精度；若验证集确实无改善则该增强手段对分布不匹配无效，属单手段消融的正常负结果。考察不被『指标变差』表象带偏而丢失评估基准。",
+      "notes": "边界: 增强导致训练指标下降的正确解读——考察以验证侧为准绳的纪律，而非被训练端表象误导"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 优化端故障(ml-deep-training-playbook)、传统模型过拟合(ml-diagnosis)、范式未定(ml-pretraining-paradigm)。双下降甄别是本 skill 区别于一切兄弟 skill 的独门考点。should-not-trigger 全部必须通过。"
+}

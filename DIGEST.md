@@ -1,7 +1,7 @@
 # 《机器学习》方法论精华 — 精华长文
 
 > 本文由 cangjie-skill 蒸馏生成，只呈现**通过三重验证**的方法论——不是全书摘要，是筛过水分的精华。想深入某个方法论时，点小节末尾的 skill 链接；想看全貌与安装方式，读 [INDEX.md](./INDEX.md) 和 [README.md](./README.md)。
-> 知识源：周志华《机器学习》，清华大学出版社，2016（"西瓜书"）| 全文约 6800 字，预计阅读 20 分钟
+> 知识源：周志华《机器学习》，清华大学出版社，2016（"西瓜书"）| 全文约 8300 字，预计阅读 25 分钟 | 文末另附《2026 增补》：合集扩展至 28 skill 后的大模型时代章节
 
 ## 这本书在讲什么
 
@@ -209,3 +209,95 @@
 1. **脱离具体问题谈算法优劣毫无意义**——先刻画任务，再匹配归纳偏好，别问"哪个最强"。
 2. **训练精度满分是红旗不是捷报**——先修尺子再做诊断：确认度量没失守、评估没泄露，然后用偏差-方差分解归因，对症下药。
 3. **理论给出边界而非答案**——每个流行技巧背后都有一条几乎从不被检查的前提；对任何学习结果保持怀疑并科学验证，才是这本书教的真本事。
+
+---
+
+# 2026 增补：从西瓜书到大模型时代
+
+> 以上正文忠实于 2016 年的原书。2026-08 起，本合集以同一流水线、同一验收规格扩充至 **28 个 skill**。这一章交代扩充的动机、三层知识来源的性质声明、新增 skill 的方法论速览，以及它们与原书章节的对应关系。
+
+## 一、为什么要扩充：批判结论的另一面
+
+本文第六节"作者的局限"给出了四条批判，其中第一条（时代局限）最刺眼：Transformer、预训练–微调范式、scaling law 完全不在书中；深度学习仅两处简述；工程落地环节整段缺席。阶段 0 的 BOOK_OVERVIEW 批判进一步确认：书中"每个任务从零训练一个模型、调参需精心设计评估流程"的世界观，在基础模型用零样本/少样本直接解决问题的今天已被部分绕开——逐算法精细对比的框架对大模型任务显得过重。
+
+但批判只负责划出边界，不负责填平它。一个诚实的合集有两条路可选：要么守着原书宣布"大模型不在范围内"，要么把边界之外的地形也测绘出来——用与书内单元相同的验收规格。本合集选择了后者：**原批 10 skill 保持不动**（它们仍是工作流主干），批A 补齐书内被漏掉的章节出口，批B/C 把原书时代之后与原书体例之外的判断纪律补进来。判别标准始终如一：收录的是可执行的判断框架，不是知识点摘要。
+
+## 二、三层知识来源：诚实声明
+
+增补后的 28 个 skill 来自三层性质不同的知识源，各自的可信度保证方式不同：
+
+| 层 | 来源 | 验收方式 | 性质 |
+|---|---|---|---|
+| 层一 · 西瓜书单元 | 原书 16 章（440 页） | 五提取器 → 三重验证（V1 跨域/V2 预测力/V3 独特性） | R 段逐字引用原书并标页码章节 |
+| 层二 · 经典文献共识 | Transformer/BERT/GPT-3/CoT/Scaling Laws/*Deep Learning* 等奠基文献 | 同规格测试 + R 段逐条标注转述性质 | R 段为文献共识的**转述**（非逐字原文）；快照大体止于 2017–2023 方法论文献 |
+| 层三 · 工程实践共识 | scikit-learn 官方文档、Google《Rules of ML》、*Hidden Technical Debt* 等 | 同规格测试 + 来源逐条标注 | 业界通行做法，是纪律不是定理；工具载体（Hydra/Optuna）会过时 |
+
+层二、层三比原书新，但不比未来新——文献共识可能被后续研究修正，工具名三年后可能换血。应当继承的是纪律内核，而非某句措辞或某个库名。
+
+## 三、批A：书内补全的八个 skill（速览）
+
+这八个 skill 的素材全部出自原书，只是原批 10 个 skill 未覆盖到的章节出口：
+
+- [`ml-neural-training`](./skills/ml-neural-training/SKILL.md)（第5章）— **解决什么**："神经网络不收敛""该几个隐藏层"这类训练决策。**核心纪律**：先用任务性质判断该不该上 NN，再谈结构；训不动时按"数据→容量→优化"归因，而不是堆层数碰运气。
+- [`ml-svm-playbook`](./skills/ml-svm-playbook/SKILL.md)（第6章）— **解决什么**："SVM 参数怎么选"其实是一条决策链而非并列参数表。**核心纪律**：可分性判断 → 软间隔把"全部做对"改为"总体代价最小"（C 的由来）→ 核选型 → C 与 γ 在 log 尺度联合扫 → 规模可行性闸门。
+- [`ml-clustering-toolkit`](./skills/ml-clustering-toolkit/SKILL.md)（第9章）— **解决什么**："聚类分几类""kmeans 还是 dbscan"。**核心纪律**：距离度量先于算法选择（对无序属性硬算欧氏距离从第一步就错了）；簇是算法产物不是真实类别，评估靠内部指标与外部对照，不下本体论断言。
+- [`ml-multiclass-strategies`](./skills/ml-multiclass-strategies/SKILL.md)（第3章多分类主线）— **解决什么**：用二分类器解 N 类问题的拆解选型。**核心纪律**：OvO/OvR/ECOC 各有自己的开销与纠错特性，大类数仍套 OvO 是工程事故的前奏；ECOC 的码本设计决定容错能力。
+- [`ml-graphical-models`](./skills/ml-graphical-models/SKILL.md)（第14章）— **解决什么**：多变量依赖建模与推断路线。**核心纪律**：结构学习的代价远高于参数学习，能借先验就别让数据白学；推断跑不动时降级到变分/MCMC 要把近似误差记进账。
+- [`ml-rule-learning`](./skills/ml-rule-learning/SKILL.md)（第15章）— **解决什么**：要"人能读懂"的 if-then 模型时的路线判断。**核心纪律**：规则集在训练集上完美却频繁触发默认规则，是覆盖不足的信号；命题规则不够用时才升一级逻辑，别为表达力提前付搜索代价。
+- [`ml-rl-decision-loop`](./skills/ml-rl-decision-loop/SKILL.md)（第16章）— **解决什么**：任务该不该用 RL、走哪条路线。**核心纪律**：环境模型已知归结为动态规划，未知才进采样学习；MC 与 TD、Sarsa 与 Q-learning 的分岔都由"评估的策略和执行的策略是否一致"这一个变量决定；reward 设计是整个回路里最容易被低估的一环。
+- [`ml-semisupervised`](./skills/ml-semisupervised/SKILL.md)（第13章）— **解决什么**：标注太少时未标注数据的用法。**核心纪律**：未标记数据不是免费午餐——生成式假设不准时海量未标记样本会把模型拽偏；主动学习（挑着标）与半监督（白嫖未标）是两条不同预算曲线，先问标注预算再选路。
+
+## 四、批B：经典文献共识的六个 skill（速览）
+
+主题超出原书时代，R 段改引奠基文献（均标转述）。共同的精神底色仍是西瓜书的判断纪律——比如 `ml-llm-evaluation` 本质上是 NFL 定理在 LLM 时代的重演。
+
+- [`ml-transformer-era`](./skills/ml-transformer-era/SKILL.md) — **解决什么**："CNN/RNN 还是 Transformer"的架构选型。**核心纪律**：架构选择是归纳偏好的选择，必须同时匹配数据形态×数据规模×算力三轴——Transformer 是低先验架构，靠数据喂养出结构知识；小表格数据 GBDT 常胜深度骨架，小数据 CNN/RNN 仍是正解。"Transformer 万能"是这个时代最流行的误区。
+- [`ml-pretraining-paradigm`](./skills/ml-pretraining-paradigm/SKILL.md) — **解决什么**："要不要自己训模型""LoRA 还是全参微调"。**核心纪律**：适配任务的手段是四档成本阶梯（提示工程 → PEFT → 全参微调 → 从零预训练），永远先试低成本档，低档被证明不够才升档；数据不足 1k 条禁止直接微调；微调必配通用能力回归测试来发现灾难性遗忘。
+- [`ml-prompting-methodology`](./skills/ml-prompting-methodology/SKILL.md) — **解决什么**："prompt 改来改去时好时坏"。**核心纪律**：prompt 是代码——GPT-3 论文实测示例顺序波动的影响可与换方法同量级，对抗这种敏感性的唯一武器是回归测试集驱动的受控迭代；CoT 只在多步推理任务启用，简单分类纯属浪费 token；输出格式靠 schema 约束而非口头祈求。
+- [`ml-deep-training-playbook`](./skills/ml-deep-training-playbook/SKILL.md) — **解决什么**："loss 不降/NaN/训练发散"。**核心纪律**：深度训练失败极少是神秘原因，绝大多数落在确定排查链上——数据管道→小样本过拟合测试→初始化归一化→学习率扫描→优化器调度→梯度监控；先廉价检查后昂贵实验，一次只动一个变量，否则涨跌无法归因。
+- [`ml-overfitting-modern`](./skills/ml-overfitting-modern/SKILL.md) — **解决什么**：Dropout/weight decay/增强怎么配，以及"训练 loss 为 0 但 gap 很大"怎么解读。**核心纪律**：深度正则主力五件套各有适用位（AdamW 解耦后 weight decay 才真正起效）；双下降现象要求重新标定经典"gap=过拟合"直觉——插值训练集却泛化良好在现代网络中真实存在；正则叠加必须逐个消融，过量叠加制造症状相反的"假性欠拟合"。
+- [`ml-llm-evaluation`](./skills/ml-llm-evaluation/SKILL.md) — **解决什么**："榜单排名和实测为什么不一致""测试集是不是被污染了"。**核心纪律**：网络规模预训练语料几乎必然吞下公开 benchmark，测试集隔离这个经典前提系统性崩塌；榜单是参照物不是成绩单，自有分布抽测补鸿沟；LLM-as-judge 有位置/自偏爱/长度三种已知偏差，须逐一校正。总纲：评估的对象永远是"模型×任务分布"这对组合。
+
+## 五、批C：工程实践共识的四个 skill（速览）
+
+原书明确不讲工程落地，这四个 skill 从业界公开共识构造，锚定西瓜书中最近的原则回声（如第2章"测试集互斥"类比、"性能比较不能直接比大小"的前提）：
+
+- [`ml-leakage-defense`](./skills/ml-leakage-defense/SKILL.md) — 泄漏 = 让模型在训练时接触考试拿不到的信息。三大类型（特征-目标泄漏 / 训练-测试污染 / 过程泄漏）各有指纹；元原则只有一条：一切依赖数据分布的计算只在训练折内执行再 transform 出去。它把原书"测试集必须与训练集互斥"从评估集选择扩展到整条数据管道。
+- [`ml-feature-engineering`](./skills/ml-feature-engineering/SKILL.md) — 特征工程是把领域知识注入模型的主要通道。四类字段各有一棵决策树（数值：变换三问；类别：按基数选编码；时间：窗口右端不得越过预测时刻）；顺序铁律"先切分→体检→构造"，ID 与编号列永远不入模。
+- [`ml-experiment-tracking`](./skills/ml-experiment-tracking/SKILL.md) — 一次实验 = 代码×数据×配置×环境×随机性五元组，任何一个没钉住结果就不可复现。记录发生在实验开始时而非结束时；复现不了的实验等于没做过——在科研场景这是学术诚信问题，不只是工程洁癖。
+- [`ml-hpo-strategy`](./skills/ml-hpo-strategy/SKILL.md) — 调参 = 在有限 trial 预算下做最优分配。随机搜索胜网格的原因是重要维度通常很少；贝叶斯优化省 trial 但自身有开销且并行差；Hyperband 做"早砍多养"的预算分配。前置闸门：未做归因不开搜——偏差主导时调参是在错误的方向上加注。
+
+## 六、与原书章节的对应关系
+
+```
+西瓜书 16 章 ──────────────────► 合集 skill
+────────────────────────────────────────────────────────
+第1章 绪论（NFL/版本空间）      → task-matching, router
+第2章 模型评估与选择            → evaluation-design, diagnosis,
+                                  pitfall-audit, theory-compass(部分),
+                                  experiment-tracking*, leakage-defense*(回声)
+第3章 线性模型/不平衡           → imbalanced-learning, multiclass-strategies†
+第4章 决策树                    → diagnosis(案例), rule-learning(关联)
+第5章 神经网络                  → neural-training†
+第6章 SVM                       → svm-playbook†
+第7章 贝叶斯分类器              → bayesian-thinking
+第8章 集成学习                  → ensemble-design
+第9章 聚类                      → clustering-toolkit†
+第10章 降维与度量学习           → dimensionality
+第11章 特征选择与稀疏           → dimensionality
+第12章 计算学习理论             → theory-compass
+第13章 半监督学习               → semisupervised†
+第14章 概率图模型               → graphical-models†
+第15章 规则学习                 → rule-learning†
+第16章 强化学习                 → rl-decision-loop†
+
+书外延伸：
+  经典文献共识(2017-2023)       → transformer-era, pretraining-paradigm,
+                                  prompting-methodology, deep-training-playbook,
+                                  overfitting-modern, llm-evaluation
+  工程实践共识                  → feature-engineering, experiment-tracking,
+                                  hpo-strategy, leakage-defense
+  （† = 批A 书内池外补充；* = 书内有原则回声但主体在书外）
+```
+
+一句话收束：原书教的是"在任何地形上都成立的基本功"——刻画任务、修好尺子、怀疑满分、尊重理论边界；增补的 18 个 skill 是这套基本功在新地形上的施工图。两层合起来，才是 2026 年做机器学习决策的完整装备。

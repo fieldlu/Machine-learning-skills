@@ -1,0 +1,73 @@
+{
+  "skill": "ml-neural-training",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "手写一个两层的小神经网络，loss 一直在来回震荡就是不下降。learning rate 调大就炸、调小就慢得要死，我是不是该改网络结构？还是换个优化器？完全没头绪。",
+      "expected_behavior": "应激活 ml-neural-training，按 loss 曲线分诊病因：振荡指向学习率两难（太大振荡/太小龟速），给出分参数组设不同 η、先大后小自适应缩小的补救方向，而非盲目换结构。",
+      "notes": "正面场景: 训练振荡 + 学习率两难（A2 场景 1+3，命中『loss 不下降』『learning rate 两难』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我的数据明显不是线性可分的（画出来是环形的）。是不是必须加隐藏层？那到底几个 hidden layer 合适？神经元个数怎么定？",
+      "expected_behavior": "应激活 ml-neural-training，按可分性判结构下限：非线性可分问题单层感知机解不了（XOR 数学边界），必须加隐层；再按问题复杂度给层数/宽度的起点建议与试错纪律。",
+      "notes": "正面场景: 结构设计问题（A2 场景 2，命中『hidden layers 怎么定』语言信号，含 XOR 资格判断）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "同一个网络我换了五个随机种子训，最好的一次 accuracy 0.88，最差的一次才 0.71！差这么多正常吗？是不是撞上局部极小了？有什么办法能稳定一点？",
+      "expected_behavior": "应激活 ml-neural-training，解释 BP 误差曲面的局部极小现象与多初值择优的启发式本质（无理论保障），并提醒把某次运行的最低 loss 当全局最优是自欺；给出多组初值/SGD 等缓解手段与合理预期。",
+      "notes": "正面场景: 不同种子结果天差地别 + 局部极小怀疑（A2 场景 4，命中『局部极小/local minimum』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "训练误差还在慢慢降，但验证误差从第 40 个 epoch 开始往上爬了。我要不要现在就停？早停的判断标准是什么？要不要顺便加点正则化？",
+      "expected_behavior": "应激活 ml-neural-training，执行早停+正则化两手纪律：以验证误差回升为停机信号（patience 设置），并说明正则化 λ 与学习率 η 是两个不同的旋钮（一个管偏好什么解、一个管走多远）。",
+      "notes": "正面场景: 早停时机纠结（A2 场景 5，命中『early stop 该什么时候停』语言信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我在用 ResNet 微调做图像分类，加了 warmup 和 AdamW 之后 loss 还是 NaN。初始化也检查过没问题。这种现代深度网络的发散该怎么系统排查？",
+      "expected_behavior": "不应激活 ml-neural-training——这是深度现代训练栈的故障（ResNet/warmup/AdamW/NaN），属于初始化归一化优化器调度时代的排查链，应激活 ml-deep-training-playbook；本 skill 的 Sigmoid+BP trick 体系管经典浅层语境。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-deep-training-playbook 的分界（最难的一条）——同为『训不动』，经典 BP 小网络归本 skill，深度现代训练栈归 playbook"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我的 LSTM 收敛得很正常，训练和验证曲线都很平滑，就是在测试集上比 XGBoost baseline 差了 5 个点。是不是神经网络不适合这个任务？要不要换模型？",
+      "expected_behavior": "不应激活 ml-neural-training 作为主责——训练收敛正常，问题是泛化差距与模型族比较：泛化差的归因走 ml-diagnosis，『要不要换模型』的横向选型走 ml-task-matching；本 skill 管训练动力学故障（不收敛/振荡/局部极小），此处无故障可修。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 双重分流考题——训练正常但验证差 → diagnosis；换不换模型 → task-matching"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "项目还没开始，就是想问问：几百条表格数据做个回归预测，用神经网络合适吗？还是传统方法更稳？",
+      "expected_behavior": "不应激活 ml-neural-training——这是训练前的横向选型（『要不要用 NN』），且 B 段明确小样本表格数据简单模型常更稳的判断发生在选型关，应激活 ml-task-matching；已决定用 NN 之后的训练决策才归本 skill。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 时序分界——选型前 vs 已选定后的施工"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我的 loss 卡在一个平台上不去也不下来，梯度范数查了也不是零。这算局部极小、鞍点，还是欠拟合啊？三种病听起来症状一样啊？",
+      "expected_behavior": "合理判断: 应激活 ml-neural-training 且执行其 B 段的分诊纪律——『局部极小 vs 欠拟合』都表现为 loss 下不去，但前者换优化策略有效、后者须增容量；鞍点在高维空间更常见于深度语境（需声明外推边界）；合理输出是用处置实验反推病因（换优化策略 vs 加容量），而非只给名词解释。",
+      "notes": "边界: 同症不同病的鉴别诊断——skill B 段明确写了这条混淆，考察用处置反应区分病因的方法论而非背定义"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我想给我的小 BP 网络加上 dropout 和 batch normalization 这些新玩意儿，会不会有冲突？这些在书上那个年代有吗？",
+      "expected_behavior": "合理判断: 可激活 ml-neural-training 但须按其时代局限声明——Dropout/BN 超出西瓜书覆盖（书中止于 BP+Sigmoid 体系），属于深度现代工具箱（ml-overfitting-modern/ml-deep-training-playbook 领地）；本 skill 能给的是纪律层（正则叠加要消融、单变量原则），具体器件配方应转介或明示外推。",
+      "notes": "边界: 经典 skill 遇到现代器件——考察是否诚实声明外推边界并把器件问题转介给对口兄弟 skill"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 深度现代训练(ml-deep-training-playbook，最难分界)、泛化归因(ml-diagnosis)、横向选型(ml-task-matching)。『经典 BP vs 深度现代』是合集内最锐利的分界线之一。should-not-trigger 全部必须通过。"
+}

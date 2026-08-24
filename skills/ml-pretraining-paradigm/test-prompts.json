@@ -1,0 +1,73 @@
+{
+  "skill": "ml-pretraining-paradigm",
+  "version": "0.1.0",
+  "source_book": "经典文献共识（Devlin《BERT》、Brown《GPT-3》及 2018-2021 范式奠基文献）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "任务是要做一个法律文书的意图分类，我手里有 800 条标注。同事说直接拿开源 LLM 微调一下就行，也有人说这数据量微调会崩。我到底该从零训练、微调，还是直接调 API 加 prompt？",
+      "expected_behavior": "应激活 ml-pretraining-paradigm，走四档决策树（从零训练/全参微调/LoRA 等 PEFT/纯提示）按数据量×算力×领域距离选最低够用档；800 条触发判停条件——禁止直接微调，先做提示工程与少样本基线。",
+      "notes": "正面场景: 档位阶梯选型（A2 场景 1+4，命中『要不要自己训/fine-tune 还是 API』语言信号，判停条件考题）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "用 LoRA 微调完一个 7B 模型做客服对话之后，模型专业问题答得不错，但普通闲聊变得又僵又差，有时候连基本格式都不对了。这是出什么问题了？",
+      "expected_behavior": "应激活 ml-pretraining-paradigm，识别灾难性遗忘：微调分布挤压通用能力，给出缓解手段（更低学习率/混入通用语料/更小秩/冻结策略）并强调微调后必须做通用能力回归测试。",
+      "notes": "正面场景: 灾难性遗忘的识别与缓解（A2 场景 2，命中『变笨了/通用能力下降』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "决定要微调了，但在 LoRA 和全参微调之间摇摆：显存就一张 4090，LoRA 效果会不会差太多？另外底座模型哪些层该冻结哪些解冻？",
+      "expected_behavior": "应激活 ml-pretraining-paradigm，按算力轴与领域距离轴给 PEFT vs 全参的取舍（单卡 7B 场景 LoRA 是现实解），冻结/解冻按领域距离分层建议。",
+      "notes": "正面场景: PEFT 选型 + 冻结纠结（A2 场景 3，命中『LoRA 还是全参』『冻结』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "prompt 写了几十个版本了，输出格式还是不稳定，感觉提示工程到头了。是不是该升级去微调了？怎么判断这个坎该不该迈？",
+      "expected_behavior": "应激活 ml-pretraining-paradigm，执行档位升降级判断：确认提示档是否真的到达天花板（有无回归测试证据），再按数据可得性与收益预期决定升档——而非凭挫败感直接跳微调。",
+      "notes": "正面场景: 从提示档升级的门槛判断（命中『prompt 不行再微调吗』语言信号，与 prompting-methodology 的衔接面）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "已经确定要从头预训练一个自己的小 Transformer 做代码补全。那架构上该堆多少层、注意力头怎么配、用不用相对位置编码？",
+      "expected_behavior": "不应激活 ml-pretraining-paradigm——用户已明确走自训路线，问题是骨架内部设计（层数/注意力/位置编码），应激活 ml-transformer-era；本 skill 管『要不要自己训』的高层决策，架构细节归那边。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-transformer-era 的分界——『要不要训』归本 skill，『训什么架构』归那边"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "还是用 API 的方案，但 few-shot 示例放三个好还是五个好？示例顺序影响大吗？要不要在结尾加一句 let's think step by step？",
+      "expected_behavior": "不应激活 ml-pretraining-paradigm——已确定留在提示档位内部，few-shot 选择/CoT 使用是提示施工规范，应激活 ml-prompting-methodology；本 skill 判停在档位 0 时执行权移交对方。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-prompting-methodology 的分界——档位间升降级 vs 档位内施工"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "传统图像项目：拿 ImageNet 预训练的 ResNet 抽特征接个 SVM，这种做法现在还推荐吗？跟大模型那套微调是一回事吗？",
+      "expected_behavior": "不应激活 ml-pretraining-paradigm 作为主责——B 段明确非 LLM 语境的传统迁移学习（预训练 CNN 特征提取）工具细节不同，勿照搬配方；合理动作是声明边界并按传统迁移学习常识回答。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): B 段排除项——考察不把 LLM 范式框架硬套到传统 CV 迁移学习"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们领域术语很特殊（半导体工艺），只有 200 条标注，但是可以无成本写规则把大部分输入转成标准化描述。这种情况还值得微调吗，还是在 prompt 里塞领域知识就够了？",
+      "expected_behavior": "合理判断: 应激活 ml-pretraining-paradigm 走三轴评估——数据量轴明确不足（<1k 判停），但『领域距离』轴因可预处理而缩短，恰好是提示工程能覆盖的形态；合理输出是维持低档位+利用预处理缩小领域距离，并把微调资格线讲清楚。",
+      "notes": "边界: 三轴中两轴冲突时的权衡——考察灵活应用决策树而非只看数据量一刀切"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "微调后的模型在我们测试集上涨了 6 个点准备汇报，但我隐约担心它别的方面变差了。上线前应该检查些什么？",
+      "expected_behavior": "合理判断: 应激活 ml-pretraining-paradigm 并强制执行其纪律条款——微调后必须做通用能力回归测试检测遗忘；同时『涨 6 个点』的结论可信度涉及测试集污染嫌疑（可串联 ml-llm-evaluation 三探针）。考察是否主动追加交付前检查而非只看涨幅数字。",
+      "notes": "边界: 微调收益验收的多重前提——skill 独有的回归测试纪律 + 与 llm-evaluation 的串联意识"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 架构细节(ml-transformer-era)、提示档内施工(ml-prompting-methodology)、非 LLM 传统迁移(B 段排除)。『档位内 vs 档位间』是与 prompting 分界的核心语言。should-not-trigger 全部必须通过。"
+}

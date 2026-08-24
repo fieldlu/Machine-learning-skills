@@ -1,0 +1,73 @@
+{
+  "skill": "ml-clustering-toolkit",
+  "version": "0.0.1",
+  "source_book": "《机器学习》 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "手里有两百万用户的消费行为数据，没有标签，老板让做用户分群。第一个问题就卡住了：到底该分成几类啊？k 取多少有没有说法？",
+      "expected_behavior": "应激活 ml-clustering-toolkit，执行 k 值指标扫描（DB指数/Dunn/轮廓系数随 k 变化）+ 任务语义复核，明确告知聚类没有客观标准答案（NFL 重演），指标只能缩小候选区间。",
+      "notes": "正面场景: 『聚类分几类』是 A2 场景 1 的标准话术，命中语言信号『how many clusters/k 值怎么定』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "用户行为数据想做分群，纠结半天了：kmeans 还是 dbscan？我看别人都用 kmeans，但我怀疑我们的数据不是一团一团的。",
+      "expected_behavior": "应激活 ml-clustering-toolkit，按数据形状选范式：团状凸簇走 k 均值，任意形状+噪声多走 DBSCAN，层次结构看 dendrogram 走 AGNES，并说明各自的隐藏前提。",
+      "notes": "正面场景: 聚类算法范式选型（A2 场景 2，命中『kmeans 还是 dbscan』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我把性别、城市这些列 label_encode 成数字之后直接跑了 kmeans，轮廓系数只有 0.08，是不是算法不行？城市这一列有一百多个取值。",
+      "expected_behavior": "应激活 ml-clustering-toolkit，指出对无序属性硬算欧氏距离是方法错误而非算法不行：有序属性才用闵氏距离，无序属性应走 VDM 或重新编码，并复核结果可信度。",
+      "notes": "正面场景: 无序属性硬算欧氏距离的典型事故（A2 场景 4）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "聚类跑完了，簇 1 的人我们就定义成高价值客户直接推运营策略了，报告都写好了。同事说簇不就是算法随便分的吗，我心里有点虚。",
+      "expected_behavior": "应激活 ml-clustering-toolkit，触发『簇≠真实类别』警报：聚类结果只是算法在给定距离度量下的分组假设，把簇当真实类别下业务结论须补证据强度论证（外部参考/业务语义复核），不能默认等价。",
+      "notes": "正面场景: 把簇当真实类别使用（A2 场景 5，本 skill 核心纪律之一）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我们数据有五万维基因表达，做个聚类之前发现样本间欧氏距离全都差不多，最近邻和最远邻没区别了。这问题本身该怎么处理？",
+      "expected_behavior": "不应激活 ml-clustering-toolkit——症状是高维距离趋同（维数灾难），属于聚类前的高维预处理，应激活 ml-dimensionality 先做降维/特征选择；clustering-toolkit 的 description 明确排除此环节。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-dimensionality 的分界——『聚类前距离已经失效』是降维的事，『聚类怎么选怎么评』才是本 skill"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我有历史客户的流失标签，想把客户分成几类然后分别预测会不会流失，分类模型还没定用啥。这个思路靠谱吗？该用什么方法做好？",
+      "expected_behavior": "不应激活 ml-clustering-toolkit——数据有标签且目标是预测，这是有监督任务，聚类至多是辅助画像手段；『该用什么方法』的横向选型应激活 ml-task-matching。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-task-matching 的分界——description 明确排除『有标签分类』；句子里出现『分成几类』字样但不构成聚类任务"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "sklearn 里 KMeans 的 n_init 参数是干嘛的？报错说 memory leak 是不是我内存不够了？",
+      "expected_behavior": "不应激活任何方法论 skill——n_init 用法是 API 检索问题，memory leak 报错是工程调试问题，均不走路由，直接回答。",
+      "notes": "诱饵: 纯代码/API 问题（router B 段明确不路由的类别，考验对『聚类词汇出现』的克制）"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我想从全量用户里找出行为异常的那一小撮人，听人说可以先用聚类，离所有簇都很远的点就是异常的，这个做法行不行？",
+      "expected_behavior": "合理判断: 可激活 ml-clustering-toolkit 但必须按其 B 段边界声明——聚类可作异常初筛（远离簇中心/密度极低处），但不等于异常检测的完整方法论；应给出初筛定位+局限说明，若用户要完整异常检测体系则明示超出范围。",
+      "notes": "边界: 聚类与异常检测的交界——B 段明确『聚类可作异常初筛但不等于异常检测本身』，考察是否照搬边界条款而不一刀切拒绝"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "聚类的轮廓系数我算出来了，平均 0.42，k=4 的时候最高。这样是不是就能跟老板说 4 群是最优解了？",
+      "expected_behavior": "合理判断: 应激活 ml-clustering-toolkit 且触发其核心纪律——内部指标最优 ≠ 客观最优解，轮廓系数只衡量几何紧致度，必须叠加任务语义复核与稳定性检查才能汇报；预期动作是教用户把『指标扫描区间+语义佐证』一起呈现，而非背书单一最优 k。",
+      "notes": "边界: 内部指标与业务结论之间的鸿沟——prompt 字面在问『指标解读』（像评估问题），实际考的是『聚类没有客观标准』这条纪律的应用方式"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 时序上游(ml-task-matching 该不该聚类)、预处理上游(ml-dimensionality 高维距离失效)、下游误用(把簇当真实类别)。should-not-trigger 全部必须通过。"
+}

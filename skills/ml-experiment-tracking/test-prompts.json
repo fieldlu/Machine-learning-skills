@@ -1,0 +1,73 @@
+{
+  "skill": "ml-experiment-tracking",
+  "version": "0.1.0",
+  "source_book": "工程实践共识（业界公开文献与社区共识，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "明天要开始跑第一批实验了，想问下开工前要准备什么？random seed 要不要固定、配置怎么管比较稳、结果存哪里才不会一个月后找不到？",
+      "expected_behavior": "应激活 ml-experiment-tracking，给出新实验启动 checklist：钉种子（含 PYTHONHASHSEED/cudnn 标志）、配置版本化（Hydra/配置文件随 run 归档）、输出目录命名规范（experiment_timestamp）、环境快照 pip freeze。",
+      "notes": "正面场景: 实验开工前的记账准备（A2 场景 1，命中『随机种子』『配置怎么管』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "同一份代码我昨天和今天各跑了一遍，一行都没改，F1 差了 0.4 个点。代码里也没看到明显的随机性啊，这差异从哪来的？",
+      "expected_behavior": "应激活 ml-experiment-tracking，按过程失控排查未控随机源（种子未全钉/dataloader worker 种子/GPU 非确定性算子/数据文件悄悄变了），并指出这是账本缺失的典型症状。",
+      "notes": "正面场景: 同一份代码两次结果对不上（A2 场景 2，命中『复现不了/两次结果不一样』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "训练到第 30 个 epoch 显卡驱动崩了。我只保存了 model_state_dict，现在想接着训，optimizer 状态和 scheduler 进度全没了，是不是得从头来？checkpoint 到底应该存哪些东西？",
+      "expected_behavior": "应激活 ml-experiment-tracking，给出完整 checkpoint 内容清单（model/optimizer/scheduler/epoch/best_metric/config），说明断点续训的正确姿势与只存权重的后果。",
+      "notes": "正面场景: checkpoint 该存什么才能续训（A2 场景 4，命中『checkpoint 续训』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "导师问我三个月前那个 0.87 的结果是怎么跑出来的：用的哪个版本的数据、哪个 config、什么环境。我翻了半天 notebook 和聊天记录，找不到了……",
+      "expected_behavior": "应激活 ml-experiment-tracking，指出这是实验归档缺失的代价，给出实验结束归档 checklist（config+环境+数据版本 hash+指标与产物入库），让每个数字能回答『从哪来』。",
+      "notes": "正面场景: 事后溯源失败（A2 场景 3 与 5 的合体，命中『复现不了自己的数字』语言信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我要对比三个模型的最终性能，每个模型打算跑 5 次取平均再做 t 检验。这个重复次数和检验方法的选择有没有讲究？",
+      "expected_behavior": "不应激活 ml-experiment-tracking——问的是比较协议设计（重复运行次数/统计检验），属于评估方案设计，应激活 ml-evaluation-design；本 skill 是给实验过程上账本，不回答『怎么比才可信』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-evaluation-design 的分界——『跑几次怎么比』是协议设计，『每次跑的种子环境记没记』才是 tracking"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我 CV 分数 0.91，拿真实业务数据一测只有 0.72，差得也太离谱了。同事说可能是特征泄漏，帮我看看是不是这个问题？",
+      "expected_behavior": "不应激活 ml-experiment-tracking——分数对不上但病因怀疑是信息穿越（线下虚高线上暴跌），这是泄漏专项排查，应激活 ml-leakage-defense；tracking 管『过程失控导致的不可复现』，不管『分数本身虚高』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-leakage-defense 的分界——『分数为什么虚高』走泄漏审计，『数字为什么对不上』才走本 skill"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "wandb.init(project=...) 这个参数怎么填？报错说 API key 无效是怎么回事？",
+      "expected_behavior": "不应激活任何方法论 skill——工具 API 用法问题，直接回答，不走路由。",
+      "notes": "诱饵: 纯工具 API 问题（tracking 工具词汇出现，考验边界回退检查）"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "就写个一次性的探索脚本，随便试试几个想法，明知道大概率都不要了。这种情况也要搞全套 seed、config、归档吗？会不会太重了？",
+      "expected_behavior": "合理判断: 应激活 ml-experiment-tracking 但必须按其 B 段判停条件降级——探索性一次性脚本全套档案会拖垮节奏，降级为最低纪律（只钉种子即可）；考察是否机械执行全套 checklist 而不懂轻重。",
+      "notes": "边界: 全套纪律 vs 探索脚本的降级条款——skill 自己定义了轻重分级，考察是否照搬流程"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我们组两个人用完全相同的代码和数据跑同一个实验，一个人 0.83 一个人 0.79。是不是有人偷改了代码？还是谁抄错了参数？",
+      "expected_behavior": "合理判断: 应激活 ml-experiment-tracking 做差异来源定位（对比两边的种子/配置 diff/环境/数据版本），这正是『复现不了别人的数字』的场景；同时注意若排除过程因素后差距仍在，可能引向评估协议问题（可串联 ml-evaluation-design 复核划分方式）。",
+      "notes": "边界: 过程失控 vs 协议不一致的双重嫌疑——主归属在本 skill（先查账本），但保留向 evaluation-design 的转介意识"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 协议设计上游(ml-evaluation-design)、虚高病因(ml-leakage-defense)、效果归因下游(ml-diagnosis)。『过程失控 vs 结果虚高』是本 skill 最锐利的分界语。should-not-trigger 全部必须通过。"
+}

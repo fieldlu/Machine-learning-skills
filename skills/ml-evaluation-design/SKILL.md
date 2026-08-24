@@ -191,4 +191,5 @@ related_skills:
 
 - **验证通过**: V1 ✓ / V2 ✓ / V3 ✓（f05/f06/f07/f08 + x04-x11/x16-x18 + c03-c10/c20 共 23 单元，见 verified-fp.md / verified-xc.md）
 - **测试通过率**: 待阶段 4 压力测试（test-prompts.json）
+- **skill_version**: 0.0.1
 - **蒸馏时间**: 2026-08-24

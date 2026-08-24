@@ -1,0 +1,73 @@
+{
+  "skill": "ml-semisupervised",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "医学影像项目，专家标注太贵了，手里只有 300 张标注切片，但医院还有五万张没标注的同设备影像。这些未标注的能拿来提升模型吗？怎么用才靠谱？",
+      "expected_behavior": "应激活 ml-semisupervised，执行资格线检查（标注真不够/未标注同源均通过）→验证聚类/流形假设→选路线（生成式/S3VM/基于分歧/图传播）→强制纯监督基线对照。",
+      "notes": "正面场景: 标注贵数据贱的经典开局（A2 场景 1+5，命中『只有几百条标注』『未标注数据怎么用』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我实现了 self-training：用初始模型给未标注数据打伪标签再重新训练。结果加了伪标签之后验证集反而掉了 3 个点！这是为什么？越加越差不是应该更准吗？",
+      "expected_behavior": "应激活 ml-semisupervised，解释免费午餐反噬机制：模型假设不准时利用未标记样本会降低泛化性能（书中核心警告），伪标签错误被自我强化；处置指向置信度过滤/纯监督基线对照。",
+      "notes": "正面场景: self-training 掉点（A2 场景 2，命中『pseudo-label/self-training 掉点』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "想做协同训练，听说需要两个『视图』。我们的用户数据可以切成行为特征和画像特征两块，这算两个合格的视图吗？前提条件是什么？",
+      "expected_behavior": "应激活 ml-semisupervised，执行协同训练前提审查：充分且条件独立的两个视图——并指出高度相关的特征切块不满足独立性前提，分歧无法互相纠错。",
+      "notes": "正面场景: 协同训练双视图前提（A2 场景 4，命中『协同训练/co-training』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "预算有限要分配标注经费。同事说该做主动学习让模型挑最有价值的样本来标，另一人说半监督直接吃无标注的不要钱。这两个到底啥区别？我该往哪个方向投入？",
+      "expected_behavior": "应激活 ml-semisupervised，讲清边界：主动学习有人工查询交互（花钱但精准）、半监督零交互消化未标注（免费但有桥梁假设风险），按预算与质量需求给出方向建议。",
+      "notes": "正面场景: 主动学习与半监督的区别澄清（命中『主动学习和半监督有什么区别』语言信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我有完整的标注数据五十万条，监督模型效果也够用。同事建议再抓一批网上爬的无标注数据进来做 pseudo-label 提升一下，有必要折腾这个吗？",
+      "expected_behavior": "不应激活 ml-semisupervised 作为主责——B 段明确排除『标注充足、监督已好用』的场景：引入半监督是净增风险（多一层桥梁假设），没有收益就没有理由；合理输出是劝阻而非进入路线选择流程。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): B 段资格线的反向考题——pseudo-label 词汇出现但资格线不过关"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我们想从零开始预训练一个领域大模型，手头有几个 T 的无标注语料。这种大规模无监督利用跟半监督是一回事吗？该按什么框架来规划？",
+      "expected_behavior": "不应激活 ml-semisupervised——B 段明确排除自监督预训练：几个 T 语料的利用是自监督/预训练范式问题（ml-pretraining-paradigm 领地），与『少量标注+大量未标注同源』的半监督格局完全不同。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-pretraining-paradigm 的分界——同为『用无标注数据』，自监督预训练 vs 半监督是不同范式"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "客户给了完全没有标签的用户行为数据，就想把用户分成几类做运营。没有标签也能聚类吧？k 取多少合适？",
+      "expected_behavior": "不应激活 ml-semisupervised——这是纯粹的无监督聚类任务（无任何标注锚点），应激活 ml-clustering-toolkit；半监督的前提是存在少量标注，此处一张标签都没有。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-clustering-toolkit 的分界——『无标签聚类』vs『少量标注+大量未标注』"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们的未标注数据来自另一个事业部的 App，用户群体和标注数据明显不一样，采集时间也早了一年。这种情况下还能用半监督吗？",
+      "expected_behavior": "合理判断: 应激活 ml-semisupervised 且触发其 B 段资格线红灯——未标注与标注明显异源（不同人群/不同时间段且可能漂移），桥梁假设从地基上不成立；合理输出是判停（不建议直接用），并说明若强行使用需先做分布对齐与同源性论证。",
+      "notes": "边界: 同源性资格审查的红灯案例——skill 自己的第一道关卡就是查同源，考察是否照常开工而不拦停"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "图神经网络上做标签传播，只标注了一小部分节点，剩下节点靠图结构扩散标签。这套东西算你们说的半监督吗？归谁管？",
+      "expected_behavior": "合理判断: 图传播正是本 skill 路线清单中的一项（基于图的半监督/标签传播出自西瓜书 13 章），应激活 ml-semisupervised 认领；但需注意 GNN 实现层细节超出本书语境（如实声明外推），安全纪律（纯监督基线对照/假设校验）仍然适用。考察不因『GNN』字样而推诿归属。",
+      "notes": "边界: 经典图半监督与现代 GNN 的名实之辨——方法谱系确属本 skill，实现层须声明时代外推"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 无标签纯聚类(ml-clustering-toolkit)、自监督预训练(ml-pretraining-paradigm)、标注充足的反向资格线(B 段)。『同源性+资格线』是本 skill 的第一道闸门考点。should-not-trigger 全部必须通过。"
+}

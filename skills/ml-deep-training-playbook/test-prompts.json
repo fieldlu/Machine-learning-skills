@@ -1,0 +1,73 @@
+{
+  "skill": "ml-deep-training-playbook",
+  "version": "0.0.1",
+  "source_book": "经典文献共识（Goodfellow《Deep Learning》及 2010-2019 深度学习奠基论文）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "ResNet50 在我们数据集上训了两个 epoch 就 NaN 了，loss 直接爆掉。我完全不知道从哪查起，lr 已经减了一半还是炸。",
+      "expected_behavior": "应激活 ml-deep-training-playbook，进入固定排查链：先廉价检查（数据管道/fp16 溢出/log(0)）→初始化归一化→学习率扫描→warmup 缺失导致的假性发散，按先廉价后昂贵的顺序逐步排除，每步带完成标准。",
+      "notes": "正面场景: NaN/发散无从下手（A2 场景 1，命中语言信号『NaN/loss 爆了』）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "写 training script 的时候纠结：初始化用 Xavier 还是 He？BN 和 LayerNorm 到底怎么选？我看有的代码俩都加了。",
+      "expected_behavior": "应激活 ml-deep-training-playbook，按架构类型给默认配方（He 配 ReLU 系、Transformer/LN 场景），并提醒单变量原则——一次改一个旋钮否则涨跌无法归因。",
+      "notes": "正面场景: 初始化/归一化配置纠结（A2 场景 2，命中『Xavier 还是 He』『BN 还是 LN』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "大 batch 训练 loss 前几百步就飞了，有人让我加 warmup，有人让我换 AdamW，还有人说 cosine decay。这些调度到底怎么配？有没有先后顺序？",
+      "expected_behavior": "应激活 ml-deep-training-playbook，识别 warmup 缺失导致的假性发散（大 batch/大模型热启动头几百步炸掉常被误诊为模型不行），按优化器→调度器的既定顺序给配置路径，反对一次改三个旋钮。",
+      "notes": "正面场景: warmup/优化器/调度组合配置（A2 场景 2，命中『warmup』『Adam 还是 SGD』『cosine 调度』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "12 层的网络，前面几层权重基本没变化，后半段 loss 震荡得厉害。是不是梯度传不到底？怎么确诊，确诊了怎么治？",
+      "expected_behavior": "应激活 ml-deep-training-playbook，按梯度监控步骤确诊 vanishing/exploding gradient（逐层梯度范数统计），处置指向归一化/残差连接/梯度裁剪/初始化修正，而非盲目调 lr。",
+      "notes": "正面场景: 梯度消失/爆炸的确诊与处置（A2 场景 3，命中『梯度消失』语言信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "课程作业要求手写 BP 网络：一个 hidden layer、sigmoid 激活，做 MNIST。我的 loss 一直在 2.3 附近来回震荡不下降，learning rate 从 0.5 试到 0.001 都不行，是不是撞局部极小了？",
+      "expected_behavior": "不应激活 ml-deep-training-playbook——这是经典浅层 BP 小网络的训练动力学问题（sigmoid 饱和/学习率两难/局部极小/多组初值），属于西瓜书第 5 章语境，应激活 ml-neural-training；playbook 管 Transformer/ResNet 时代的深度现代训练栈。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-neural-training 的分界（最难的一条）——同为『loss 不降』，经典 BP 小网络归 neural-training，深度现代训练栈（初始化/归一化/warmup/Adam）才归本 skill"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我的 ViT 训练很正常，loss 平稳下降最后收敛了，但是验证集 accuracy 比 CNN baseline 低了 8 个点。是不是哪里没配好？",
+      "expected_behavior": "不应激活 ml-deep-training-playbook——训练动力学正常（loss 平稳收敛），问题是泛化差距，应激活 ml-diagnosis 做偏差-方差归因；playbook 的 description 明确排除『训练正常但泛化差』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-diagnosis 的分界——『loss 降得好但 val 掉队』是诊断问题不是训练故障"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "新项目要做电商评论的情感分类，几万条文本。我在想要不要整个 Transformer 来做，还是传统方法就够了？",
+      "expected_behavior": "不应激活 ml-deep-training-playbook——架构尚未确定，处于训练前的选型阶段，应激活 ml-transformer-era（数据量×形态×算力三轴匹配）；playbook 假设架构已定、只管执行层。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-transformer-era 的时序分界——先选骨架再来 playbook，先鸡后蛋必然返工"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们在预训练一个 1.2B 的语言模型，loss 曲线非常平滑地在缓慢下降，没有任何异常，但同事说按他的经验这个绝对值偏高，是不是我们哪里有 bug？",
+      "expected_behavior": "合理判断: 若进入本 skill 必须先按其 B 段『时代局限』重新标定——scaling law 语境下 loss 平滑但绝对值偏高是常态，与病态发散/平台期是完全不同的问题，经典『loss 不降=出 bug』的直觉在此失效；合理动作是对照 scaling law 预期曲线判断，而不是套排查链找 bug。",
+      "notes": "边界: 大模型 scaling 语境对『训练不动』的重新标定——skill 自己声明了这条外推边界，考察是否机械套用经典排查链"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "8 卡 DDP 训练，速度比单卡还慢，而且每隔一段时间所有进程卡死不动。是不是我的模型有问题？要不要调学习率？",
+      "expected_behavior": "合理判断: 不应直接进入训练超参排查——多卡同步 bug、数据加载器死锁是分布式工程故障，症状相似但根因在工程侧，本 skill 的 B 段明确要求最先排除这类故障；合理动作是先查通信/数据管道，排除后再谈训练方法论。",
+      "notes": "边界: 训练方法论与系统工程故障的分界——症状以『训练慢/不动』呈现但病根不在训练配置"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 经典 BP vs 深度现代(ml-neural-training，最难分界)、优化端 vs 泛化端(ml-diagnosis)、架构未定(ml-transformer-era)。should-not-trigger 全部必须通过。"
+}

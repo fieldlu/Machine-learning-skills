@@ -4,6 +4,8 @@
 >
 > 本表由阶段 1 的 193 条候选术语裁剪而来，收录约 60 条核心术语。裁剪标准：①跨章复用 ≥3 次（如过拟合贯穿 ch2/3/4/5/6/11），或②为某个子 skill 的关键概念（如"好而不同"之于 ml-ensemble-design）。完整 193 条底稿见 `books/ml-jiqi-xuexi/candidates/glossary.md`。
 >
+> **批B/批C 增补**：合集扩容后新增 18 个子 skill 覆盖深度训练与大模型场景，这些 skill 的关键概念不在原书内——按主题分组追加于各节末尾（标注 ◆），定义来自对应子 skill 锚定的经典文献共识/工程实践共识，引用时注意与原书语境的外推边界。
+>
 > "关联 skill"列指向仓库 `skills/` 下对应子 skill；路由入口见 `skills/ml-methodology-router`。
 
 ---
@@ -42,6 +44,12 @@
 | Friedman 检验/Nemenyi 后续检验 | Friedman test / Nemenyi post-hoc test | 多个算法在一组数据集上按序值排序的检验；拒绝"全部相同"后再用 Nemenyi 临界值域 CD 区分配对——检验图上横线段交叠=无显著差别 | ml-evaluation-design |
 | 偏差-方差分解 | bias-variance decomposition | 泛化误差 = 偏差² + 方差 + 噪声，分别刻画拟合能力、数据扰动影响、问题固有难度；两者冲突（窘境），训练程度是调节旋钮 | ml-diagnosis, ml-ensemble-design |
 | 噪声 | noise | 当前任务上**任何学习算法**所能达到的期望泛化误差的下界——问题固有难度，不是"脏数据"；给一切优化画了天花板 | ml-diagnosis |
+| ◆ 随机种子 | random seed | 控制一切伪随机过程（初始化/打乱/dropout）的起点；钉种子是可复现的最低纪律——但深度训练方差大，单 seed 下的小差距多数是噪声，须多 seed 报告 | ml-experiment-tracking |
+| ◆ 数据泄漏 | data leakage | 训练时接触了部署时不可能获得的信息（特征-目标泄漏/训练-测试污染/过程泄漏三大类型）；症状是线下虚高线上暴跌、特征重要性一骑绝尘 | ml-leakage-defense, ml-pitfall-audit |
+| ◆ 嵌套交叉验证 | nested cross validation | 外层循环评估泛化、内层循环选超参的双层结构；调参必须在评估层之内进行，否则"用测试集调参再在同一测试集上报分"会系统性虚高 | ml-hpo-strategy, ml-evaluation-design |
+| ◆ 超参扫描 | hyperparameter sweep | 对超参空间的一轮系统化搜索（网格/随机/贝叶斯）；空间设计纪律：跨数量级参数用对数尺度采样、区分高价值参数与低敏感参数 | ml-hpo-strategy |
+| ◆ 检查点 | checkpoint | 训练状态的持久化快照；断点续训要求完整保存 model/optimizer/scheduler/epoch/config，只存 model_state_dict 会丢失优化动量无法正确续训 | ml-experiment-tracking |
+| ◆ 基准污染 | benchmark contamination | 测试题目泄入预训练语料导致榜单分数虚高——模型可能只是"背过答案"；LLM 时代 NFL 教训重演的一部分，榜单分数是参照物不是成绩单 | ml-llm-evaluation |
 
 ## 三、经典模型关键概念（第3–7章）
 
@@ -63,6 +71,7 @@
 | 贝叶斯网 | Bayesian network | 借助有向无环图刻画属性依赖关系、用条件概率表描述联合分布；是独立性假设放松谱系（朴素→半朴素→任意依赖）的"任意依赖"端 | ml-bayesian-thinking |
 | 推断/近似推断 | inference / approximate inference | 通过证据变量的观测推测查询变量取值的过程；精确推断 NP 难，降级路径分随机化（MCMC/吉布斯采样）与确定性（变分推断）两条 | ml-bayesian-thinking |
 | EM 算法/隐变量 | Expectation-Maximization / latent variable | 存在未观测的隐变量时，交替执行"E 步据当前参数推断隐变量分布、M 步最大化期望似然"直至收敛；只收敛到局部最优，k-means/高斯混合/HMM 共用此骨架 | ml-bayesian-thinking |
+| ◆ 目标编码 | target encoding | 用类别值对应的目标统计量（如该类别的平均标签）替换类别本身；高基数类别列的常用手段，但标签信息直接进入特征——必须折外/K 折计算并加平滑先验，否则是教科书级泄漏 | ml-feature-engineering, ml-leakage-defense |
 
 ## 四、集成学习（第8章）
 
@@ -100,10 +109,25 @@
 | 未标记样本/半监督学习 | unlabeled sample / semi-supervised learning | 无标记但包含数据分布信息的廉价样本；**模型假设不准时，利用它们反倒会降低泛化性能**——免费午餐会反噬，须保留纯监督基线对照 | ml-pitfall-audit, ml-theory-compass |
 | 主动学习/伪标记 | active learning / pseudo-label | 先用已有模型挑最有价值的样本请专家查询（与半监督的区别在于有无外界交互）/ 把学习器对未标记样本的预测当作其"标记"使用——自训练与协同训练的核心机制，漂移场景下会自我强化偏差 | ml-pitfall-audit, ml-theory-compass |
 
+## 七、◆ 深度与大模型时代增补（批B/批C 子 skill 关键概念，非原书内容）
+
+| 术语 | 英文 | 一句话定义（文献共识用法） | 关联 skill |
+|---|---|---|---|
+| 注意力机制/自注意力 | attention / self-attention | 每个位置以 query 对全部位置的 key 做相似度匹配、按权重加权聚合 value 的信息路由机制；自注意力中 Q/K/V 同源生成，序列内任意两位置直接连接——长程依赖一步可达，但本身置换不变 | ml-transformer-era |
+| 位置编码 | positional encoding | 外挂给模型的位置信息（正弦编码/可学习/相对位置等）：自注意力对输入顺序天然无感，没有它"猫咬狗"与"狗咬猫"无法区分——序列顺序必须显式注入 | ml-transformer-era |
+| LoRA | Low-Rank Adaptation | 参数高效微调（PEFT）代表：冻结原权重、只训练一对低秩分解矩阵 ΔW=BA；单卡即可微调大模型，秩是容量旋钮——与全参微调的分界在算力轴与领域距离轴 | ml-pretraining-paradigm |
+| 上下文学习 | in-context learning (ICL) | 不更新任何参数、仅靠 prompt 中给出的少量示例完成新任务的能力（GPT-3 揭示）；few-shot 示例的选择与顺序直接决定效果——提示档位的理论基础 | ml-prompting-methodology, ml-pretraining-paradigm |
+| 思维链 | chain-of-thought (CoT) | 在 prompt 中引导模型输出中间推理步骤再给答案的技巧；只在多步推理任务有增益，简单分类任务纯属浪费且徒增延迟与 token 成本 | ml-prompting-methodology |
+| 基于人类反馈的强化学习 | RLHF (Reinforcement Learning from Human Feedback) | 用人类偏好数据训练奖励模型、再用强化学习优化语言模型输出使其对齐人类偏好的三阶段范式——RL 资格验证（延迟奖赏+序贯决策）在大模型对齐上的应用 | ml-rl-decision-loop, ml-pretraining-paradigm |
+| 双下降 | double descent | 模型规模/训练时长跨过插值阈值后测试误差先升后**再次下降**的现象；过参数化区间"训练 loss=0 却泛化良好"是常态而非 bug——经典"gap=过拟合"直觉需重新标定 | ml-overfitting-modern |
+| 缩放定律 | scaling law | 模型参数量、数据量、算力与损失之间跨越多个数量级近似成立的幂律关系；推论：loss 平滑但绝对值偏高可能是算力预算问题而非 bug，经典"loss 不降=出故障"直觉在大模型语境失效 | ml-deep-training-playbook, ml-transformer-era |
+| 灾难性遗忘 | catastrophic forgetting | 微调分布挤压预训练通用能力、旧技能崩坏的现象；缓解手段：低学习率/混入通用语料/更小 PEFT 秩/冻结策略——微调后必须做通用能力回归测试 | ml-pretraining-paradigm |
+| LLM 裁判 | LLM-as-judge | 用强模型给候选输出批量打分的自动评估方式；已知系统性偏差：位置偏差（偏先答者）、自偏爱（偏自家输出）、长度偏好——须换序平均/匿名化/长度控制校正 | ml-llm-evaluation |
+
 ---
 
 ## 统计与使用说明
 
-- **收录词条：62 条**（源：candidates/glossary.md 的 193 条；裁掉的主要是各章算法专属细节词，如增益率/SMO/势函数/FOIL 增益/Q-学习等——它们服务于具体算法实现，而非跨场景的方法论判断）
-- 按主题分组：基本概念 9 · 模型评估 16 · 经典模型 16 · 集成 6 · 聚类降维 8 · 理论与进阶 7
-- 使用方式：任一子 skill 被 ml-methodology-router 派发后，若用户对术语含义有疑问，回查本表而非重新解释；本表定义均为周志华原书语境下的用法，引用到其他语境（尤其深度学习/大模型场景）时注意外推边界。
+- **收录词条：79 条**（西瓜书原文 62 条，源：candidates/glossary.md 的 193 条；批B/批C 增补 17 条，标注 ◆，定义来自对应子 skill 锚定的经典文献共识/工程实践共识）
+- 按主题分组：基本概念 9 · 模型评估 22 · 经典模型 17 · 集成 6 · 聚类降维 8 · 理论与进阶 7 · 深度与大模型时代增补 10（原书裁掉的主要是各章算法专属细节词，如增益率/SMO/势函数/FOIL 增益/Q-学习等——它们服务于具体算法实现，而非跨场景的方法论判断）
+- 使用方式：任一子 skill 被 ml-methodology-router 派发后，若用户对术语含义有疑问，回查本表而非重新解释；一至六节定义均为周志华原书语境下的用法，第七节为现代文献语境——引用到其他语境时注意各自的外推边界。

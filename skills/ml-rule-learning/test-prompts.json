@@ -1,0 +1,73 @@
+{
+  "skill": "ml-rule-learning",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "信贷风控项目，合规部门明确要求：每个拒绝贷款的决定都必须能给监管和客户讲出明确的 if-then 理由。这种可解释是硬需求的情况下该用什么方法？规则模型怎么做？",
+      "expected_behavior": "应激活 ml-rule-learning，确认可解释是硬需求后进入其方法路线：命题规则 vs 一阶规则的判定、序贯覆盖生成、剪枝与后处理防贪心锁死。",
+      "notes": "正面场景: 可解释硬需求（A2 场景 1，命中『要可解释的规则/if-then』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我的数据是分子结构和它们的活性，样本之间的关系（原子键、环结构）用一张属性表根本表达不了。这种情况还能挖规则吗？听说有个 ILP？",
+      "expected_behavior": "应激活 ml-rule-learning，执行命题 vs 一阶的判定：对象间关系数据超出属性-值表达力，指向一阶规则学习/归纳逻辑程序设计（ILP）路线。",
+      "notes": "正面场景: 关系型数据的一阶路线判定（A2 场景 3，命中『ILP/一阶规则』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "用 WEKA 的 JRIP 挖了一组分类规则，训练集上几乎全对，但新样本一大半都落进了最后那条默认规则里。这是学歪了吗？问题出在哪个环节？",
+      "expected_behavior": "应激活 ml-rule-learning，按规则特有机制归因：默认规则高频触发指向覆盖不足/剪枝过度/贪心搜索锁死，处置指向后处理与剪枝策略调整——本 skill 的核心增量场景。",
+      "notes": "正面场景: 默认规则频繁触发的故障归因（A2 场景 4，命中语言信号，skill 独有的机制级考点）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "业务方拿来了 Apriori 从购物篮里挖出的关联规则，说这些规则直接拿来当分类器预测用户购买行不行？关联规则和分类规则到底什么关系？",
+      "expected_behavior": "应激活 ml-rule-learning，澄清关联规则与分类规则的差异（支持度-置信度框架 vs 有标记监督下的序贯覆盖），评估直接当分类器的坑。",
+      "notes": "正面场景: 关联规则 vs 分类规则的边界澄清（A2 场景 5，命中『关联规则和分类规则』语言信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我们还在讨论技术方案：这个欺诈检测任务到底要不要追求可解释？用黑箱 XGBoost 精度可能更高，用规则模型好交代但精度悬。这个取舍该怎么分析？",
+      "expected_behavior": "不应激活 ml-rule-learning 作为主责——用户还在犹豫『要规则模型还是黑箱』，处于选型阶段，应激活 ml-task-matching 做需求刻画与归纳偏好匹配；已锁定可解释需求之后的施工才归本 skill。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-task-matching 的分界——选型犹豫期 vs 已锁定的施工期；『要不要可解释』本身是选型议题"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "医疗诊断场景需要给出每个判断的概率和置信度，变量之间还有明确的依赖关系（症状→疾病→并发症）。想建个能输出概率的模型，白盒一点的。",
+      "expected_behavior": "不应激活 ml-rule-learning 作为主责——核心诉求是概率置信输出+依赖关系表达，同为白盒但概率图才是对口答案，应激活 ml-graphical-models；规则系统是确定性逻辑（真/假），无不确定性量化能力。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-graphical-models 的分界——同为白盒路线，确定性规则 vs 概率软依赖"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "决策树生成的树太大了，我想把它转成一组 if-then 规则再精简一下。sklearn 里 export_text 输出的规则格式怎么自定义？",
+      "expected_behavior": "不应激活任何方法论 skill——工具 API 用法问题（export_text 参数），直接回答，不走路由。",
+      "notes": "诱饵: 规则词汇高频出现但纯属实现细节，考验 router 边界回退检查"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "合规只要求模型整体可审计，不是每条判断都要解释。那我还需要专门的规则学习吗？还是说随机森林加个特征重要性报告就够了？",
+      "expected_behavior": "合理判断: 应激活 ml-rule-learning 但须先做资格线判断——B/A2 明确无可解释需求的精度优先任务不该上规则模型；『整体可审计』与『逐条可解释』的需求强度不同，合理输出是把需求强度翻译成方案档位（事后解释 vs 内在可解释），并说明两者的证据效力差异。",
+      "notes": "边界: 可解释需求的强度分级——考察不把『沾点可解释字样』一律路由到规则施工，而是先校准需求等级"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我挖出来的规则集精度不错，但有人质疑说规则之间会打架（两条规则同时命中给出不同结论）。这种冲突你们一般怎么处理？会不会影响上线？",
+      "expected_behavior": "合理判断: 应激活 ml-rule-learning 并调用其冲突消解纪律（排序法/投票法/集合覆盖序），同时点出这与集成思想同源（可串联 ml-ensemble-design 的结合策略视角）；上线前冲突消解顺序必须显式固定并可复现。",
+      "notes": "边界: 规则集内部冲突消解——skill A2/B 都提到的机制点 + 与 ensemble-design 的思想同源性"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 选型犹豫期(ml-task-matching)、概率白盒兄弟(ml-graphical-models)、纯 API 诱饵。『确定性规则 vs 概率软依赖』『选型 vs 施工』是两条最锐利的分界语。should-not-trigger 全部必须通过。"
+}

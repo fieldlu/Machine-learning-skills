@@ -1,0 +1,73 @@
+{
+  "skill": "ml-feature-engineering",
+  "version": "0.0.1",
+  "source_book": "工程实践共识（业界公开文献与社区共识，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "拿到一份信贷数据，第一次做这种表。收入这一列长尾分布得很厉害，要取对数吗？年龄要不要分箱？城市列几百个取值 one-hot 直接爆炸，这列该怎么处理？",
+      "expected_behavior": "应激活 ml-feature-engineering，按处理链逐列决策：数值列（偏态→log 变换、业务语义决定是否分箱）、高基数类别列（one-hot 爆炸→target encoding/哈希/频次编码并说明各自风险）。",
+      "notes": "正面场景: 新表格数据集各列怎么处理的经典开局（A2 场景 1，命中『标准化/对数/分箱』『高基数』多个语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我在做销量预测，想加滑动窗口特征：过去 7 天均值、上周同期值这些 lag features。但我担心窗口切不好会把未来的信息带进来，比如把当天销量也算进去了。构造这类特征有什么纪律吗？",
+      "expected_behavior": "应激活 ml-feature-engineering，讲清滞后特征的防漏纪律：窗口统计只能聚合严格早于预测点的信息、shift 对齐、折内拟合滚动统计，并说明这与全局切分方案的关系。",
+      "notes": "正面场景: 时序特征构造担心偷看未来（A2 场景 2，命中『滑动窗口/lag features』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "听说 target encoding 效果很好想给用户 ID 列用上，但又听说它很容易过拟合还可能泄漏。这个东西到底危险在哪，怎么用才安全？",
+      "expected_behavior": "应激活 ml-feature-engineering，解释目标编码的风险机制（标签信息直接进入特征→折外计算/K 折 target encoding/平滑先验），并说明它在本 skill 处理链中的位置与安全用法。",
+      "notes": "正面场景: 目标编码的安全使用（A2 场景 5，命中『目标编码』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "XGBoost 的 feature importance 第一名是一个用户注册流水号，重要性比第二名高三倍。这个特征要不要留着？感觉有点邪门。",
+      "expected_behavior": "应激活 ml-feature-engineering，识别 ID 类高基数特征的重要性红旗（记忆样本而非学到规律），给出复盘处置：剔除/降级为派生特征（如注册时段），并衔接泄漏排查意识。",
+      "notes": "正面场景: 特征重要性异常高的复盘（A2 场景 4，命中『feature importance looks weird』语言信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "特征现在有三百多个，感觉太冗余了，想砍到五十个以内。用 LASSO 自动筛好还是 PCA 压一下好？还是递归特征消除？",
+      "expected_behavior": "不应激活 ml-feature-engineering——已有特征池做减法（挑选/压缩）是特征选择问题，应激活 ml-dimensionality（过滤/包裹/嵌入三路线 + PCA）；两者的分界是『造池子』vs『选池子』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-dimensionality 的分界——description 明确排除『已有特征池挑选压缩』；先构造后挑选，此问在挑选段"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "图像分类任务，我想在 CNN 前面手工设计一些纹理特征喂进去会不会有帮助？还是端到端就够了？",
+      "expected_behavior": "不应激活 ml-feature-engineering——端到端深度学习场景下表示学习自动完成特征工作（B 段明确排除），手工特征流程基本不适用；此问的正确归宿是架构/范式讨论（ml-transformer-era/ml-task-matching 方向）。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): B 段边界——深度学习端到端场景手工特征工程基本不适用，考验是否见『特征』二字就激活"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "pandas 里 pd.get_dummies 和 OneHotEncoder 到底啥区别？fit_transform 在测试集上报错说 unseen category，怎么解决？",
+      "expected_behavior": "不应激活任何方法论 skill——API 区别与 handle_unknown 参数用法是纯实现问题，直接回答，不走路由。",
+      "notes": "诱饵: 纯代码问题（one-hot 词汇高频出现，考验 router 边界回退检查的克制力）"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我准备把归一化写在 train_test_split 之前，因为这样代码整洁一点，一起 fit 整个数据集再切分不行吗？顺序真的有那么重要？",
+      "expected_behavior": "合理判断: 骑在 feature-engineering 与 leakage-defense 分界线上的典型场景——『变换器在切分前还是切分后 fit』正是 feature-engineering 步骤 1（先切分）与 leakage-defense 的共同交界；合理动作是任一 skill 接手后立即指出这是过程泄漏（测试集统计信息泄入训练），必须先切分后拟合变换器。",
+      "notes": "边界: 特征构造纪律与泄漏防御的交界点——两 skill 的 related_skills 互指此处，考察接手后能否给出正确处方而不纠结归属"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "模型效果一般，我怀疑是特征不行。但是我也说不清是特征太少、还是现有特征质量差、还是该造新特征。这种情况第一步干嘛？",
+      "expected_behavior": "合理判断: 应激活 ml-feature-engineering 但须先做体检步骤（其处理链首步即『先切分→体检』），同时意识到效果差的系统性归因可能需要 ml-diagnosis 先行——特征侧整改是诊断开方后的常见药方之一；合理输出是『先诊断归因、再进特征施工』的双跳路由。",
+      "notes": "边界: 症状模糊时特征嫌疑与其他病因的排序——feature-engineering 自己的 A2 与 diagnosis 的衔接处，考察不困在单一视角"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 下游减法环节(ml-dimensionality 挑选 vs 本 skill 构造)、安检仪(ml-leakage-defense 全面审计)、端到端深度学习场景(B 段排除项)。should-not-trigger 全部必须通过。"
+}

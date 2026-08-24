@@ -1,0 +1,73 @@
+{
+  "skill": "ml-prompting-methodology",
+  "version": "0.1.0",
+  "source_book": "经典文献共识（Brown《GPT-3》、Wei《Chain-of-Thought》及 2020-2023 提示方法文献）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "做个信息抽取的 prompt，要求模型输出 JSON，但格式时好时坏，十次里有三次解析失败。是措辞的问题吗？还是我该用别的办法约束住输出？",
+      "expected_behavior": "应激活 ml-prompting-methodology，按其纪律回答：结构化输出靠 schema 约束（JSON mode/函数调用/格式校验重试）而非口头祈求，并建议把解析失败纳入回归测试统计。",
+      "notes": "正面场景: 输出格式不稳定（A2 场景 1，命中『输出 JSON 解析失败』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我的 prompt 改了一版效果变好了，但完全不知道为什么好。再改一句又变差了。这样改来改去太玄学了，有没有系统的迭代方法？",
+      "expected_behavior": "应激活 ml-prompting-methodology，执行其核心纪律：回归测试集驱动迭代——先固定一个小评测集，每次改动跑分对比，禁止无评估的玄学改写；prompt 当代码做版本管理。",
+      "notes": "正面场景: prompt 迭代玄学化（A2 场景 2，命中『时好时坏』『版本』语言信号，本 skill 核心纪律考题）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "few-shot 示例怎么挑？我手头有几百个例子，放几个进 prompt 合适？选哪些？顺序重要吗？",
+      "expected_behavior": "应激活 ml-prompting-methodology，给出 few-shot 选择纪律：按多样性与代表性挑选、数量适中、固定顺序（顺序本身影响输出），示例覆盖典型与边界 case。",
+      "notes": "正面场景: few-shot 示例选择（A2 场景 3，命中『few-shot 示例怎么选』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "听说思维链特别神，我给一个简单的情感二分类任务也加上了『让我们一步一步思考』，结果又慢又贵还掉点了。CoT 到底什么时候该用什么时候不该用？",
+      "expected_behavior": "应激活 ml-prompting-methodology，讲清 CoT 边界：只在多步推理任务启用，简单分类任务纯属浪费（本 skill 明确条款），并说明其代价（延迟/token 成本）。",
+      "notes": "正面场景: CoT 误用的边界判断（A2 场景 4，命中『CoT 有没有必要』语言信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "试了所有提示技巧输出质量还是上不去，我在想是不是该放弃 prompt 方案直接微调一个自己的模型了。这个决定该怎么权衡？",
+      "expected_behavior": "不应激活 ml-prompting-methodology 作为主责——根本问题是『该不该放弃提示转微调』的档位升降级决策，应激活 ml-pretraining-paradigm 的决策树；本 skill 只在确定留在提示档后开工。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-pretraining-paradigm 的分界——档位内施工 vs 档位间升降级；此问正骑在升档决策上"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我们准备在三个候选大模型里正式选型采购，需要一套严谨的评估流程证明哪个更适合我们的业务。每个模型的 prompt 都可以单独优化，但最终要的是能力结论。",
+      "expected_behavior": "不应激活 ml-prompting-methodology 作为主责——目标是模型能力的科学度量（选型态/验收态），应激活 ml-llm-evaluation（防污染/judge 校正/分布鸿沟）；prompt 回归集太小太局部，不能当能力结论的证据。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-llm-evaluation 的分界——开发态日常回归 vs 选型态能力度量；『最终要的是能力结论』是关键信号"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "XGBoost 的超参我调来调去也是时好时坏，有没有什么系统的方法能稳定住结果？是不是也该建个测试集每次跑分？",
+      "expected_behavior": "不应激活 ml-prompting-methodology——传统 ML 超参调优不在 prompt 回归那套语境里：『时好时坏』的系统方法是实验记录+评估协议+搜索策略（ml-experiment-tracking/ml-hpo-strategy/ml-diagnosis 领地）；B 段明确排除传统 ML 场景。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): B 段排除项——考察不把『prompt 回归测试』方法论外推到传统 ML 调参"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我的 prompt 回归集跑了三个月，分数从没掉过，但用户投诉却越来越多。这个回归集是不是有问题？问题出在哪一层？",
+      "expected_behavior": "合理判断: 可激活 ml-prompting-methodology 但须诊断回归集自身失效（分布漂移/覆盖缺口/goodhart 化），同时意识到若要解释『真实体验 vs 测试分数』的鸿沟，可能需升级到 ml-llm-evaluation 的自有分布抽测思路。合理输出是双跳：修回归集 + 引入更贴近真实分布的抽测。",
+      "notes": "边界: 开发态工具失效向验收态方法升级的临界点——考察不停留在修 prompt 而看见评估体系的层级问题"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "RAG 系统里检索到的文档内容变化也会影响输出质量，这种情况下 prompt 层面的回归测试还有意义吗？要不要连检索一起测？",
+      "expected_behavior": "合理判断: 应激活 ml-prompting-methodology 并诚实划界——prompt 回归测试只隔离 prompt 变量才有意义；系统级（含检索）波动超出单层测试的解释力，须分层归因（固定检索测 prompt、固定 prompt 测检索）；RAG 端到端体系超出合集范围的部分如实声明。",
+      "notes": "边界: 单层变量控制 vs 系统级测试的分界——考察变量隔离思想的应用与范围声明"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 档位升降级(ml-pretraining-paradigm)、能力度量(ml-llm-evaluation)、传统 ML 排除(B 段)。『开发态 vs 验收态』是与 llm-evaluation 分界的核心语言。should-not-trigger 全部必须通过。"
+}

@@ -1,0 +1,73 @@
+{
+  "skill": "ml-multiclass-strategies",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "手里只有现成的二分类器（SVM），现在要解决一个 8 类的分类问题。多分类怎么拆？OvO 和 OvR 到底差在哪，该用哪个？",
+      "expected_behavior": "应激活 ml-multiclass-strategies，按开销矩阵讲清 OvO（N(N-1)/2 个分类器、训练快存储多）vs OvR（N 个、存储少）的适用条件并给出选型。",
+      "notes": "正面场景: 二分类器解决 N 类问题的拆解选型（A2 场景 1+2，命中『ovo ovr 区别』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "听说 ECOC 纠错输出码有容错能力，想给 20 类问题用上。码本怎么设计？码长取多少合适？有没有讲究？",
+      "expected_behavior": "应激活 ml-multiclass-strategies，给出 ECOC 码本设计纪律：类间码距要远、子任务难度适中，码长与纠错能力的关系（码距决定可纠正位数），以及编码越长的开销代价。",
+      "notes": "正面场景: ECOC 码本设计（A2 场景 3，命中『ECOC/纠错输出码』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "人脸识别任务有一万个身份类别，同事提议两两配对训练 SVM。我隐约觉得不对劲但说不上来哪里不对。",
+      "expected_behavior": "应激活 ml-multiclass-strategies，触发大类数判死警报：OvO 开销随 N 平方增长，一万类≈5000 万个分类器当场判死；应改走 OvR/MvM 或原生多分类方案。",
+      "notes": "正面场景: 大类数仍套 OvO 的提前判死（A2 场景 5，书中万类反例的标准话术）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "10 类商品分类器搭好了，用的是 OvR 拆解。有人提醒我说拆出来的每个二分类里正负例比例悬殊，让我去做重采样。这有必要吗？",
+      "expected_behavior": "应激活 ml-multiclass-strategies，按书内论点回答：OvR/MvM 对每个类对称处理，拆解任务的失衡影响会相互抵消，通常无需专门处理；只有自定义非对称拆分（MvM 手工分组）时才需回头审查子任务比例。",
+      "notes": "正面场景: 拆解后子任务失衡要不要处理——本 skill 与 imbalanced 的交界面考题（A2 场景 4）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我的训练数据是 99:1 极度不平衡的二分类，accuracy 虚高得没法看。是不是该做 SMOTE 过采样或者调一下判决阈值？",
+      "expected_behavior": "不应激活 ml-multiclass-strategies——这是原始数据的类别比例失衡本身（度量失守/重采样/阈值移动），应激活 ml-imbalanced-learning；本 skill 管『多类怎么拆』的结构工程，不管『两类比例悬殊』的数据失衡。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-imbalanced-learning 的分界（A2 边界最关键一条）——『99:1 怎么办』走那边，『N 类怎么拆』走这边"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我想把 5 个不同算法的模型投票融合一下提升精度，硬投票和软投票怎么选？权重怎么定？",
+      "expected_behavior": "不应激活 ml-multiclass-strategies——目标是『为降误差而集成同质个体』，属于集成学习设计（好而不同/结合策略），应激活 ml-ensemble-design；拆解是为扩类别而生成异质任务，两者只是结合手段上有交集。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-ensemble-design 的分界——涨精度走 ensemble-design，支持 N 类输出走本 skill"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "SVM 单个二分类器内部：C 和 gamma 我一直不会设，还有文本数据上到底该用 linear kernel 还是 RBF？",
+      "expected_behavior": "不应激活 ml-multiclass-strategies——这是单个二分类器内部的间隔/核/参数决策，应激活 ml-svm-playbook；本 skill 只管外层拆解架构，内核施工归 playbook。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-svm-playbook 的分界——『SVM 做 N 类』= 本 skill 定拆解 + playbook 定内核，两层各答各的问题"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我的任务是给一篇文章打多个标签，一篇可能同时属于好几个类别。这个能用 OvR 那套拆解思路吗？跟普通多分类是一回事吗？",
+      "expected_behavior": "合理判断: 应激活 ml-multiclass-strategies 但须先声明边界——description 明确排除『多标记学习』；OvR 形式上相似但多标记的评估度量、标签相关性建模是完全不同的问题域，合理输出是指出差异并声明超出范围的部分，不假装等价处理。",
+      "notes": "边界: 多分类 vs 多标记的形式相似陷阱——考察是否照搬拆解框架而不触发 B/A2 排除项"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我们模型本身就是 softmax 原生多分类的神经网络，还需要了解这些拆解策略吗？还是说那都是老古董了？",
+      "expected_behavior": "合理判断: 应激活 ml-multiclass-strategies 且执行其步骤 1——先确认基分类器是否原生支持多分类：原生支持的模型无需外接拆解，拆解策略的价值场景正是 SVM/感知机这类二分类器；合理输出是确认『此处不需要』并说明何时才需要，而非机械推销拆解。",
+      "notes": "边界: 原生多分类器的免检通道——skill 自己的第一步就是资格检查，考察是否跳过资格检查直接开药"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 数据失衡(ml-imbalanced-learning)、精度集成(ml-ensemble-design)、内核施工(ml-svm-playbook)。『拆解结构 vs 类别比例』是本 skill 最锐利的分界语。should-not-trigger 全部必须通过。"
+}

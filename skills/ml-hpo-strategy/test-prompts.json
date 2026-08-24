@@ -1,0 +1,73 @@
+{
+  "skill": "ml-hpo-strategy",
+  "version": "0.1.0",
+  "source_book": "工程实践共识（业界公开文献与社区共识，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "要调 XGBoost 的超参了，GridSearchCV、random search、Optuna 贝叶斯优化……到底该用哪个？是不是贝叶斯优化一定更好？",
+      "expected_behavior": "应激活 ml-hpo-strategy，给出搜索算法选型决策：网格在高维空间指数爆炸、随机搜索在高维更划算、贝叶斯优化（TPE）在 trial 昂贵时占优但非免费午餐——按预算与维度选。",
+      "notes": "正面场景: HPO 算法选型（A2 场景 1，命中『grid 还是 random』『贝叶斯优化值得吗』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "定义搜索空间的时候拿不准：learning rate 从 1e-5 到 1，是线性扫还是对数扫？还有哪些参数值得搜、哪些直接用默认值就行？",
+      "expected_behavior": "应激活 ml-hpo-strategy，讲清搜索空间设计纪律：跨数量级参数用对数尺度采样、区分高价值参数（lr/正则/树深）与低敏感参数、空间大小与预算匹配。",
+      "notes": "正面场景: 搜索空间设计（A2 场景 2，命中『学习率对数尺度』『search space design』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "GPU 就一张卡，预算只够跑大概 60 个 trial。有没有办法提前砍掉那些明显没希望的配置？听说 Hyperband 是干这个的？",
+      "expected_behavior": "应激活 ml-hpo-strategy，介绍预算分配策略：Hyperband/successive halving 用早停淘汰机制把算力集中到有希望的配置上，并说明其前提（metric 可早读）与代价。",
+      "notes": "正面场景: 预算有限的分配策略（A2 场景 3，命中『Hyperband』『预算不够怎么分配』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "调参跑了一百多个 trial 了，最好成绩还是没超过 baseline 多少。继续烧下去有意义吗？还是说明该换方向了？另外我发现每次搜索出来的 best config 都不一样，正常吗？",
+      "expected_behavior": "应激活 ml-hpo-strategy，执行止损判断与过拟合验证集的甄别：连续无起色先回查归因是否做对；best config 不稳定提示验证集噪声或调参过拟合——需检查评估协议而非加大搜索量。",
+      "notes": "正面场景: 止损判停 + 调参过拟合怀疑（A2 场景 5，命中『还没提升要不要继续』『best config 不一样』语言信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我的模型训练集准确率才 65%，加什么特征都上不去。朋友说把超参好好搜一搜就能救回来，准备让我开 Optuna 大干一场。这个思路对吗？",
+      "expected_behavior": "不应激活 ml-hpo-strategy 直接开搜——这是归因未做就开搜的反模式（hpo B 段最高频预算浪费）：训练集都上不去指向偏差主导/欠拟合，应先激活 ml-diagnosis 做偏差-方差归因；确认『值得精修』后 hpo 才接管。合理输出是双跳路由建议。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-diagnosis 的分界——顺序铁律『先 diagnosis 开药方，再本 skill 定怎么搜』；此 prompt 正考这条顺序"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "sklearn 的 GridSearchCV 里 cv 参数填整数和填 KFold 对象有什么区别？n_jobs=-1 是啥意思？",
+      "expected_behavior": "不应激活任何方法论 skill——纯 API 参数用法问题，直接回答，不走路由。",
+      "notes": "诱饵: 纯代码问题（grid search 词汇出现，考验 router 边界回退检查）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我每次实验的结果都没法追溯：跑了啥配置、用的哪个数据版本全都记不清了，想搭一套记录流程，从哪开始？",
+      "expected_behavior": "不应激活 ml-hpo-strategy——诉求是实验记账纪律（种子/配置/环境/产物归档），应激活 ml-experiment-tracking；HPO 管的是『怎么搜得聪明』，tracking 管的是『每个 trial 记了什么』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-experiment-tracking 的分界——搜索决策 vs 过程记账；几十个 trial 的产出正需要 tracking 才能复盘"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "神经网络的架构本身我也想自动化搜一下（多少层、每层多宽、连接方式），这个也能用 Optuna 搜吗？跟普通调参是一回事吗？",
+      "expected_behavior": "合理判断: 应激活 ml-hpo-strategy 但须按其 B 段声明边界——NAS（架构搜索）是与超参搜索不同量级的问题域，本 skill 只覆盖训练超参与少量结构超参（层数/宽度可勉强纳入），完整 NAS 超出范围须明示；考察是否照单全收而不划界。",
+      "notes": "边界: HPO 与 NAS 的量级分界——skill 自己声明的排除项，考察边界意识"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "老板问学习率设 3e-4 行不行。我就想要一个能直接抄的推荐值，不想搞什么搜索流程，有这种表吗？",
+      "expected_behavior": "合理判断: 不应启动完整 HPO 流程——B 段明确『只是想要某个参数的推荐默认值，查框架文档默认值即可，不值得启动搜索』；合理输出是给常见默认值参照（并注明来源语境），同时点一句何时才值得真的搜。",
+      "notes": "边界: 推荐默认值 vs 启动搜索的资格线——考察克制，不为小问题动用重流程"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 归因前置(ml-diagnosis 先诊断再搜索的铁律)、记账兄弟(ml-experiment-tracking)、协议上游(ml-evaluation-design 的嵌套 CV)。should-not-trigger 全部必须通过。"
+}

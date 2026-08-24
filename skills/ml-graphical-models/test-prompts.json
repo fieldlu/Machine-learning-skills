@@ -1,0 +1,73 @@
+{
+  "skill": "ml-graphical-models",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们有一组传感器和设备状态变量，想让模型表达它们之间的依赖关系，而不是每个变量独立预测一遍。这种多变量联合建模该用什么框架？贝叶斯网络结构怎么定？",
+      "expected_behavior": "应激活 ml-graphical-models，走其建模决策：先判关系是因果向（有向网）还是相关对称（无向场）→结构由专家给定或从数据学习→再谈推断路线。",
+      "notes": "正面场景: 多变量依赖建模（A2 场景 1，命中『变量之间的依赖关系』『贝叶斯网络结构』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "做命名实体识别这种序列标注任务，纠结用 HMM 还是 CRF。观测序列和隐状态怎么对应？这两个到底差在哪？",
+      "expected_behavior": "应激活 ml-graphical-models，按生成式 vs 判别式的图结构差异讲清 HMM/CRF 的适用条件与观测-隐状态对应关系。",
+      "notes": "正面场景: 序列标注的图模型选型（A2 场景 2，命中『HMM』『CRF 还是 HMM』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "贝叶斯网建好了，40 个节点，变量之间连得比较密，精确推断直接跑不动了。是该换算法还是把网络简化？MCMC 和变分推断这时候怎么选？",
+      "expected_behavior": "应激活 ml-graphical-models，执行推断决策树：精确推断不可行（团规模过大）→变量消去/信念传播仍不行→在 MCMC（慢但渐近准）与变分（快但带近似偏差）间按需求选路，并提示可回头审结构。",
+      "notes": "正面场景: 推断跑不动的降级路线（A2 场景 3+4，命中『变分推断还是 MCMC』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "接手了前同事留下的一个概率图项目，图是他手画的，条件概率表是拍脑袋填的。我该怎么审查这个模型靠不靠谱？结构应该谁说了算？",
+      "expected_behavior": "应激活 ml-graphical-models，进入结构审阅流程：这个结构是谁定的、每条边代表的条件独立关系是否合理、参数估计有无数据支撑——A2 场景 5 的标准动作。",
+      "notes": "正面场景: 审阅他人图模型（A2 场景 5）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "只有几百条标注但是有几万条没标注的同源数据，听说可以用标签传播把没标注的利用起来。这个思路可行吗？",
+      "expected_behavior": "不应激活 ml-graphical-models——用户目标是『利用未标注数据』，图传播只是借用图结构做半监督，不涉及概率推断路线；应激活 ml-semisupervised（其资格审查与安全对照在那边）。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-semisupervised 的分界——『借图的半监督』归那边，『表达与推断变量间依赖』才归本 skill"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "朴素贝叶斯做文本分类效果很差，怀疑属性条件独立性假设太强了。有没有办法放松这个假设？还有我的 EM 算法老收敛到奇怪的地方怎么办？",
+      "expected_behavior": "不应激活 ml-graphical-models——这是单个分类器的概率建模问题：独立性谱系放松（朴素→半朴素→贝叶斯网选档）与 EM 局部最优纪律归 ml-bayesian-thinking；本 skill 管多变量网络的图结构与推断路线，单模型假设纪律不在其内。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-bayesian-thinking 的分界——朴素贝叶斯/EM/独立性谱系在那边；多变量纠缠成网才来这边"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我要做一个贷款审批系统，合规部门要求每个拒绝决定都能给出明确的 if-then 理由，不需要概率，就是硬规则审计。用什么方法好？",
+      "expected_behavior": "不应激活 ml-graphical-models——需要的是确定性逻辑规则而非带不确定性的软依赖，白盒路线里规则系统才是对口答案，应激活 ml-rule-learning；本 skill 的价值主张是概率推断，与『硬规则、无概率』的需求错位。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-rule-learning 的分界——同为白盒，确定性规则 vs 概率软依赖"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我想搞清楚用户流失背后哪些因素相互影响，最好能有个直观的结构图给业务方讲。但我只有两万条样本，够吗？是不是直接上相关性热力图就行了？",
+      "expected_behavior": "合理判断: 可激活 ml-graphical-models 但须先泼冷水——B 段边界指出数据量远小于可靠结构学习所需且没有领域知识时，学出的结构是精致空想；合理输出是给出替代路径（专家定结构的轻量图/或坦承此处只需探索性分析），并说明相关性热力图≠依赖结构。",
+      "notes": "边界: 数据量不足以学结构的资格线——考察是否照常开工而不触发 B 段『空想图』警告"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "特征有一千多个变量互相纠缠，有人说用 PCA 压到 50 维就解耦了，有人说建个图模型把依赖显式画出来。这两条路我该听谁的？",
+      "expected_behavior": "合理判断: 这是 dimensionality 与 graphical-models 的经典分岔口——目标是压缩表示（后续喂黑箱模型）→ PCA 归 ml-dimensionality；目标是读懂依赖+做概率推断（可解释的条件独立结构）→ 本 skill。合理动作是按用户下游用途反问澄清后派发，而非默认一条路。",
+      "notes": "边界: 降维 vs 图模型的『多变量纠缠』双解——skill A2 明确写了这条区分（投影到低维 vs 显式写成图），考察按目标分流而非按症状分流"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 单模型概率纪律(ml-bayesian-thinking)、借图的半监督(ml-semisupervised)、白盒兄弟(ml-rule-learning)。should-not-trigger 全部必须通过。"
+}

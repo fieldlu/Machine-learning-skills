@@ -1,6 +1,6 @@
 {
   "skill": "ml-dimensionality",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "source_book": "《机器学习》 — 周志华",
   "darwin_compatible": true,
   "test_cases": [

@@ -1,0 +1,73 @@
+{
+  "skill": "ml-rl-decision-loop",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我想做一个动态定价系统：每次调价会影响用户后续的购买行为，一个价格策略好不好要好几天之后才知道。这种任务能用普通的监督学习做吗？还是必须上强化学习？",
+      "expected_behavior": "应激活 ml-rl-decision-loop，执行资格验证：动作影响后续局面（序贯决策）+ 奖赏延迟揭晓，两条资格线都命中——与一次性预测有根本差异，指向 RL 范式。",
+      "notes": "正面场景: 序贯决策+延迟奖赏的资格判断（A2 场景 1）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "给训练 agent 设计 reward 卡住了：每步给 0 只有终点给 1 的话完全学不动，随便给点中间奖励又导致 agent 学会刷分不走正路。奖励函数到底该怎么设计？",
+      "expected_behavior": "应激活 ml-rl-decision-loop，处理奖赏设计缺陷：稀疏奖励训不动的成因（信用分配困难）与稠密奖励被钻空子的风险（reward hacking 倾向），给出折中设计思路。",
+      "notes": "正面场景: 奖励函数设计纠结（A2 场景 2，命中『reward 怎么设计』『稀疏奖励』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我实现的 Q-learning 行为很怪：agent 要么永远重复第一个找到的动作从不尝试新东西，要么全程乱试根本不收敛。是不是探索没做好？epsilon 该怎么设？",
+      "expected_behavior": "应激活 ml-rl-decision-loop，定位探索利用失衡：固化=探索不足、乱试=利用缺失，按 ε 贪心/Softmax 温度给出折中配置与衰减策略。",
+      "notes": "正面场景: 探索利用窘境的行为诊断（A2 场景 3，命中『exploration exploitation/ε 贪心』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "我的状态是连续的传感器读数向量，Q 表根本建不出来。这种情况怎么办？听说可以用神经网络逼近 Q 函数，什么时候该这么干？",
+      "expected_behavior": "应激活 ml-rl-decision-loop，执行表格→函数逼近的升级判据：状态空间大到表格存不下时过渡到值函数近似（DQN 方向），并预告由此引入的不稳定性问题。",
+      "notes": "正面场景: 表格法容量爆掉后的升级路线（A2 场景 5，命中语言信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我有十万个历史订单和最终成交价，想训练一个模型预测给定商品该定什么价。数据都是现成的带标签记录，用 XGBoost 回归行不行？",
+      "expected_behavior": "不应激活 ml-rl-decision-loop——这是静态数据集上的监督回归：无交互、无延迟奖赏、动作不影响后续状态，资格验证不过关；应走常规监督管线选型（ml-task-matching）。定价『适合 RL』的前提是线上闭环交互，离线静态预测不是。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-task-matching 的分界——同为定价话题，『有标签静态数据』是监督学习，RL 需要序贯决策+延迟奖赏缺一不可"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "只有几百条标注但是有几万条没标注的同源样本，想把这些没标注的利用起来提升分类器效果。有什么成熟的路线吗？",
+      "expected_behavior": "不应激活 ml-rl-decision-loop——标签稀缺家族里的另一支：靠未标注样本分布信息提泛化是半监督问题，应激活 ml-semisupervised；RL 靠环境交互延迟奖赏学策略，数据形态完全不同（静态数据集 vs 交互轨迹）。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-semisupervised 的分界——同属标签稀缺家族但机制完全不同"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "DQN 的 target network 每隔多少步同步一次比较合适？replay buffer 的 size 参数怎么填？",
+      "expected_behavior": "不应激活任何方法论 skill——具体实现超参的推荐值属于工程细节/API 层面，直接回答，不走路由。",
+      "notes": "诱饵: 纯实现细节问题（Q-learning/DQN 词汇出现，考验边界克制）"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们棋类游戏 AI 的规则和模拟器全都有，每步之后局面完全确定。既然环境模型已知了，还有必要用什么免模型的 Q-learning 吗？直接搜索不行吗？",
+      "expected_behavior": "合理判断: 应激活 ml-rl-decision-loop 并执行其模型可知否分支——有模型（模拟器/规则已知）时优先考虑动态规划/基于模型的规划路线，免模型方法并非必需；考察 skill 是否给出正确的路线分流而非条件反射推 Q-learning。",
+      "notes": "边界: 有模型 vs 免模型的路线分岔——skill 动作链第二步的正向考题"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我的 agent 训练不动，累积奖赏一直不涨。朋友说可能是网络拟合的问题让我去查偏差方差，也有人说就是 reward 设计太烂。这两派说法我该先信哪个？",
+      "expected_behavior": "合理判断: 应激活 ml-rl-decision-loop 并按其排查顺序先查结构性病因（探索失衡/确定性策略零信息/奖赏设计缺陷/表格容量），排除这些之后才轮到值函数近似的偏差-方差问题（此时才移交 ml-diagnosis 深查）；考察顺序纪律而非两派各打五十大板。",
+      "notes": "边界: RL 结构性病因与统计归因的先后排序——skill A2 明确写了移交时机在『排除后』"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 监督选型(ml-task-matching)、半监督兄弟(ml-semisupervised)、统计归因下游(ml-diagnosis)。『资格验证缺一不可』是与监督学习分界的核心武器。should-not-trigger 全部必须通过。"
+}

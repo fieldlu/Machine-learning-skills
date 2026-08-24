@@ -1,0 +1,73 @@
+{
+  "skill": "ml-transformer-era",
+  "version": "0.1.0",
+  "source_book": "经典文献共识（Vaswani《Attention Is All You Need》及 2017-2021 架构演进文献）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "新项目要做文本情感分析，两万条数据。都 2024 年了是不是直接上 Transformer 就完事了？还是 BERT 这类？或者传统方法其实就够了？",
+      "expected_behavior": "应激活 ml-transformer-era，按数据形态×规模×算力三轴匹配：两万条中等规模文本给出决策边界与候选架构建议，纠正『无脑上 Transformer』的默认冲动。",
+      "notes": "正面场景: 新项目选骨架（A2 场景 1，命中『该用什么网络结构』『都 2024 年了』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "学 Transformer 的时候卡在注意力机制了：QKV 到底是什么意思？为什么要分成三个矩阵？没有位置编码会怎样？这些概念一直似懂非懂。",
+      "expected_behavior": "应激活 ml-transformer-era，给 QKV 直觉解释（查询-键-值的检索类比）与位置编码必要性（自注意力本身置换不变，序列顺序信息必须外挂）。",
+      "notes": "正面场景: 概念关口（A2 场景 2，命中『QKV』『位置编码有什么用』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "看到篇论文说他们用 ViT 在 ImageNet 上刷爆了。我们只有三千张工业缺陷图，老板让我照搬这套架构。这能行吗？总觉得哪里不对。",
+      "expected_behavior": "应激活 ml-transformer-era，指出规模前提不成立：ViT 的优势建立在大规模预训练/大数据上，小数据集 CNN 归纳偏好仍是正解；给『SOTA 架构搬运』的规模校验纪律。",
+      "notes": "正面场景: SOTA 架构搬运的拦截（A2 场景 3，命中『小数据能用大模型架构吗』语境）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "下周技术评审，CTO 质询我们为什么时间序列预测不用 Transformer 而在用最普通的模型。我需要一个有理有据的回答，不管支持还是反对。",
+      "expected_behavior": "应激活 ml-transformer-era，按三轴框架组织论证（数据规模/算力/序列长度），提供支持或反对 Transformer 的依据——反流行或流行论证都要有据。",
+      "notes": "正面场景: 选型评审辩护（A2 场景 4）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "表格数据的结构化预测任务，就几千条样本。XGBoost 和随机森林选哪个好？还是说该试试深度学习？",
+      "expected_behavior": "不应激活 ml-transformer-era——这是传统模型之间的选择（GBDT vs RF vs 线性/深度入门），归 ml-task-matching 的 NFL 领地；本 skill 只服务深度架构内部（CNN/RNN/Transformer）的选择，且其结论本就是小表格数据 GBDT 常胜。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-task-matching 的分界——通用选型哲学 vs 深度架构内部分流"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我们的 Transformer 模型训练到一半 loss 就 NaN 了，梯度也查过没爆炸。是不是层数堆太多了？这种训练不下去的问题怎么排查？",
+      "expected_behavior": "不应激活 ml-transformer-era 作为主责——架构已定、训练过程出故障（NaN），归 ml-deep-training-playbook 的执行层排查链（初始化/warmup/fp16 等）；先鸡后蛋：选骨架归这边，训得动归那边。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-deep-training-playbook 的时序分界——『用哪个骨架』vs『怎么训得动』"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "已经决定微调开源的 LLaMA 做我们领域的问答了。LoRA 和全参微调哪个合适？多少条数据起步？",
+      "expected_behavior": "不应激活 ml-transformer-era——用户不需要自己训骨架，走的是预训练模型微调路线，档位与 PEFT 决策归 ml-pretraining-paradigm；本 skill 只服务于确需自训骨架的场景。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-pretraining-paradigm 的分界——『要不要自己训』的答案若是微调则移交那边"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "一万条中文医疗对话做意图分类。BERT-base 微调是标配我知道，但我想问的是：这个量级从头训一个小 Transformer 划得来吗？两条路怎么比？",
+      "expected_behavior": "合理判断: 应激活 ml-transformer-era 处理『从头训什么/多大规模』的比较，同时意识到『要不要自己训 vs 直接微调现成模型』的高层问题归 ml-pretraining-paradigm——合理输出是以 transformer-era 给架构侧依据、pretraining-paradigm 给范式侧结论的双跳串联，并明确先后。",
+      "notes": "边界: 自训小模型的划不划算问题横跨两个 skill——考察双跳路由的分工与顺序而非抢答"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我们的传感器时序数据采样率很高但总量不大（每段几秒）。有人推荐用 Transformer 做，有人说这种短序列 LSTM 都嫌重。到底听谁的？判断标准是什么？",
+      "expected_behavior": "合理判断: 应激活 ml-transformer-era 并应用其三轴判据——序列长度短、数据规模小时 RNN 甚至经典方法可能已够，Transformer 的并行优势在长序列才兑现；输出应是可复用的判断标准（形态×规模×算力）而非站队某个模型。",
+      "notes": "边界: 短序列场景的架构适配——考察教判断标准而非给唯一答案，符合 skill 的决策边界定位"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 传统模型间选型(ml-task-matching)、训练故障(ml-deep-training-playbook)、范式档位(ml-pretraining-paradigm)。『深度架构内部分流』是本 skill 相对 task-matching 的存在理由。should-not-trigger 全部必须通过。"
+}
