@@ -1,22 +1,27 @@
 ---
 name: ml-methodology-router
 description: |
-  ML 方法论问题总入口（Machine Learning Methodology Router），统辖 27 个子 skill 的决策方法合集。
+  ML 方法论问题总入口（Machine Learning Methodology Router），统辖 38 个子 skill 的决策方法合集。
   用户提出任何涉及机器学习决策/判断的问题时应最先激活本 skill：先判断其处于工作流哪一段
   （选型前 / 实验设计与数据准备 / 模型族内部施工 / 训练与调参 / 结果诊断 / 特殊场景 /
-  大模型场景 / 工程交付），再派发到对应子 skill 并说明理由。触发信号："该用什么算法/模型"、
-  "X 和 Y 哪个好"、"榜单第一为什么输"、"怎么设计实验/评估"、"过拟合了怎么办"、"效果不好"、
-  "accuracy 99% 却没用"、"类别不平衡"、"冲榜/集成/融合模型"、"特征太多/降维"、"聚类分几类"、
-  "贝叶斯/概率图/生成模型"、"loss 不降/NaN"、"warmup/Adam 还是 SGD"、"dropout 设多少"、
-  "超参怎么搜/Optuna"、"结果复现不了/checkpoint 存什么"、"是不是有泄漏"、"多分类怎么拆"、
-  "只有几百条标注"、"强化学习适不适合"、"要可解释的规则"、"Transformer 还是 CNN"、
-  "要不要微调/LoRA"、"prompt 时好时坏"、"LLM 榜单可信吗"、"模型要上线"、"结果好得可疑"、
-  "理论保证何时能信"；英文: "which model should I use", "how to evaluate", "overfitting",
-  "class imbalance", "data leakage", "hyperparameter search", "reproducibility",
-  "fine-tune vs prompt", "benchmark contamination", "too good to be true",
-  "when can I trust the theory"。不路由：纯代码实现问题（如 sklearn 调参语法、报错栈、
-  API 用法）——直接回答，不走本路由。
-source_book: 《机器学习》周志华（批A 九个子 skill 原文锚定）；批B/批C 十八个子 skill 为时代局限的外推补全（经典文献共识/工程实践共识）
+  大模型场景 / 工程交付 / 专项进阶 / LLM 应用与运维），再派发到对应子 skill 并说明理由。
+  触发信号："该用什么算法/模型"、"X 和 Y 哪个好"、"榜单第一为什么输"、"怎么设计实验/评估"、
+  "过拟合了怎么办"、"效果不好"、"accuracy 99% 却没用"、"类别不平衡"、"冲榜/集成/融合模型"、
+  "特征太多/降维"、"聚类分几类"、"贝叶斯/概率图/生成模型"、"loss 不降/NaN"、
+  "warmup/Adam 还是 SGD"、"dropout 设多少"、"超参怎么搜/Optuna"、"结果复现不了/checkpoint 存什么"、
+  "是不是有泄漏"、"多分类怎么拆"、"只有几百条标注"、"强化学习适不适合"、"要可解释的规则"、
+  "Transformer 还是 CNN"、"要不要微调/LoRA"、"prompt 时好时坏"、"LLM 榜单可信吗"、"模型要上线"、
+  "结果好得可疑"、"理论保证何时能信"、"牛顿法还是梯度下降/KKT 对偶"、"该不该用 CNN/卷积核感受野"、
+  "RNN 还是 LSTM/门控/seq2seq"、"AutoML 靠谱吗/NAS 怎么回事"、"相关还是因果/混杂/反事实/
+  政策评估归因"、"LIME/SHAP 怎么选/黑箱怎么解释"、"联邦学习怎么做/差分隐私 ε/数据不出域"、
+  "RAG 还是长上下文/切块/embedding 选型/引用溯源"、"多模态融合/CLIP 零样本"、"RLHF/PPO 还是
+  DPO/奖励黑客"、"影子金丝雀 A-B/PSI 漂移/什么时候重训"；英文: "which model should I use",
+  "how to evaluate", "overfitting", "class imbalance", "data leakage", "hyperparameter search",
+  "reproducibility", "fine-tune vs prompt", "benchmark contamination", "too good to be true",
+  "when can I trust the theory", "convex or not", "CNN vs Transformer", "causation vs correlation",
+  "SHAP or LIME", "federated learning", "RAG or fine-tune", "RLHF vs DPO", "canary deployment"。
+  不路由：纯代码实现问题（如 sklearn 调参语法、报错栈、API 用法）——直接回答，不走本路由。
+source_book: 《机器学习》周志华（批A 九个子 skill 原文锚定）；批B/批C 十八个子 skill 为时代局限的外推补全（经典文献共识/工程实践共识）；批D 五个架构与优化基础 skill、批E 六个交叉学科 skill 为文献与交叉学科共识补全（2026-08 v0.0.2）
 source_chapter: 全书（路由层，主锚点：第1章绪论、第2章模型评估与选择）
 tags: [machine-learning, methodology, routing, meta-skill]
 related_skills:
@@ -51,12 +56,18 @@ related_skills:
     relation: composes-with
   - slug: ml-multiclass-strategies
     relation: composes-with
+  - slug: ml-cnn-vision
+    relation: composes-with
+  - slug: ml-rnn-sequence
+    relation: composes-with
   # —— 训练与调参 ——
   - slug: ml-deep-training-playbook
     relation: composes-with
   - slug: ml-overfitting-modern
     relation: composes-with
   - slug: ml-hpo-strategy
+    relation: composes-with
+  - slug: ml-automl-nas
     relation: composes-with
   # —— 结果诊断 ——
   - slug: ml-diagnosis
@@ -82,6 +93,24 @@ related_skills:
     relation: composes-with
   - slug: ml-theory-compass
     relation: composes-with
+  # —— 专项进阶 ——
+  - slug: ml-optimization-methods
+    relation: composes-with
+  - slug: ml-causal-inference
+    relation: composes-with
+  - slug: ml-explainability-xai
+    relation: composes-with
+  - slug: ml-federated-privacy
+    relation: composes-with
+  # —— LLM 应用与运维 ——
+  - slug: ml-alignment-rlhf
+    relation: composes-with
+  - slug: ml-rag-systems
+    relation: composes-with
+  - slug: ml-multimodal
+    relation: composes-with
+  - slug: ml-mlops-deployment
+    relation: composes-with
 ---
 
 # ML 方法论总控路由（ML Methodology Router）
@@ -96,21 +125,23 @@ related_skills:
 
 ## I — 方法论骨架 (Interpretation)
 
-本 skill 是二十七个子 skill 的调度器，自己不做任何具体分析。它做的事只有一件：在任何 ML 方法论问题被回答之前，先定位"用户此刻卡在工作流的哪一段"，再把问题交给管那一段的子 skill。
+本 skill 是三十八个子 skill 的调度器，自己不做任何具体分析。它做的事只有一件：在任何 ML 方法论问题被回答之前，先定位"用户此刻卡在工作流的哪一段"，再把问题交给管那一段的子 skill。
 
 西瓜书的论证顺序就是这张路由图的来源：第1章先立根本目标（泛化）并证明"脱离任务谈算法优劣无意义"（NFL），第2章立刻建立评判武器库（评估方法 × 性能度量 × 比较检验 + 偏差-方差归因），之后各模型族、集成、降维、概率建模才围绕这条评估主线并列展开。也就是说：**先明确任务与目标，再谈怎么评，最后才轮到用什么模型**——用户的提问无论从哪句开始，都可以映射回这条主干上的某个位置。
 
-批A 九个子 skill 原文锚定于西瓜书；批B/批C 十八个新子 skill 是对原书时代局限的外推补全：深度训练栈、HPO、实验可复现、特征工程、泄漏防御出自工程实践共识，Transformer/预训练范式/提示方法/LLM 评估出自经典文献共识——派发到这些 skill 时应保留其自带的时代边界声明。
+批A 九个子 skill 原文锚定于西瓜书；批B/批C 十八个新子 skill 是对原书时代局限的外推补全：深度训练栈、HPO、实验可复现、特征工程、泄漏防御出自工程实践共识，Transformer/预训练范式/提示方法/LLM 评估出自经典文献共识；批D 五个新子 skill 补数学与架构基础（优化方法/CNN/RNN/AutoML-NAS/对齐 RLHF），批E 六个新子 skill 补应用与交叉学科（因果推断/XAI/联邦隐私/RAG/多模态/MLOps）——派发到这些 skill 时应保留其自带的时代边界声明。
 
-八段工作流（路由表的分组依据）：
+十段工作流（路由表的分组依据）：
 1. **选型前**——问题还没被刻画清楚，或正在争论"谁更强"、该不该进某个范式；
 2. **实验设计与数据准备**——要跑实验、定度量、管数据、记过程；
 3. **模型族内部施工**——已选定某族模型，需要该族的专属决策树；
-4. **训练与调参**——训练动力学故障、正则配置、超参搜索；
+4. **训练与调参**——训练动力学故障、正则配置、超参与架构搜索；
 5. **结果诊断**——已有结果但不符合预期，需要归因；
 6. **特殊场景**——问题带有结构性特殊信号（不平衡/高维/集成）；
 7. **大模型场景**——架构选型、范式档位、提示施工、LLM 能力评估；
-8. **工程交付**——上线前审计、理论适用性横向审查。
+8. **工程交付**——上线前审计、理论适用性横向审查；
+9. **专项进阶**——横切的方法论深水区：优化理论、因果思维、事后解释、隐私保护；
+10. **LLM 应用与运维**——对齐生产、检索增强、多模态建模、上线后生命周期。
 
 ---
 
@@ -147,21 +178,25 @@ related_skills:
 5. **结果不如意**: "模型效果不好"、"好像过拟合了"、"验证集掉点了"，需要系统归因而不是瞎调。
 6. **上线/信任关口**: 新模型准备上线、"结果好得可疑"、线下线上对不上，需要审查隐藏前提或做泄漏排查。
 7. **大模型场景**: "Transformer 还是 CNN"、"要不要微调/LoRA"、"prompt 时好时坏"、"LLM 榜单可信吗"。
+8. **方法论深水区**: 推导卡壳问 KKT/对偶、拿观测数据下因果结论、黑箱要向监管解释、数据合规不能集中。
+9. **LLM 应用与运维**: 纠结 PPO 还是 DPO、知识库问答怎么搭、多模态要不要上、上线后效果悄悄下滑。
 
 ### 语言信号 (用户的话里出现这些就应激活)
 
 - "该用什么算法/模型"、"哪个模型更好"、"SOTA/榜单"、"RL 能不能做 X"（→ 选型前）
 - "怎么设计实验"、"怎么评估"、"数据该怎么划分"、"用什么指标"、"复现不了"、"特征这列怎么处理"（→ 实验设计与数据准备）
-- "SVM 参数怎么选"、"贝叶斯网结构"、"HMM 还是 CRF"、"聚类分几类"、"要可解释的规则"（→ 模型族内部施工）
-- "loss 不降/NaN"、"warmup 要不要加"、"dropout 放哪层"、"grid 还是 random search"（→ 训练与调参）
+- "SVM 参数怎么选"、"贝叶斯网结构"、"HMM 还是 CRF"、"聚类分几类"、"要可解释的规则"、"图像用不用 CNN"、"序列上 LSTM 还是 Transformer"（→ 模型族内部施工）
+- "loss 不降/NaN"、"warmup 要不要加"、"dropout 放哪层"、"grid 还是 random search"、"AutoML/NAS 划算吗"（→ 训练与调参）
 - "效果不好"、"过拟合/欠拟合"、"掉点了"、"学习曲线封顶"（→ 结果诊断）
 - "99% 精度"、"不平衡"、"冲榜"、"特征太多"（→ 特殊场景）
 - "Transformer 还是 CNN"、"LoRA 还是全参"、"prompt 时好时坏"、"benchmark 可信吗"（→ 大模型场景）
 - "要上线了"、"结果好得可疑"、"是不是有泄漏"、"理论上说"（→ 工程交付）
+- "凸不凸/KKT/对偶"、"牛顿法还是梯度下降"、"相关还是因果/混杂/反事实"、"SHAP/LIME 怎么选"、"联邦学习/差分隐私"（→ 专项进阶）
+- "RLHF/PPO 还是 DPO"、"RAG 还是长上下文"、"切块/embedding/重排"、"多模态融合/CLIP"、"PSI 漂移/什么时候重训"（→ LLM 应用与运维）
 
 ### 与相邻 skill 的区分
 
-- 本 skill 与九个子 skill 是**父子关系而非竞争关系**：router 只负责定位与派发，绝不亲自展开分析；一旦定位完成，控制权移交对应子 skill。
+- 本 skill 与三十八个子 skill 是**父子关系而非竞争关系**：router 只负责定位与派发，绝不亲自展开分析；一旦定位完成，控制权移交对应子 skill。
 - 与 `ml-pitfall-audit` 的区别: pitfall-audit 是可被路由到的终点之一，同时也是唯一会被 router **主动追加**的横向检查（凡"即将上线/结果可疑"信号出现，即使已路由到其他 skill 也要追加提示）。
 
 ---
@@ -178,12 +213,12 @@ related_skills:
 
 ### 步骤 2: 阶段定位
 
-- 动作: 把用户问题映射到八段工作流之一——选型前 / 实验设计与数据准备 / 模型族内部施工 / 训练与调参 / 结果诊断 / 特殊场景 / 大模型场景 / 工程交付。
+- 动作: 把用户问题映射到十段工作流之一——选型前 / 实验设计与数据准备 / 模型族内部施工 / 训练与调参 / 结果诊断 / 特殊场景 / 大模型场景 / 工程交付 / 专项进阶 / LLM 应用与运维。
 - 完成标准: 能用一句话说出"用户处于 X 阶段，卡点是 Y"。说不出卡点就先向用户澄清，禁止盲派。
 
 ### 步骤 3: 特殊信号扫描
 
-- 动作: 扫描九类结构性信号——①类别不平衡 ②高维/特征过多 ③集成/冲榜 ④概率建模/生成式 ⑤上线前/结果可疑 ⑥理论保证疑问 ⑦训练动力学故障(loss 不降/NaN) ⑧泄漏嫌疑(线下线上不一致/too good to be true) ⑨大模型范式疑问(fine-tune/prompt/benchmark)。
+- 动作: 扫描十三类结构性信号——①类别不平衡 ②高维/特征过多 ③集成/冲榜 ④概率建模/生成式 ⑤上线前/结果可疑 ⑥理论保证疑问 ⑦训练动力学故障(loss 不降/NaN) ⑧泄漏嫌疑(线下线上不一致/too good to be true) ⑨大模型范式疑问(fine-tune/prompt/benchmark) ⑩因果疑问(do/干预/反事实/混杂) ⑪解释需求(黑箱/LIME/SHAP/合规解释) ⑫隐私约束(数据不出域/差分隐私/成员推断) ⑬LLM 应用架构与运维(RAG/多模态/对齐/漂移重训)。
 - 判停条件: 任一信号命中 → 直接跳到步骤 4 派发对应专项 skill（信号优先级高于阶段归属，因为它们有专属处置流程）。
 
 ### 步骤 4: 查路由表派发
@@ -216,6 +251,8 @@ related_skills:
 | SVM 参数怎么选、选哪个核、完美可分沾沾自喜、大数据硬跑非线性核 | 已选定 SVM 后的专属构造性决策树 | `ml-svm-playbook` | 默认软间隔（完美可分可能是过拟合假象）、文本用线性核、核选择是最大变数、非线性核 O(m²) 判死大数据 |
 | NN 不收敛/震荡/局部极小/几个隐藏层/早停时机——经典浅层 BP 语境 | 训练动力学故障但属于 Sigmoid+BP trick 体系 | `ml-neural-training` | 可分性定结构下限（XOR 数学边界）→loss 曲线分诊→多组初值/SGD 跳局部极小→早停+正则两手 |
 | 二分类器解决 N 类问题、"ovo ovr 区别"、ECOC 码本设计、万类仍套 OvO | 基分类器不支持原生多分类，需外接拆解架构 | `ml-multiclass-strategies` | 开销矩阵选 OvO/OvR/MvM-ECOC；大类数平方开销提前判死；拆解任务的失衡通常相互抵消 |
+| 该不该用 CNN、卷积核/感受野/池化/BN 放哪、ResNet 为何有效、ViT 之后 CNN 过时吗 | 已锁定视觉形态后的卷积路线纵向设计与理解纪律 | `ml-cnn-vision` | 归纳偏好三件套匹配定资格（局部性/平移不变/层次化）→组件链（小核堆叠/池化/BN）→退化问题与残差动机；表格数据在此劝退转 task-matching，三方摇摆转 transformer-era |
+| 序列用 RNN 还是 LSTM/GRU、门控干嘛的、seq2seq 长句崩塌要不要加注意力、流式边缘场景 | 序列一族内部的纵向路线细化（任务定形→门控→注意力→主干选择） | `ml-rnn-sequence` | 定形（几对几/要不要流式）→认病（时序梯度消失靠门控治）→定线（短中小数据/流式走 RNN 系；长依赖/大数据走 Transformer）；与 rl-decision-loop 分界：序列监督 vs 序贯决策 |
 
 #### ④ 训练与调参
 
@@ -224,6 +261,7 @@ related_skills:
 | 深度网络 loss 不降/NaN/发散、初始化 Xavier 还是 He、BN 还是 LN、warmup、梯度消失爆炸 | 架构已定后的训练动力学故障，属深度现代训练栈 | `ml-deep-training-playbook` | "数据管道→小样本过拟合→初始化归一化→学习率→优化器调度→梯度监控"固定排查链，先廉价后昂贵每步带完成标准；与 neural-training 分界：经典 BP 小网络归那边 |
 | Dropout 放哪层/比例、weight decay 与 L2 区别、正则叠加打架、"训练 loss=0 但泛化好" | train-val gap 已出现后的深度正则工具箱与双下降甄别 | `ml-overfitting-modern` | 插值区间的新形态要求重新标定经典红旗直觉；先单手段消融再组合；与 deep-playbook 分界：优化端 vs 泛化端 |
 | grid/random/贝叶斯优化选哪个、搜索空间怎么设、N 次 trial 预算分配、止损 | 归因已完成、确认值得精修后的搜索算法选型 | `ml-hpo-strategy` | 偏差主导时开搜是最高频预算浪费（先 diagnosis）；对数尺度/Hyperband 早停淘汰/调参过拟合验证集的甄别 |
+| 要不要用 AutoML、NAS 怎么回事/三要素怎么设、少 epoch 代理评估失真、大模型时代还要不要自搜架构 | 疑问指向"自动化选择环节本身"而非具体超参——NAS 搜架构 vs HPO 调参数 | `ml-automl-nas` | 划算性判定先行（人的时间 vs 机的算力）→NAS 三要素（空间/策略/估计）→代理指标偏差校准→留出终审；大模型下游默认微调/提示而非自跑 NAS |
 
 #### ⑤ 结果诊断
 
@@ -255,6 +293,24 @@ related_skills:
 | 新模型即将上线、结果好得可疑、投稿/交接前 sanity check | 决策即将不可逆，或指标异常漂亮 | `ml-pitfall-audit` | 训练精度满分可能是红旗；隐藏前提（无偏采样/误差独立/分布形式/i.i.d.）被打破时结论反转；六问总审，泄漏专项存疑再转 leakage-defense |
 | 想知道理论保证何时适用、"理论上说应该"、"需要多少数据才够" | 疑问指向保证的条件与松紧 | `ml-theory-compass` | PAC/VC/Rademacher/稳定性给出理论承诺的适用条件与刻度，防止误用修辞 |
 
+#### ⑨ 专项进阶
+
+| 用户情境/信号 | 判断依据 | 派发到 | 为什么派到这里 |
+|---|---|---|---|
+| 牛顿法还是梯度下降/L-BFGS 用在哪/KKT 与对偶推导卡壳/loss 曲线形态归因/担心陷局部最优 | 疑问指向优化方法本身的选型与数学结构，而非训练排障 | `ml-optimization-methods` | 凸性判定→一阶 vs 二阶→拉格朗日与 KKT 对偶→收敛曲线归因；与 deep-training-playbook 分界：方法选型原理层 vs 排障流水线执行层 |
+| "A 是否导致 B"、政策/活动效果归因、反事实追问（不做会怎样）、拿观测数据下因果结论、辛普森悖论 | 问题本质是干预/归因/反事实（do 层），预测模型消费 P(Y\|X) 答不了 | `ml-causal-inference` | 三阶梯定位问题本质→混杂/选择偏差机制扫描→RCT 或倾向得分/后门调整/DML 路线速览；与 pitfall-audit 分界：本质判定 vs 六问总审，audit 查出"相关当因果"时深挖转介 |
+| LIME/SHAP 怎么选、重要性排序互相矛盾、黑箱要向监管/客户解释、"SHAP 说 X 重要所以干预 X" | 已有黑箱模型，诉求是事后解释的选型与正确解读 | `ml-explainability-xai` | 按动机定档（信任/调试/合规）→内在可解释 vs 事后解释第一刀→工具匹配→稳定性验证；解释非因果声明，干预决策移交 causal-inference |
+| 数据合规不能集中要联邦学习、FedAvg 原理/non-IID 掉点、差分隐私 ε 怎么定、模型会不会泄露训练样本 | 数据因法规/主权不能集中，或发布前需隐私风险评估 | `ml-federated-privacy` | 集中化资格判定先行→横向/纵向定型态→威胁模型声明（梯度泄露/成员推断）→DP 预算直觉→non-IID 精度税预估；数据可合法集中时劝退联邦 |
+
+#### ⑩ LLM 应用与运维
+
+| 用户情境/信号 | 判断依据 | 派发到 | 为什么派到这里 |
+|---|---|---|---|
+| RLHF 怎么回事/为何先 SFT 再训奖励模型、PPO 还是 DPO、模型讨好废话空转（奖励黑客）、对齐税 | 疑问指向把模型行为推向人类偏好的方法论，而非资源档位 | `ml-alignment-rlhf` | 三阶段流程（SFT→RM→PPO/DPO）→路线四轴裁决→反黑客设计（KL 锚定/RM 新鲜度）→对齐税验收；与 pretraining-paradigm 分界：对齐方法论 vs 资源档位 |
+| 知识过时/私有知识/幻觉不能容忍、RAG 还是长上下文还是微调、切块/embedding/top-k 重排/引用溯源、检索对了答案还是错 | LLM 应用出现外部知识缺口，疑问指向知识注入架构而非提示措辞 | `ml-rag-systems` | 三信号判定→三路对比（长上下文/RAG/微调注知识的误用拦截）→切块与检索链配置→检索生成分段评估归因；零知识纯推理任务归 prompting-methodology |
+| 要不要上多模态、早期/晚期/注意力融合怎么选、CLIP 零样本原理、模态缺失/模态坍塌、多模态涨点是不是真的 | 任务涉及多个异质模态的接入决策与融合设计 | `ml-multimodal` | 单模态充分性判定先行→融合三型按交互密度×缺失风险×数据量选型→CLIP 对齐路线→消融检验真融合；单模态骨架选型归 transformer-era |
+| 模型要从 notebook 上线、影子/金丝雀/A-B 怎么选、上线后效果悄悄下滑、PSI 阈值/什么时候重训、线下好线上差已排除泄漏 | 模型进入线上生命周期，疑问指向部署/监控/重训/回滚纪律 | `ml-mlops-deployment` | skew 一致性检查→部署三策略串联→三层监控布防→再训练触发与回滚预案；与 experiment-tracking 分界：上线后生命周期 vs 实验期记账，与 leakage-defense 分界：环境差异 vs 训练期穿越 |
+
 - 完成标准: 输出包含——派发目标 skill 名 + 一句"为什么派到那里"（引用上表判断依据列）。
 
 ### 步骤 5: 串联检查
@@ -275,6 +331,17 @@ related_skills:
   - `ml-neural-training`（经典语境）与现代器件问题并存时 → 按时代分界分流 `ml-deep-training-playbook`
   - `ml-experiment-tracking` 排除过程失控后仍"结果对不上/不好" → 移交 `ml-diagnosis`
   - `ml-pitfall-audit` 六问中泄漏一问存疑 → 深挖转介 `ml-leakage-defense`
+- 批D/批E 扩展后的高频链路:
+  - `ml-optimization-methods` 曲线健康收敛但泛化差 → 移交 `ml-diagnosis` 做"收敛≠泛化"归因
+  - `ml-cnn-vision` / `ml-rnn-sequence` 设计定型后训不动 → 移交 `ml-deep-training-playbook`；跨族摇摆回接 `ml-transformer-era`
+  - `ml-automl-nas` 留出集复核显著低于搜索期成绩 → 回 `ml-leakage-defense` 排查隐性过拟合；大模型下游判停转 `ml-pretraining-paradigm`
+  - `ml-pitfall-audit` 六问发现"相关被当成因果" → 深挖移交 `ml-causal-inference`；causal 判定可随机化 → 移交 `ml-evaluation-design` 设计 A/B 协议
+  - `ml-explainability-xai` 重要性排序出现异常特征 → 移交 `ml-leakage-defense` 深挖；用户拿解释设计干预 → 移交 `ml-causal-inference` 重新立项
+  - `ml-federated-privacy` 过拟合作为隐私风险信号 → 回接 `ml-overfitting-modern` 的双下降甄别
+  - `ml-rag-systems` 三路选型判微调档 → 移交 `ml-pretraining-paradigm`；生成段忠实度评估借 `ml-llm-evaluation` 的 judge 校正
+  - `ml-multimodal` 各模态 encoder 选型 → 前置 `ml-transformer-era`；污染自查复用 `ml-llm-evaluation` 探针
+  - `ml-alignment-rlhf` 对齐效果验收 → 追加 `ml-llm-evaluation` 的 rubric 与一致性校验；SFT 数据量问题回 `ml-pretraining-paradigm`
+  - `ml-mlops-deployment` 上线前闸门由 `ml-pitfall-audit` 把守（audit 通过才进本辖区）；"线下好线上差"未排泄漏 → 先转 `ml-leakage-defense`
 - 完成标准: 要么给出至多 2 个 skill 的接力顺序，要么明确声明"单 skill 足够"。
 - 判停条件: 单次派发严禁超过 2 个子 skill——超过说明问题该拆分成多次对话。
 
@@ -287,8 +354,8 @@ related_skills:
 - **纯代码实现问题**（sklearn 怎么调参语法、报错信息、绘图代码）: 这些是检索/调试问题，路由只会拖延回答。直接作答。
 - **纯数学推导作业**（"帮我推 SVM 对偶"）: 属于演算而非方法论决策，除非用户追问推导背后的取舍。
 - **非 ML 话题**: 本合集不覆盖常规软件开发、数据清洗脚本等。
-- **二十七个 skill 都不覆盖的领域**: 分布式训练工程（多卡通信/数据管道死锁）、NAS 架构搜索的完整问题域、安全红队评估（越狱/偏见专项）、因果推断、RAG 系统端到端设计、MLOps 线上监控告警——明确告知超出本合集覆盖范围，按通用工程常识回答并注明"此部分不出自西瓜书/经典文献共识"，禁止假装路由。
-- **分布漂移与域适应**: 训练与线上数据分布本身随时间变化不是泄漏也不是诊断问题，处置方向是监控与再训练——本合集各 skill 均基于 i.i.d. 或近 i.i.d. 假设，此类提问只做边界声明不做处方。
+- **三十八个 skill 都不覆盖的领域**: 分布式训练工程（多卡通信/数据管道死锁）、安全红队评估（越狱/偏见专项）、因果发现的完整算法域与 do-演算证明、隐私攻击实现与密码学证明、多模态大模型内部机制研究——明确告知超出本合集覆盖范围，按通用工程常识回答并注明"此部分不出自西瓜书/经典文献共识"，禁止假装路由。（v0.0.1 超界清单中的 NAS、因果推断、RAG 端到端设计、MLOps 监控告警已由批D/批E 补全入合集，不再列为超界。）
+- **分布漂移与域适应**: 训练与线上数据分布本身随时间变化不是泄漏也不是诊断问题，处置方向是监控与再训练——`ml-mlops-deployment` 已覆盖漂移监控的工程纪律，但域适应算法（domain adaptation/adversarial learning）本身仍不在合集射程内，此类提问只做边界声明不做处方。
 
 ### 作者在书中警告的失败模式
 
@@ -313,23 +380,25 @@ related_skills:
 
 ## 相关 skills
 
-- dispatches-to（全部二十七个子 skill，按八段工作流分组，见 frontmatter related_skills）:
+- dispatches-to（全部三十八个子 skill，按十段工作流分组，见 frontmatter related_skills）:
   - 选型前: `ml-task-matching`, `ml-rl-decision-loop`
   - 实验设计与数据准备: `ml-evaluation-design`, `ml-experiment-tracking`, `ml-feature-engineering`, `ml-leakage-defense`, `ml-semisupervised`
-  - 模型族内部施工: `ml-bayesian-thinking`, `ml-graphical-models`, `ml-rule-learning`, `ml-clustering-toolkit`, `ml-svm-playbook`, `ml-neural-training`, `ml-multiclass-strategies`
-  - 训练与调参: `ml-deep-training-playbook`, `ml-overfitting-modern`, `ml-hpo-strategy`
+  - 模型族内部施工: `ml-bayesian-thinking`, `ml-graphical-models`, `ml-rule-learning`, `ml-clustering-toolkit`, `ml-svm-playbook`, `ml-neural-training`, `ml-multiclass-strategies`, `ml-cnn-vision`, `ml-rnn-sequence`
+  - 训练与调参: `ml-deep-training-playbook`, `ml-overfitting-modern`, `ml-hpo-strategy`, `ml-automl-nas`
   - 结果诊断: `ml-diagnosis`
   - 特殊场景: `ml-imbalanced-learning`, `ml-dimensionality`, `ml-ensemble-design`
   - 大模型场景: `ml-transformer-era`, `ml-pretraining-paradigm`, `ml-prompting-methodology`, `ml-llm-evaluation`
   - 工程交付: `ml-pitfall-audit`, `ml-theory-compass`
+  - 专项进阶: `ml-optimization-methods`, `ml-causal-inference`, `ml-explainability-xai`, `ml-federated-privacy`
+  - LLM 应用与运维: `ml-alignment-rlhf`, `ml-rag-systems`, `ml-multimodal`, `ml-mlops-deployment`
 - 组合约定: router 是唯一入口；子 skill 之间不得互相调用，接力一律经由 router 的步骤 5 串联规则。
-- 共享术语表: 见仓库根目录 `GLOSSARY.md`（西瓜书 62 条核心术语 + 批B/批C 现代术语增补）。
+- 共享术语表: 见仓库根目录 `GLOSSARY.md`（西瓜书 62 条核心术语 + 批B/批C/批D/批E 现代术语增补）。
 
 ---
 
 ## 审计信息
 
-- **验证通过**: V1 ✓ / V2 ✓ / V3 ✓（router 无独立验证单元；由阶段 1.5 通过的 39 条框架单元 + 53 条反例/案例素材按 skill_groups.json 组装；批B/批C 扩容后路由表 27 行经交叉核对各子 skill frontmatter 与 A2/B 段）
+- **验证通过**: V1 ✓ / V2 ✓ / V3 ✓（router 无独立验证单元；由阶段 1.5 通过的 39 条框架单元 + 53 条反例/案例素材按 skill_groups.json 组装；批B/批C 扩容后路由表 27 行、批D/批E 扩容后路由表 38 行均经交叉核对各子 skill frontmatter 与 A2/B 段）
 - **测试通过率**: 待阶段 4 压力测试（test-prompts.json 已生成，9 条/文件）
-- **skill_version**: 0.0.1
+- **skill_version**: 0.0.2
 - **蒸馏时间**: 2026-08-24

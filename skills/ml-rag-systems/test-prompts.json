@@ -1,0 +1,73 @@
+{
+  "skill": "ml-rag-systems",
+  "version": "0.0.2",
+  "source_book": "交叉学科文献共识（Lewis RAG 2020; Guu REALM 2020; Liu Lost in the Middle 2023，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们在做一个公司内部制度问答机器人，但 LLM 完全不知道我们的考勤报销规定，要么胡编要么拒答。同事建议把制度文档都塞给模型微调一下，这个方向对吗？还是该搞什么别的方案？",
+      "expected_behavior": "应激活 ml-rag-systems：先核对三信号（私有知识命中）→三路选型——微调不适合注入事实知识（事实会过时且易被幻觉覆盖，拿微调当知识库是常见误用）；企业知识库量大且会更新应走 RAG；核心立场是检索质量决定上限、垃圾进垃圾出。",
+      "notes": "正面场景: 私有知识注入的三路判定（A2 场景 1 + 微调注知识的反模式拦截）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "RAG 系统搭好了效果很差：明明文档里明确写着答案，检索就是召不回相关段落；有时候检索回来的片段是对的，生成的答案却又答非所问。这种问题该从哪里下手排查？",
+      "expected_behavior": "应激活 ml-rag-systems，执行分段归因纪律（本 skill 核心立场）：检索与生成必须拆开度量——命中率低问题在切块/召回/重排环节回炉检索链，禁止去调生成 prompt；检索对但答案错问题在生成段（prompt 约束/上下文超载/模型能力）；只报端到端准确率每次改动都在盲调。",
+      "notes": "正面场景: 检索/生成两段故障的分段归因（A2 场景 4 原文场景——『明明文档里有答案却检索不到』+『检索对了答案还是错』双症状齐发）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "几十万字的法务合同库要做问答，答案必须能标注出处条款，编造后果很严重。切块是按固定 500 字切好，还是有什么讲究？向量库存 embedding 之后还需要什么？",
+      "expected_behavior": "应激活 ml-rag-systems：幻觉敏感场景命中第三信号且引用溯源是硬需求（既是合规需求也是幻觉抑制手段——强制生成器只依据材料作答，无据可引时明确说材料未覆盖而不是编）；切块按结构切优于盲切固定长度（500 字硬切会把条款腰斩）、设 overlap；检索链配混合检索（BM25 补专有名词精确匹配）+宽召回+交叉编码器重排。",
+      "notes": "正面场景: 高合规场景的流水线关键决策（A2 场景 3/5，命中『引用溯源』『chunking 怎么切』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "现在模型上下文窗口都到百万 token 了，我们那点产品手册是不是直接全塞进 system prompt 就行，还折腾什么 RAG？两种方案到底怎么取舍？",
+      "expected_behavior": "应激活 ml-rag-systems 的三路对比分支：文档总量小塞得进窗口时长上下文优先（简单即正义，无检索环节无检索错误）；但要引 Lost in the Middle 证据——中间塌陷使超长文档中部信息利用率下降，『塞得下』不等于『用得上』；量大或高频更新才轮到 RAG；具体阈值随硬件定价漂移，给决策框架不给恒久数字。",
+      "notes": "正面场景: 长上下文 vs RAG 的边界判断（A2 场景 5 变体，I 段三路对比的直接应用）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我在写一个数学推理应用的 prompt，模型有时直接给答案有时列步骤，输出格式也时好时坏。few-shot 示例该怎么放几个？要不要加一句『请一步步思考』？",
+      "expected_behavior": "不应激活 ml-rag-systems——任务无外部事实缺口（数学推理不需要知识库），纯提示档内的施工规范问题（few-shot 选择/CoT 边界/schema 约束/回归测试驱动迭代），应激活 ml-prompting-methodology。分界原文：『确定留在纯提示档后才轮到那边』——RAG 三信号一条都不命中时 E 步骤 1 直接劝退。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-prompting-methodology 的最难混淆对——外部知识注入架构决策 vs 零外部知识的提示施工规范"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我们想让客服机器人学会用更正式得体的敬语风格回复，还要支持固定的 JSON 工单格式输出。听说往知识库里加一些范例文档让 RAG 检索参考就能实现？",
+      "expected_behavior": "不应采纳 RAG 路线——目标是改行为风格/格式/技能而非注入事实知识；B 段明写『检索注入不了怎么做事只能注入是什么』，风格技能是微调的领地，应移交 ml-pretraining-paradigm（PEFT 档）。E 步骤 2 判停条件原文：『问题是风格技能而非事实知识 → 微调，RAG 不解决此类问题』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 知识注入 ≠ 能力注入的反向误用场景"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我要查上季度每个销售区域的成交金额汇总，还有各产品的退货率统计。能不能把我们 ERP 数据库接进 RAG，用自然语言问它要数？",
+      "expected_behavior": "不应套用 RAG——结构化数据的精确查询是 SQL 能答的问题，B 段明写『别用向量相似度硬查数据库，Text-to-SQL/BI 工具是对口工具；模糊语义搜索与精确字段查询是两种问题』。考察识别查询类型错配并给出对口工具方向。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): B 段第四条反场景——结构化精确查询 ≠ 向量语义检索"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们文档库里有不少互相矛盾的旧版本制度文件，RAG 上线后用户抽到哪版算哪版，投诉说回答前后不一致。这是检索工程能解决的问题吗？",
+      "expected_behavior": "合理判断: 应激活 ml-rag-systems 并触发 B 段警告——材料本身互相矛盾/过期时 RAG 忠实检索出的也是矛盾与错误，知识治理（来源权威性/时效标记/冲突清洗）先于检索工程；E 步骤 6 判停条件原文：『语料质量是根因 → 上报知识治理问题，把来源清洗列为前置条件后暂停迭代』。考察识别工程边界外的根因。",
+      "notes": "边界: 把 RAG 当万能补丁的拦截——知识治理先于检索工程的纪律"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "预算只够买 embedding 模型，独立部署一个 rerank 交叉编码器太贵了。检索链可以砍掉重排环节直接用 top-k 吗？会有什么代价？",
+      "expected_behavior": "合理判断: 应激活 ml-rag-systems 并按 E 步骤 4 判停处理——预算不允许独立重排模型时，用『召回宽+embedding 好』的简化链起步并把重排列入迭代路线图；同时说明代价（召回管覆盖率重排管精度，砍重排后精度损失靠加大人工抽检监控）。考察降级方案的纪律性而非教条要求完整链路。",
+      "notes": "边界: 预算约束下的链路降级——判停条件的灵活应用，考务实与底线平衡"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 提示施工(ml-prompting-methodology)、能力注入误用(ml-pretraining-paradigm)、结构化查询(Text-to-SQL)。should-not-trigger 全部必须通过。"
+}

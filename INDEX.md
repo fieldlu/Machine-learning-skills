@@ -1,7 +1,7 @@
 # 《机器学习》（西瓜书）方法论 Skill 合集 — Index
 
-> 本书由 cangjie-skill 蒸馏，共产出 **28** 个 skills（1 总控路由 + 27 子 skill）。
-> 处理时间：2026-08-24
+> 本书由 cangjie-skill 蒸馏，共产出 **39** 个 skills（1 总控路由 + 38 子 skill）。
+> 处理时间：2026-08-24（v0.0.2 史诗扩充：+批D 数学与架构基础 ×5、+批E 应用与交叉学科 ×6）
 
 ## 关于这本书与这套合集
 
@@ -9,16 +9,18 @@
 - **出版年**：2016（清华大学出版社，"西瓜书"）
 - **一句话主旨**：机器学习的本质是从有限样本出发在巨大假设空间中做选择以获得泛化能力——一切学习系统的设计都围绕"如何评估、如何选择、如何缓解过拟合"展开。
 
-**合集定位**：这不是一份 ML 知识摘要，而是一套**决策方法论** skill 合集。它把西瓜书里反复出现的判断纪律——"脱离任务谈算法优劣无意义"、"先修尺子再谈诊断"、"训练精度满分是红旗不是捷报"、"理论给出边界而非答案"——蒸馏成 1 个路由总控 + 27 个原子决策框架，覆盖从选型、实验设计、数据准备、模型族施工、训练调参、结果诊断到上线交付的全流程，并外推补全了西瓜书的两大时代盲区：深度现代训练栈与大模型范式。
+**合集定位**：这不是一份 ML 知识摘要，而是一套**决策方法论** skill 合集。它把西瓜书里反复出现的判断纪律——"脱离任务谈算法优劣无意义"、"先修尺子再谈诊断"、"训练精度满分是红旗不是捷报"、"理论给出边界而非答案"——蒸馏成 1 个路由总控 + 38 个原子决策框架，覆盖从选型、实验设计、数据准备、模型族施工、训练调参、结果诊断到上线交付的全流程，并外推补全了西瓜书的时代盲区：深度现代训练栈与大模型范式（批B/批C）、数学与架构基础（批D）、应用与交叉学科（批E）。
 
 **来源分层**：
 - 批A（9 个子 skill）：原文锚定于西瓜书各章；
-- 批B/批C（18 个子 skill）：对原书时代局限的外推补全——工程实践共识（experiment-tracking / feature-engineering / leakage-defense / hpo-strategy 等）与经典文献共识（deep-training-playbook / transformer-era / pretraining-paradigm / prompting-methodology / llm-evaluation 等），各自带时代边界声明。
-- **术语词典**：[GLOSSARY.md](./GLOSSARY.md)（西瓜书 62 条核心术语 + 现代术语增补）
+- 批B/批C（18 个子 skill）：对原书时代局限的外推补全——工程实践共识（experiment-tracking / feature-engineering / leakage-defense / hpo-strategy 等）与经典文献共识（deep-training-playbook / transformer-era / pretraining-paradigm / prompting-methodology / llm-evaluation 等），各自带时代边界声明；
+- 批D（5 个子 skill，v0.0.2）：数学与架构基础——optimization-methods（Boyd & Vandenberghe/Nocedal & Wright）、cnn-vision（LeNet-5/ResNet）、rnn-sequence（LSTM/seq2seq/注意力）、automl-nas（NAS 综述/Auto-Sklearn）、alignment-rlhf（InstructGPT/DPO）；
+- 批E（6 个子 skill，v0.0.2）：应用与交叉学科——causal-inference（Pearl/Rubin）、explainability-xai（LIME/SHAP）、federated-privacy（FedAvg/DP）、rag-systems（Lewis RAG）、multimodal（CLIP）、mlops-deployment（Sculley 技术债/MLOps 白皮书）。
+- **术语词典**：[GLOSSARY.md](./GLOSSARY.md)（西瓜书 62 条核心术语 + 现代/交叉学科术语增补，共 105 条）
 
 ---
 
-## Skill 总览（按工作流八段分组）
+## Skill 总览（按工作流十段分组）
 
 ### ① 选型前
 
@@ -49,6 +51,8 @@
 | [`ml-svm-playbook`](./skills/ml-svm-playbook/SKILL.md) | SVM 使用决策树：软间隔默认 · 核选型纪律 · C 与 γ · 规模判死 | "C 和 gamma 怎么设""加核完美分开了！""文本该用什么核" |
 | [`ml-neural-training`](./skills/ml-neural-training/SKILL.md) | 经典神经网络训练纪律：可分性定结构 · loss 分诊 · 局部极小 · 早停+正则 | "手写 BP 网络 loss 震荡""几个 hidden layer""是不是撞局部极小" |
 | [`ml-multiclass-strategies`](./skills/ml-multiclass-strategies/SKILL.md) | 二分类器解决 N 类问题的拆解工程（OvO/OvR/ECOC 开销矩阵） | "ovo ovr 区别""ECOC 码本怎么设计""一万类还能两两配对吗" |
+| [`ml-cnn-vision`](./skills/ml-cnn-vision/SKILL.md) | 卷积网络适用判断：归纳偏好匹配→组件链（小核/池化/BN）→残差动机→ViT 重估 | "图像该不该用 CNN""BN 放激活前还是后""为什么越深反而越差" |
+| [`ml-rnn-sequence`](./skills/ml-rnn-sequence/SKILL.md) | 序列建模路线决策：任务定形→门控治时序梯度消失→RNN 系还是 Transformer | "LSTM 还是 GRU""seq2seq 长句崩塌""流式识别边缘部署" |
 
 ### ④ 训练与调参
 
@@ -57,6 +61,7 @@
 | [`ml-deep-training-playbook`](./skills/ml-deep-training-playbook/SKILL.md) | 深度网络训不动的固定排查链：先廉价检查后昂贵实验，每步带完成标准 | "loss 不降/NaN""Xavier 还是 He""warmup 要不要加""梯度消失了怎么确诊" |
 | [`ml-overfitting-modern`](./skills/ml-overfitting-modern/SKILL.md) | 深度正则工具箱 + 双下降甄别：gap 在深度区间可能不是病 | "dropout 放哪层""正则叠加打架""训练 loss=0 泛化反而好" |
 | [`ml-hpo-strategy`](./skills/ml-hpo-strategy/SKILL.md) | 超参搜索选型：算法对比 · 空间设计 · 预算分配 · 止损判停 | "grid 还是 Optuna""学习率对数尺度吗""调了一百个 trial 还没起色" |
+| [`ml-automl-nas`](./skills/ml-automl-nas/SKILL.md) | AutoML 与 NAS 适用判断：自动化的是选择不是判断；三要素设计与代理偏差校准 | "AutoML 靠谱吗""搜索空间怎么圈""搜出来的架构训完不行" |
 
 ### ⑤ 结果诊断
 
@@ -88,11 +93,29 @@
 | [`ml-pitfall-audit`](./skills/ml-pitfall-audit/SKILL.md) | 上线前六问前提审查：无偏采样/独立采样/分布形式/误差独立/桥接假设/信息泄露 | "线下好线上崩""结果好得可疑""投稿前 sanity check" |
 | [`ml-theory-compass`](./skills/ml-theory-compass/SKILL.md) | 把学习理论当提问框架：PAC 三问、容量三刻度、MDL、替代损失、单调证书 | "需要多少数据才够""准确率要 99% 怎么谈""理论上说该信几分" |
 
+### ⑨ 专项进阶
+
+| Skill | 一句话 | 典型触发场景 |
+|---|---|---|
+| [`ml-optimization-methods`](./skills/ml-optimization-methods/SKILL.md) | 优化方法选型：凸性判定→一阶/二阶/拟牛顿→拉格朗日与 KKT 对偶→收敛曲线归因 | "牛顿法还是梯度下降""KKT 有什么用""是不是陷局部最优了" |
+| [`ml-causal-inference`](./skills/ml-causal-inference/SKILL.md) | 因果思维入门：三阶梯定位问题本质→混杂机制扫描→RCT 或观测路线速览 | "相关还是因果""增长该记在谁头上""不做会怎样""辛普森悖论" |
+| [`ml-explainability-xai`](./skills/ml-explainability-xai/SKILL.md) | 黑箱解释技术选型与正确用法：按动机定档→内在可解释 vs 事后解释→解释非因果 | "SHAP 还是 LIME""两个方法排序矛盾""监管要每个决定可解释" |
+| [`ml-federated-privacy`](./skills/ml-federated-privacy/SKILL.md) | 隐私保护 ML 决策链：集中化资格判定→FedAvg 与 non-IID→威胁模型与 DP 预算 | "数据不出域怎么建模""ε 设多少""模型会不会泄露训练样本" |
+
+### ⑩ LLM 应用与运维
+
+| Skill | 一句话 | 典型触发场景 |
+|---|---|---|
+| [`ml-alignment-rlhf`](./skills/ml-alignment-rlhf/SKILL.md) | 对齐方法论：RLHF 三阶段、PPO vs DPO 裁决、奖励黑客识别、对齐税 | "RLHF 怎么回事""模型学会讨好刷分了""base 和 chat 差在哪" |
+| [`ml-rag-systems`](./skills/ml-rag-systems/SKILL.md) | 检索增强生成决策链：三路对比→切块/embedding/重排→检索生成分段评估归因 | "RAG 还是长上下文""chunk 怎么切""检索对了答案还是错" |
+| [`ml-multimodal`](./skills/ml-multimodal/SKILL.md) | 多模态建模决策：单模态够吗→融合三型选型→CLIP 对齐→消融检验真融合 | "图文要不要都喂进去""early 还是 late fusion""涨点是不是真融合" |
+| [`ml-mlops-deployment`](./skills/ml-mlops-deployment/SKILL.md) | 上线后生命周期纪律：skew 一致性检查→部署三策略→三层监控→再训练与回滚 | "影子金丝雀 A-B 怎么选""PSI 阈值多少""什么时候该重训" |
+
 ---
 
 ## 引用图
 
-图太密分两张：主流程图覆盖工作流主干（①–⑤），横向图覆盖特殊场景/大模型/工程交付（⑥–⑧）。
+图太密分三张：主流程图覆盖工作流主干（①–⑤），横向图覆盖特殊场景/大模型/工程交付（⑥–⑧），扩展图覆盖专项进阶与大模型应用运维（⑨–⑩ 及批D 归入各段的三个新 skill）。
 
 ### 图一：主流程（选型 → 数据准备 → 施工 → 训练 → 诊断）
 
@@ -112,17 +135,20 @@ graph TD
     SS[semisupervised<br/>半监督安全]
 
     %% ③ 模型族内部施工
-    MG[模型族施工群<br/>bayesian/graphical/rule/<br/>clustering/svm/neural/multiclass]
+    MG[经典模型族施工群<br/>bayesian/graphical/rule/<br/>clustering/svm/neural/multiclass]
+    CV[cnn-vision<br/>卷积设计纪律]
+    RS[rnn-sequence<br/>序列路线]
 
     %% ④ 训练与调参
     DT[deep-training-playbook<br/>训练排查链]
     OM[overfitting-modern<br/>正则工具箱]
     HP[hpo-strategy<br/>搜索选型]
+    AN[automl-nas<br/>AutoML/NAS 划算性]
 
     %% ⑤ 结果诊断
     DG[diagnosis<br/>偏差方差归因]
 
-    R ===> TM & RL & ED & TR & FE & LD & SS & MG & DT & OM & HP & DG
+    R ===> TM & RL & ED & TR & FE & LD & SS & MG & CV & RS & DT & OM & HP & AN & DG
 
     %% 主干时序
     TM -->|"最小验证实验"| ED
@@ -132,11 +158,17 @@ graph TD
     FE -->|"造完审管道"| LD
     LD -.->|"专项深挖 vs 六问总审"| PA2[<i>见图二 pitfall-audit</i>]
     SS -->|"生成式路线借 EM"| MG
+    TM -.->|"视觉形态展开"| CV
+    TM -.->|"序列形态展开"| RS
 
     %% 施工 → 训练
     MG -->|"深度栈故障"| DT
+    CV -->|"设计定型训不动"| DT
+    RS -->|"结构定型训不动"| DT
     DT -->|"loss 正常但 gap 出现"| OM
     DG -->|"确认值得精修再搜"| HP
+    HP -.->|"搜架构 vs 调参数"| AN
+    AN -.->|"留出复核失败查泄漏"| LD
 
     %% 诊断枢纽
     DG -->|"方差主导→集成处置"| EN2[<i>见图二 ensemble-design</i>]
@@ -178,12 +210,59 @@ graph TD
     PM -->|"回归集显示到天花板"| PP
     PP -->|"微调收益验收"| LE
     PM -.->|"开发态回归 vs 验收态度量"| LE
+    TE -.->|"CNN 纵向设计归 cnn-vision"| CVX[cnn-vision<br/>（见图一）]
+    TE -.->|"RNN 族纵深归 rnn-sequence"| RSX[rnn-sequence<br/>（见图一）]
 
     %% 工程交付闸门
     EDX[evaluation-design] -.->|"设计用尺子 交付用审计"| PA
     LDX[leakage-defense] -.->|"六问存疑转专项深挖"| PA
     TC -.->|"防御查塌方 vs 建设画地图"| PA
     TMX[task-matching] -.->|"援引理论保证时接力"| TC
+    PA ==>|"闸门通过进入线上辖区"| MOX[mlops-deployment<br/>（见图三）]
+```
+
+### 图三：专项进阶 · LLM 应用与运维（批D/批E 新增）
+
+```mermaid
+graph TD
+    R[ml-methodology-router<br/>总控路由]
+
+    %% ⑨ 专项进阶
+    OP[optimization-methods<br/>优化方法选型]
+    CI[causal-inference<br/>因果三阶梯]
+    XA[explainability-xai<br/>事后解释选型]
+    FP[federated-privacy<br/>联邦与隐私]
+
+    %% ⑩ LLM 应用与运维
+    AR[alignment-rlhf<br/>对齐方法论]
+    RG[rag-systems<br/>检索增强]
+    MM[multimodal<br/>多模态融合]
+    MO[mlops-deployment<br/>上线后生命周期]
+
+    R ===> OP & CI & XA & FP & AR & RG & MM & MO
+
+    %% 专项互联
+    OP -->|"收敛但泛化差"| DG1[diagnosis<br/>（见图一）]
+    OP -.->|"方法选型 vs 排障流水线"| DT1[deep-training-playbook]
+    CI -->|"可随机化→协议设计"| ED1[evaluation-design<br/>（见图二）]
+    XA -->|"拿解释做干预"| CI
+    XA -.->|"异常重要性→泄漏线索"| LD1[leakage-defense<br/>（见图一）]
+    PA1[pitfall-audit<br/>（见图二）] -.->|"查出相关当因果"| CI
+    FP -.->|"过拟合=记忆风险"| OM1[overfitting-modern]
+
+    %% 大模型应用链
+    PP2[pretraining-paradigm<br/>（见图二）] -->|"知识注入深化"| RG
+    RG -->|"判微调档回接"| PP2
+    PM2[prompting-methodology<br/>（见图二）] -.->|"零知识提示 vs 外部知识"| RG
+    LE2[llm-evaluation<br/>（见图二）] -.->|"judge 校正与污染探针共用"| RG
+    AR -->|"对齐效果验收"| LE2
+    AR -.->|"资源档位 vs 对齐方法"| PP2
+    MM -->|"各模态 encoder 先行"| TE2[transformer-era<br/>（见图二）]
+    MM -.->|"基准泄漏自查"| LE2
+    PA ==>|"上线前闸门通过"| MO
+    MO -.->|"实验期记账 vs 线上生命周期"| TR2[experiment-tracking<br/>（见图一）]
+    MO -.->|"训练期穿越 vs 环境差异"| LD2[leakage-defense]
+    MO -->|"退化信号归因入口"| DG2[diagnosis<br/>（见图一）]
 ```
 
 图例：
@@ -202,16 +281,18 @@ graph TD
 2. **`ml-task-matching`** — 最上游：任何项目开工前先刻画任务、匹配归纳偏好（RL 形态的任务先过 `ml-rl-decision-loop` 的资格验证）
 3. **`ml-evaluation-design`** — 选型之后必须科学评估：切数据、定尺子、定比较协议
 4. **`ml-experiment-tracking` + `ml-feature-engineering`** — 开跑之前把账本和特征管道立起来：种子/配置/checkpoint 记全，各列按处理链过一遍，交付前接一道 **`ml-leakage-defense`**
-5. 进入模型族施工或大模型链路：经典模型族各有专属 playbook（SVM/聚类/规则/概率图……）；深度与大模型场景按 `ml-transformer-era` 选架构 → `ml-pretraining-paradigm` 定档位 → `ml-prompting-methodology` 做提示施工 → `ml-llm-evaluation` 做能力验收；训练环节故障走 `ml-deep-training-playbook` 排查链，泛化缺口走 `ml-overfitting-modern`
-6. 结果不如意 → **`ml-diagnosis`** 系统归因（偏差/方差/噪声），按归因结果决定加数据、换容量还是精修超参（→ `ml-hpo-strategy`）
-7. 交付前一律过一遍 **`ml-pitfall-audit`** 六问收尾闸门
+5. 进入模型族施工或大模型链路：经典模型族各有专属 playbook（SVM/聚类/规则/概率图……），深度架构按形态取 `ml-cnn-vision`（视觉）或 `ml-rnn-sequence`（序列）；大模型场景按 `ml-transformer-era` 选架构 → `ml-pretraining-paradigm` 定档位 → `ml-prompting-methodology` 做提示施工 → `ml-llm-evaluation` 做能力验收；训练环节故障走 `ml-deep-training-playbook` 排查链，泛化缺口走 `ml-overfitting-modern`
+6. 结果不如意 → **`ml-diagnosis`** 系统归因（偏差/方差/噪声），按归因结果决定加数据、换容量还是精修超参（→ `ml-hpo-strategy`）；要自动搜配置或架构再加 `ml-automl-nas`
+7. 交付前一律过一遍 **`ml-pitfall-audit`** 六问收尾闸门；通过后进入线上辖区由 **`ml-mlops-deployment`** 接管生命周期
+8. 进阶深水区按需选修：优化推导卡壳 → `ml-optimization-methods`；结论被追问因果 → `ml-causal-inference`；黑箱要解释 → `ml-explainability-xai`；数据不能集中 → `ml-federated-privacy`；LLM 要对齐/建知识库/上多模态 → `ml-alignment-rlhf` / `ml-rag-systems` / `ml-multimodal`
 
 ### 老手路径（按需直取）
 
-- 已有明确领域信号（"99% accuracy 召回 0""stacking 泄露""p≫n""loss NaN""prompt 时好时坏"）→ 直接激活对应专项 skill，不必经过 router
+- 已有明确领域信号（"99% accuracy 召回 0""stacking 泄露""p≫n""loss NaN""prompt 时好时坏""RLHF 怎么做""chunk 怎么切""PSI 报警了""相关还是因果"）→ 直接激活对应专项 skill，不必经过 router
 - 只有一个汇总数字要判断可信度 → `ml-pitfall-audit`（防御）或 `ml-theory-compass`（建设），二选一按问题性质
 - 写论文/汇报前的比较检验 → `ml-evaluation-design` 第 3 层（Friedman+Nemenyi 流程）
 - 深度训练翻车急救 → `ml-deep-training-playbook` 的固定排查链按序执行，先廉价后昂贵
+- 拿观测数据下了因果结论被挑战 → `ml-causal-inference` 的三阶梯定位与假设清单显式化
 
 ### 串联纪律
 
@@ -219,6 +300,7 @@ router 是唯一调度入口；子 skill 之间不互相调用，接力一律经
 
 - 经典链路（verified 单元证据）：diagnosis 方差主导 → ensemble-design；evaluation-design 发现不平衡 → imbalanced-learning；task-matching 援引理论保证 → theory-compass；evaluation-design 完成 + 要交付 → pitfall-audit
 - 扩展链路（批B/批C）：diagnosis 确认值得精修 → hpo-strategy；feature-engineering 构造完 → leakage-defense 审管道；transformer-era 判"不必自训" → pretraining-paradigm 选档位 → 判停档位 0 → prompting-methodology 施工；pretraining-paradigm 微调验收 → llm-evaluation 补污染检查；pitfall-audit 六问泄漏存疑 → leakage-defense 深挖
+- 批D/批E 链路（v0.0.2）：pitfall-audit 通过 → mlops-deployment 接管线上生命周期；pitfall-audit 查出"相关当因果" → causal-inference 深挖；causal 判定可随机化 → evaluation-design 设计 A/B 协议；xai 异常重要性 → leakage-defense 深挖、xai 解释驱动干预 → causal-inference 重新立项；pretraining-paradigm 定档 → rag-systems 做知识注入深化；rag/alignment/multimodal 的效果评估 → llm-evaluation 补 judge 校正；cnn-vision/rnn-sequence 设计定型训不动 → deep-training-playbook；optimization-methods 收敛但泛化差 → diagnosis
 
 ---
 
@@ -239,7 +321,7 @@ cp -r skills/<skill-slug> <project>/.cursor/skills/    # Cursor
 
 ## 测试与接入 darwin-skill
 
-28 个 skill 各带 `test-prompts.json`（9 条/个，共 252 条：4 should_trigger + 3 should_not_trigger + 2 edge_case），其中每份的 should_not_trigger 至少含 1 条跨 skill 混淆诱饵。可直接接入自动进化：
+39 个 skill 各带 `test-prompts.json`（9 条/个，共 351 条：4 should_trigger + 3 should_not_trigger + 2 edge_case），其中每份的 should_not_trigger 至少含 1 条跨 skill 混淆诱饵（批D/批E 新增测试集重点覆盖最难混淆对：optimization-methods vs hpo-strategy、cnn-vision vs rnn-sequence vs transformer-era、alignment-rlhf vs pretraining-paradigm、causal-inference vs pitfall-audit、rag-systems vs prompting-methodology、mlops-deployment vs experiment-tracking）。可直接接入自动进化：
 
 ```
 darwin evolve skills/

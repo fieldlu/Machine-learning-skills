@@ -1,0 +1,73 @@
+{
+  "skill": "ml-alignment-rlhf",
+  "version": "0.0.2",
+  "source_book": "经典文献共识（Christiano 2017; Ouyang InstructGPT 2022; Bai Anthropic HH 2022; Rafailov DPO 2023，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "一直没搞懂 RLHF 到底是怎么回事：模型不是已经预训练好了吗，为什么还要先 SFT 一遍、再单独训一个奖励模型、最后还要跑 PPO？base 模型和 chat 模型的差距就是这三步造成的吗？",
+      "expected_behavior": "应激活 ml-alignment-rlhf，讲清三阶段逻辑与动机：下一词预测只教模仿文本分布不教按意图行事；SFT 让模型见过好回答长什么样，RM 用两两偏好比较拟合人类偏好排序（相对判断比绝对打分一致），PPO 以 RM 为奖赏加 KL 锚定优化策略——InstructGPT 定型的公认基线。",
+      "notes": "正面场景: RLHF 三阶段概念原理（A2 场景 1/5，命中『RLHF 怎么回事』『为什么需要奖励模型』『SFT 之后还要做什么』『base 和 chat 差在哪』）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我们收集了两万多条偏好比较数据想给自家的 7B 模型做对齐。团队在吵：一派说走 PPO 才是正统上限高，另一派说 DPO 又稳又省。到底怎么选？",
+      "expected_behavior": "应激活 ml-alignment-rlhf，按四轴裁决 PPO vs DPO：算力（PPO 需同时驻留策略/参考/RM/价值四模型，DPO 只要双模型）、工程力（PPO 调参玄学多）、数据形态（一次性离线偏好对天然匹配 DPO）、追求（快速可用 vs 榨取上限）；两万多条离线偏好数据 + 7B 规模下 DPO 是合理默认。",
+      "notes": "正面场景: 对齐路线选型（A2 场景 2，命中『PPO 还是 DPO』语言信号，E 步骤 3 路线分叉）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "对齐训练跑了两个星期，奖励模型的分数一直在涨，但抽人工看回复发现模型变得特别啰嗦，开头结尾一堆客套话，信息量反而不如之前了。这是出什么问题了？",
+      "expected_behavior": "应激活 ml-alignment-rlhf，确认 reward hacking 发生：RM 分数上涨而人工质量持平或下降是黑客的确诊信号——堆砌套话/拉长篇幅/谄媚口吻都是钻代理空子（Goodhart 定律的对齐版）；处置为收紧 KL/重训 RM/扩充偏好覆盖面，暂不继续推高训练量。",
+      "notes": "正面场景: 奖励黑客识别与处置（A2 场景 3，E 步骤 4 判停条件原文场景——『RM 分数持续上涨而人工抽检质量持平或下降』）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "老板担心对齐之后模型会变笨：通用推理和写作能力会不会掉？这个『对齐税』大概有多重，有没有办法少交点？",
+      "expected_behavior": "应激活 ml-alignment-rlhf，回答对齐税议题：对齐常伴随通用能力轻微下降与多样性收窄——变听话的代价；工程问题不是交不交税而是压税率（更强基座/混入通用数据回灌/更小 KL 约束都能降税）；执行对齐前后通用能力回归集对照验收。",
+      "notes": "正面场景: 对齐税权衡（A2 场景 4，命中『对齐后变笨』『alignment tax』语言信号，E 步骤 5）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我想在自己领域的几万条问答数据上微调一个开源基座模型，但只有一张 4090。全参微调肯定不行吧？LoRA 的秩该设多少、要训几个 epoch？",
+      "expected_behavior": "不应激活 ml-alignment-rlhf——用户处于资源档位决策阶段（LoRA 配置与数据量问题），目标是领域适配而非注入人类偏好，应激活 ml-pretraining-paradigm 四档决策树。分界原文：『问 SFT 要多少数据/LoRA 行不行 → pretraining-paradigm；问 SFT 后如何注入人类偏好 → 本 skill』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-pretraining-paradigm 的最关键分界——资源档位决策 vs 对齐方法论；『SFT/微调』词汇出现但消费场景是档位不是对齐"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我们要对比评估两个对齐过的模型哪个更好，打算用 GPT-4 当裁判给回复打分。听说 LLM 打分有位置偏差什么的，该怎么设计这套评估才可信？",
+      "expected_behavior": "不应激活 ml-alignment-rlhf——诉求是对齐效果的验收态度量设计（judge 偏差校正/rubric），属于评估纪律，应激活 ml-llm-evaluation。分界原文：『对齐生产侧归本 skill，对齐效果的验收要用那边的人工评估 rubric 与一致性校验——两者接力而非重叠』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 生产侧 vs 验收侧的分界（与 llm-evaluation 的 composes-with 接力关系反向考）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我在做一个机械臂控制任务，「抓取成功」这个奖励函数手写了半年总是有漏洞，机器人总找到奇怪的刷分姿势。听人说可以用人类偏好学习来替代手写奖励，这条路具体怎么走通？",
+      "expected_behavior": "不应激活 ml-alignment-rlhf 作为主答——这是机器人控制域的一般 RLHF 起源问题（偏好即奖赏的原始场景），范式资格与 RL 机制细节归 ml-rl-decision-loop；本 skill 假设语境是大语言模型对齐，其 A2 语言信号全部围绕 LLM 场景。合理输出是路由到 rl-decision-loop 并说明 Christiano 原始工作在那里衔接。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 一般强化学习 vs LLM 对齐的分界——reward hacking 词汇同现但域不同"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们连 SFT 示范数据都还没有，只攒了一批偏好比较标注。能不能跳过 SFT 直接用这批偏好数据做 DPO？还是必须先把 SFT 补上？",
+      "expected_behavior": "合理判断: 应激活 ml-alignment-rlhf 并触发 E 步骤 2 判停分支——只有偏好数据没有 SFT 数据时可考虑直接 DPO 类路线（跳步方案）；但连 SFT 都没有时更须先核对基础能力现状。考察是否按判停条件给出跳步方案与风险声明，而非死板要求三阶段齐全。",
+      "notes": "边界: 缺 SFT 数据的跳步方案——E 步骤 2 判停条件的直接应用，考流程灵活性"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "推荐系统想借鉴 RLHF 的思路：用户点击当正反馈、跳过当负反馈，构造偏好对来优化排序模型。这个能套你们那套三阶段方法吗？",
+      "expected_behavior": "合理判断: 不应套用——B 段明写『传统任务的人类反馈（如推荐系统的点击反馈）是普通监督/带噪标签学习问题，不必套 RLHF 叙事』；点击是行为信号非人类偏好比较，噪声结构与 LLM 偏好标注完全不同。合理输出是边界声明并转常规推荐/学习排序思路。",
+      "notes": "边界: 传统反馈任务的反场景（B 段原文第四条）——考察拒绝把 RLHF 框架外溢到非对齐域"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 资源档位(ml-pretraining-paradigm)、验收评估(ml-llm-evaluation)、一般RL资格(ml-rl-decision-loop)。should-not-trigger 全部必须通过。"
+}

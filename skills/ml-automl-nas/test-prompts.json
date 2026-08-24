@@ -1,0 +1,73 @@
+{
+  "skill": "ml-automl-nas",
+  "version": "0.0.2",
+  "source_book": "经典文献共识（Elsken NAS 综述 2019; Zoph & Le NAS 2017; Feurer Auto-Sklearn 2015; Klein COTS 2019; Li Hyperband 2017，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "接手一个表格数据的分类任务，特征挺规整的但我对调参没什么经验。听说 AutoML 工具能自动搞定选模型和调参，靠谱吗？值得试吗？",
+      "expected_behavior": "应激活 ml-automl-nas，先做划算性判定（人工侧经验薄弱+表格任务 vs 机器侧算力），按 E 步骤 2 走 AutoML 路线：通用表格首选成熟框架（Auto-sklearn/TPOT/H2O 一类）跑端到端搜索产出对照；并回扣核心立场——自动化的是选择环节，数据质量仍是人的责任。",
+      "notes": "正面场景: 表格任务的 AutoML 划算性判定（A2 场景 1，命中『AutoML 靠谱吗』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "老板看到 NAS 的论文让我调研一下：能不能用架构搜索给我们的任务自动找一个网络结构？搜索空间、搜索策略、性能估计这三块分别要注意什么？大概要多少算力？",
+      "expected_behavior": "应激活 ml-automl-nas，先判划算性再讲三要素：空间太窄搜不出超越设计者的东西、太空宽成本指数爆炸；策略按预算选（随机/贝叶斯→进化→Hyperband 式资源分配）；性能估计用低保真+外推；同时报成本真相——经典 NAS 数百 GPU 天级，引用『NAS 达到 SOTA』必须同时报成本。",
+      "notes": "正面场景: NAS 三要素设计与成本现实（A2 场景 2/3，命中『NAS 怎么回事』『搜索空间怎么定』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我用少 epoch 训练做代理评估搜了 500 个候选架构，挑代理分数最高的几个完整训练，结果表现平平，甚至不如随机抽的一个。是我哪里搞错了吗？",
+      "expected_behavior": "应激活 ml-automl-nas，确认撞上代理指标陷阱（本 skill 核心 B 条）：早停分数与最终收敛性能的相关性不保证、权重共享下各候选互相干扰导致排名失真——『用代理指标选出的 top-k 应作为短名单而非最终答案』；处置为抽取代理前后名次候选做完整训练对照、计算秩相关、收紧低保真协议。",
+      "notes": "正面场景: 代理偏差事故现场（A2 场景 4，E 步骤 4 校准流程的直接应用）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "现在大模型这么强，我们还有必要自己做 NAS 吗？还是说直接微调现成模型就行了？感觉自己跑架构搜索有点像在重复造轮子。",
+      "expected_behavior": "应激活 ml-automl-nas，给出反向咨询的正面回答：大模型时代天平整体倒向另一边——预训练模型的架构已被巨额算力搜过一遍，下游正确动作是微调/提示（转 ml-pretraining-paradigm），自跑 NAS 多半是重新发明轮子的劣化版；NAS 性价比只在特定窗口成立。",
+      "notes": "正面场景: 大模型时代还要不要 NAS（A2 场景 5，命中『大模型时代还需要 NAS 吗』语言信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "网络架构就用 ResNet-50 不动了，现在要搜训练超参：学习率范围、weight decay、数据增强强度。预算够跑一百多次实验，用什么搜索策略比较科学？",
+      "expected_behavior": "不应激活 ml-automl-nas——架构已定、只差调参，这是给定架构后搜超参配置的问题，应激活 ml-hpo-strategy。分界原文（本批最关键）：『HPO 是给定架构后搜超参配置；NAS 是连架构本身一起搜』——把 NAS 叙事套在纯超参问题上会引入不必要的复杂度。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-hpo-strategy 的最关键分界——搜架构 vs 调参数；『搜索策略』词汇同现但对象是超参"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我跑了 AutoML 工具，它给出的最优 pipeline 离线分数特别漂亮，但拿到新数据上就掉得一塌糊涂。是不是自动化工具本身不可靠？还是我的数据有什么问题？",
+      "expected_behavior": "不应滞留在 ml-automl-nas 归咎工具——线下虚高线上崩是信息穿越嫌疑，且嵌套的自动化选择更容易把验证信息漏进管道（AutoML 放大而不是消除数据质量风险）。B 段明写『数据本身可疑 → 先走 ml-leakage-defense；垃圾进垃圾出，自动化只会更快地产出精致的垃圾』；留出集复核失败也指向 leakage 排查。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-leakage-defense 的 depends-on 分界——自动化放大验证集泄漏风险"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我想让模型学会根据用户历史行为预测他下一步会买什么品类。有没有那种能自动学习怎么做预测的方法？听说元学习可以『学会学习』，适合我这个需求吗？",
+      "expected_behavior": "不应激活 ml-automl-nas——诉求是跨任务学习方法迁移（元学习的地盘），不是在定义好的空间里搜配置；automl-nas B 段明写『元学习：同样讲从历史任务学，但目标是学会新任务的学习方法而非直接给出配置——概念近邻，问题不同』。且该任务是普通序列推荐建模，连外包选型的前提都未确立。",
+      "notes": "跨 skill 混淆诱饵: 元学习近邻概念混淆——考察识别『学会学习』≠『自动化选择』"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我想在搜索空间里既放层数、连接方式这些结构维度，也放学习率、batch size 这些训练超参，一起联合搜。这到底算 NAS 还是算 HPO？该参考哪套方法？",
+      "expected_behavior": "合理判断: 骑在两 skill 分界线上的混合场景——含结构维度即进入 automl-nas 辖区（NAS 三要素设计），但性能估计与预算分配大量借用 HPO 的省钱手段（Hyperband 早停两边通用）。合理输出是承认工具层衔接、问题层以 NAS 为主责，并建议分层搜索（结构外层+超参内层）控制成本。",
+      "notes": "边界: 联合搜索的归属判定——automl-nas A2 原文『实践中 NAS 的性能估计大量借用 HPO 手段，两 skill 在工具层衔接但在问题上互斥』"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "AutoML 跑出来的 pipeline 是一个特别奇怪的组合：两个几乎一样的 scaler 叠着用加一个冷门模型，分数确实最高但完全看不懂为什么。这样交付出去合适吗？",
+      "expected_behavior": "合理判断: 应激活 ml-automl-nas 并触发 B 段可解释性与复现性警告——自动化产出的 pipeline 常是反直觉组合且随机种子不同结果迥异；交付时应附搜索日志与多 seed 方差，并在从未参与搜索的留出数据上复核（E 步骤 5 验收纪律）。考察是否要求验证与人责清单而非直接采纳黑箱结果。",
+      "notes": "边界: 自动化结果的可解释性与验收纪律——考察是否守住『留出终审+人责交接』底线"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 超参搜索(ml-hpo-strategy)、泄漏防御(ml-leakage-defense)、元学习近邻。should-not-trigger 全部必须通过。"
+}

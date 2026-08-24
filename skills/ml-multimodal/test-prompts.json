@@ -1,0 +1,73 @@
+{
+  "skill": "ml-multimodal",
+  "version": "0.0.2",
+  "source_book": "交叉学科文献共识（Radford CLIP 2021; Baltrušaitis 融合综述; VQA 语言捷径教训，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们做电商商品分类，现在有商品标题文本和主图图片两种数据。同事说多模态是趋势都喂进去肯定更好，我觉得标注和工程量会翻倍。到底要不要上双模态？怎么判断值不值？",
+      "expected_behavior": "应激活 ml-multimodal 的第一问：单模态够吗——加模态的理由必须来自信息增量（另一模态携带独有信息），论证不出就劝退留在单模态；多一个模态不是免费升级而是翻倍的失败面（标注×对齐×过拟合风险）；若图文互补确凿（如标题与图片信息不重叠）再进融合选型。",
+      "notes": "正面场景: 单模态充分性判定（A2 场景 1 原文场景——纠结要不要都喂进去会不会反而更差；E 步骤 1）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "医疗场景要做影像+化验单联合诊断。难点是化验单经常缺项，有时候影像也调不到。融合架构该怎么设计才不会因为缺一侧就整个崩掉？早期晚期融合有什么区别？",
+      "expected_behavior": "应激活 ml-multimodal：模态缺失是常态而非异常，设计时要问『缺一侧还能不能跑』——晚期（决策级）融合天然抗单侧缺失、早/中融合需要缺失感知训练策略；按『交互密度×缺失风险×数据量』三轴定融合策略，本例缺失风险高指向晚期决策级或带降级路径的设计。",
+      "notes": "正面场景: 模态缺失鲁棒性 + 融合三型选型（A2 场景 4 原文场景，E 步骤 3/5 直接应用）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "听说 CLIP 不用训练就能做图像分类，零样本这是什么原理？我们想用它给几十万张无标注图片自动打标签，这条路可行吗？",
+      "expected_behavior": "应激活 ml-multimodal 的对齐路线分支：讲清 CLIP 对比对齐原理（4 亿图文对比学习拉近配对推远错对→图像语言共享语义空间，分类变成『图和哪个类名最像』）；零样本迁移是空间的免费赠品；用现成对齐空间做免训练打标成本几乎为零，先测零样本成绩 vs 目标差距再决定是否继续投入。",
+      "notes": "正面场景: CLIP 零样本原理与应用判定（A2 场景 3，命中『CLIP』『零样本迁移』『zero-shot』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "我们的图文匹配模型离线指标涨了四个点，上线后发现好像文本模型单独跑效果也差不多。是不是图片根本没起作用？这种怀疑有没有办法验证？",
+      "expected_behavior": "应激活 ml-multimodal 的评测特殊性分支：疑似模态坍塌/语言捷径——强模态吃掉全部梯度弱模态沦为摆设（名义双模态实际单模态）；验证手段是单模态消融对照（去掉次模态掉点 < 噪声水平即为名义多模态）；VQA 语言捷径危机正是此教训的出处——不跑盲基线的多模态报告不可信；证实后砍掉次模态简化系统。",
+      "notes": "正面场景: 模态坍塌诊断（A2 场景 5 原文场景变体——涨点是不是真来自融合，E 步骤 6 验收纪律）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我要从头搭一个视频理解模型的骨架，在 3D-CNN 和 Video Transformer 之间拿不定主意。我的数据有五十万段视频，算力充足。该选哪个骨干？",
+      "expected_behavior": "不应激活 ml-multimodal 作为主答——视频是单一视觉模态内部的时间维扩展（格式仍是同质视觉信号），3D-CNN vs Transformer 是单模态骨架选型问题，归 ml-transformer-era 的数据形态×规模×算力三轴决策。multimodal 管的是多个异质模态怎么接，不是单模态内部结构。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 单模态骨架选型 vs 多模态接法决策的分界（contrasts-with transformer-era 原文）"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我有一份问卷数据，同一批被试填了五份不同的心理量表，想把五个量表的信息合起来做一个综合评分模型。这算多模态融合问题吗？能不能用 cross-attention？",
+      "expected_behavior": "不应激活 ml-multimodal——B 段明写『多模态 ≠ 多视图：多视图学习指同一对象的多份同质观测（多个量表），模态间异质性低；融合技巧可互通但缺失模式与对齐难度完全不同』。且五份量表都是数值表格，只是格式不同质的数据，连多视图都勉强。考察概念近邻的辨析。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 多模态 vs 多视图的概念混淆对——B 段易混淆方法论第一条"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我的表格数据里收入字段缺失了 30%，用均值填充还是模型预测填充比较好？听说有多重插补的方法？",
+      "expected_behavior": "不应激活 ml-multimodal——表格字段缺失值插补是 ml-feature-engineering 的辖区；multimodal B 段明写『模态缺失 ≠ 数据缺失：表格的缺失值插补逻辑不能照搬到模态缺失——后者缺的是整条信息通道，处置是架构级降级而非数值填充』。反向考：别因『missing modality』字面相近误路由。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 模态缺失 vs 数据缺失的字面混淆对——B 段第三条易混淆条款"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我想微调 CLIP 来适配我们领域的专业图像检索，但不清楚该直接零样本凑合用、加个 adapter 轻量调一下，还是全量重训。这个决定该怎么框架化？",
+      "expected_behavior": "合理判断: 两 skill 边界共管区——multimodal A2 明写『用现成 CLIP 零样本还是微调它是两边交界处：档位问题走 pretraining-paradigm，对齐与融合设计走这边』。合理输出是先由 multimodal 测零样本基线给出差距数字，档位升级决策移交 ml-pretraining-paradigm 四档树，两步接力而非一 skill 包办。",
+      "notes": "边界: CLIP 档位选择的跨界归属——A2 区分节原文的直接应用，考串联意识"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我们的 VQA 模型在热门榜单上分数很高，但我担心这些测试图文对早就爬进过大模型的预训练语料。这个担心有必要吗？该怎么自查？",
+      "expected_behavior": "合理判断: 应激活 ml-multimodal 并确认担心成立——评测集泄漏是多模态专项坑之一（热门图文基准大量出现在预训练网页语料中榜单分虚高）；自查衔接 ml-llm-evaluation 的污染探针并叠加自有分布抽测；同时提醒跨模态检索指标与下游任务表现不总是一致。考 multimodal 与 llm-evaluation 的分工协作。",
+      "notes": "边界: 多模态基准泄漏的自查路径——I 段评测特殊性第三条+llm-evaluation 探针复用的联动"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 单模态骨架选型(ml-transformer-era)、多视图近邻(非多模态)、表格缺失值(ml-feature-engineering)。should-not-trigger 全部必须通过。"
+}

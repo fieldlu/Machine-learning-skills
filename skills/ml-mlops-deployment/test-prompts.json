@@ -1,0 +1,73 @@
+{
+  "skill": "ml-mlops-deployment",
+  "version": "0.0.2",
+  "source_book": "交叉学科共识（Sculley 技术债 2015; Google MLOps 白皮书与《Rules of Machine Learning》，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "模型在 notebook 里调好了，第一次要上线。团队在吵部署方式：有人说先影子跑一段，有人说要金丝雀灰度，还有人问要不要直接 A/B。这三种到底怎么选怎么排？",
+      "expected_behavior": "应激活 ml-mlops-deployment，按风险递进讲清三策略与串联关系：影子模式零风险观察『如果用它决策会怎样』适合首发；金丝雀 1%-5% 起步爆炸半径小逐级放量；A/B 同时验证业务指标是最终裁决——三者常串联影子→金丝雀→A/B 全量；交付放量计划表（阶段/流量比例/晋级条件/中止条件）。",
+      "notes": "正面场景: 部署三策略选型与串联（A2 场景 1 原文场景——『影子/金丝雀/A-B 怎么选』，E 步骤 3）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "模型上线四个月了，最近发现效果在悄悄下滑：坏例慢慢变多，但没人说得清是从哪天开始的，业务报表也还没看出明显异常。这是怎么了？该怎么建立预警？",
+      "expected_behavior": "应激活 ml-mlops-deployment：典型静默退化——业务指标滞后数周才反映模型退化（只盯业务层等于裸奔），PSI 类分布监控的价值就是把发现提前到数小时级；应布防三层监控（基础设施/预测层特征 PSI+预测分布/业务层），并走退化响应流程分清『系统坏了/世界变了/对手变了』再定位到层。",
+      "notes": "正面场景: 静默退化与三层监控布防（A2 场景 2/3 原文场景——指标慢慢掉没人说得清哪天开始）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "线下评估 AUC 0.87 挺好，上了线表现差一截。数据泄漏我们已经排查过了没有问题。还有什么可能的原因？听说有个叫 training-serving skew 的东西？",
+      "expected_behavior": "应激活 ml-mlops-deployment 的 skew 分支（leakage 已排除的前提正是其 A2 场景 5）：training-serving skew 是线上线下鸿沟主因——同一特征两套实现口径不一致（时区/边界/空值处理）、离线消费干净历史线上面对实时流；处置为逐特征一致性核对表+端到端比对证据，无法对齐的特征移出模型或加适配层。",
+      "notes": "正面场景: 排除泄漏后的 skew 嫌疑（A2 场景 5 原文场景，E 步骤 2 一致性检查）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "领导要求写一份模型运维预案：多久重训一次合适？自动重训会不会越训越差？还有万一新模型线上出问题，回滚怎么保障？",
+      "expected_behavior": "应激活 ml-mlops-deployment 的再训练与回滚分支：触发组合预定义（定期兜底+性能衰减线+漂移报警）；自动重训必须过固定验收集闸门否则有死亡螺旋风险（拟合异常期脏数据越训越差）；回滚要求旧版制品与特征管道热备且演练过至少一次——纸面上的回滚等于没有，旧版制品不存在时禁止新版上线。",
+      "notes": "正面场景: 再训练节奏与回滚预案（A2 场景 4/6，E 步骤 5 直接应用）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我这两周的实验记录乱成一团：改过哪些超参、用的哪版数据全记不清了，两次跑出来的结果还对不上。想搭一套实验管理流程把种子、配置、产物都管起来。",
+      "expected_behavior": "不应激活 ml-mlops-deployment——诉求是实验期的可复现记账（种子/配置/环境/checkpoint 上账本），应激活 ml-experiment-tracking。分界原文（最难混淆对）：『tracking 管实验期记账；本 skill 管上线后的生命周期（部署/监控/重训/回滚）；那边 B 段明言已上线系统的监控告警超出账本边界，移交点就在这里』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-experiment-tracking 的最难混淆对——实验期记账 vs 线上生命周期"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我们的模型还没上线，但在测试集上离线指标虚高得离谱。怀疑是归一化在数据划分之前就 fit 了，还有个特征好像把标签信息编码进去了。这类问题该怎么系统排查？",
+      "expected_behavior": "不应激活 ml-mlops-deployment——模型尚未上线、症状是训练期的信息穿越（变换器切分前 fit/特征编码标签），线下虚高的病因在训练过程而非线上环境差异，应激活 ml-leakage-defense。mlops-deployment E 步骤 1 判停条件原文反向应用：『线下好线上差且未做过泄漏排查 → 先移交 leakage-defense，排除后回来』——本例连线上环节都不存在。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-leakage-defense 的分界——训练期信息穿越 vs 线上线下环境差异；症状相似病因处方完全不同"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我们要把推理服务从单机迁到 Kubernetes 集群上，顺便配好 HPA 自动扩缩容和网关限流。这块的架构方案该怎么设计？",
+      "expected_behavior": "不应激活 ml-mlops-deployment——容器编排/网关配置/扩缩容是纯软件工程问题（DevOps/SRE 领地），B 段第一条明写『本 skill 只管 ML 特有的那部分（skew/漂移/模型制品）』。合理输出是边界声明并指出该诉求不在方法论合集射程内，按通用工程实践处理。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): ML 特有纪律 vs 通用 DevOps 工程的分界——『MLOps ≠ DevOps』易混淆条款"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们做的是一次性批量评分任务：每月一号对新客户批次打一次信用分，跑完落库就结束，没有常驻服务。这种形态还需要影子金丝雀那一套吗？监控要怎么做？",
+      "expected_behavior": "合理判断: 应激活 ml-mlops-deployment 并按 B 段第三条收窄范围——无持续服务就没有影子/金丝雀可言（其『部署』主要是调度与数据新鲜度管理），本 skill 仅监控与重训章节适用：批间漂移检查（输入分布 PSI 对照历史批次）与定期重训评估仍有意义。考察裁剪适用面而非全套照搬。",
+      "notes": "边界: 批处理式任务对部署策略的豁免——B 段反场景第三条的直接应用"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "PSI 报警响了，某核心特征的分布偏了 0.3。但业务转化率看起来一切正常。这算事故吗？要不要立刻回滚重训？还是可以先观察？",
+      "expected_behavior": "合理判断: 应激活 ml-mlops-deployment 并走 E 步骤 6 定位到层——预测分布动了但业务没动=观察信号（可能是上游数据源变更或季节性），业务动了才是行动信号；行动选项排序为阈值调整/规则兜底→回滚→紧急重训，盲目立刻重训反而可能拟合异常期脏数据；同时检查 PSI 阈值是否照抄行业数字未按特征基数校准。考分层决策纪律而非条件反射式回滚。",
+      "notes": "边界: 监控报警的分层响应——E 步骤 6 『预测层动业务没动=观察』的直接应用+PSI 阈值校准警告"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 实验期记账(ml-experiment-tracking)、训练期污染(ml-leakage-defense)、通用DevOps(非ML工程)。should-not-trigger 全部必须通过。"
+}

@@ -6,14 +6,14 @@
 
 **以西瓜书方法论为骨架、扩展至深度学习与大模型时代的全栈 ML 方法论 Skill 合集**
 
-[![Release](https://img.shields.io/badge/release-v0.0.1-blue)](https://github.com/fieldlu/Machine-learning-skills/releases/tag/v0.0.1)
+[![Release](https://img.shields.io/badge/release-v0.0.2-blue)](https://github.com/fieldlu/Machine-learning-skills/releases/tag/v0.0.2)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-![Skills](https://img.shields.io/badge/skills-28-2563eb)
-![Blind Tests](https://img.shields.io/badge/blind%20tests-252%2F252%20passed-16a34a)
-![Verified Units](https://img.shields.io/badge/verified%20units-97%20triple--verified%20%2B%2018%20extended-f59e0b)
+![Skills](https://img.shields.io/badge/skills-39-2563eb)
+![Blind Tests](https://img.shields.io/badge/blind%20tests-351%20cases-16a34a)
+![Verified Units](https://img.shields.io/badge/verified%20units-97%20triple--verified%20%2B%2029%20extended-f59e0b)
 [![Made with Claude Code](https://img.shields.io/badge/made_with-Claude_Code-8b5cf6)](https://claude.com/claude-code)
 
-> 🚧 **v0.0.1 — 首个公开版本**。合集处于早期阶段，结构与内容会持续迭代；欢迎通过 Issue 反馈触发不准或内容错误。
+> 🚧 **v0.0.2 — 史诗扩充版**。在 v0.0.1 的 28 个 skill 基础上新增批D（数学与架构基础 ×5）与批E（应用与交叉学科 ×6）共 11 个 skill，测试同规格扩至 351 条；合集处于早期阶段，结构与内容会持续迭代；欢迎通过 Issue 反馈触发不准或内容错误。
 
 </div>
 
@@ -21,11 +21,12 @@
 
 ## 这是什么
 
-这不是又一份机器学习知识点摘要，而是一套 **AI-agent 可直接调用的决策方法论合集**，共 **28 个 skill**，沿 ML 工作流全程铺开（总控路由 → 选型与评估 → 训练诊断调参 → 模型族施工 → 数据与特征 → 大模型时代 → 上线防御）。它的知识来自三层，性质各异、如实标注：
+这不是又一份机器学习知识点摘要，而是一套 **AI-agent 可直接调用的决策方法论合集**，共 **39 个 skill**，沿 ML 工作流全程铺开（总控路由 → 选型与评估 → 训练诊断调参 → 模型族施工 → 数据与特征 → 大模型时代 → 上线防御 → 专项进阶 → LLM 应用与运维）。它的知识来自四层，性质各异、如实标注：
 
 1. **🍉 西瓜书验证单元**（router + 17 个子 skill）——把周志华《机器学习》（2016）里反复出现的判断纪律——"脱离任务谈算法优劣无意义"、"先修尺子再谈诊断"、"训练精度满分是红旗不是捷报"、"理论给出边界而非答案"——经跨域复现 / 预测力 / 独特性三关验证后蒸馏成原子决策框架，R 段逐字引用原书并标注章节。
-2. **📜 经典文献共识外推**（6 个"大模型时代" skill）——Transformer 架构、预训练-微调范式、思维链等主题超出原书时代，改从奠基文献（*Attention Is All You Need*、BERT、GPT-3、Scaling Laws、CoT、*Deep Learning* 教科书等）的学界公认结论构造，R 段为逐条标注"（转述）"的文献表述，不是原书文字。
-3. **🛠️ 工程实践补全**（4 个"工程落地" skill）——数据泄漏防御、特征工程、实验可复现、超参搜索是原书明确不讲的部分，改从业界公开共识（scikit-learn 官方文档、Google《Rules of Machine Learning》、*Hidden Technical Debt in ML Systems* 等）构造；它们是纪律与通行做法，不是定理。
+2. **🌱 书内补全单元**（8 个"批A"子 skill）——西瓜书池外补充的书内内容（神经网络/SVM/聚类/规则/概率图/RL/半监督/多分类），沿用同一套三重验证流程，R 段同样逐字引用原书。
+3. **📜 经典文献共识外推**（6 个"大模型时代"+ 3 个架构基础 skill）——Transformer 架构、预训练-微调范式、思维链等主题超出原书时代，改从奠基文献（*Attention Is All You Need*、BERT、GPT-3、Scaling Laws、CoT、*Deep Learning* 教科书等）的学界公认结论构造；批D 的 CNN/RNN/AutoML-NAS 同属此类（LeNet-5、ResNet、LSTM、NAS 综述等奠基文献）；R 段为逐条标注"（转述）"的文献表述，不是原书文字。
+4. **🛠️ 工程与交叉学科共识**（4 个"工程落地"+ 批E 全部 6 个 skill）——数据泄漏防御、特征工程、实验可复现、超参搜索从业界公开共识构造；批E 的因果推断、可解释性（XAI）、联邦隐私、RAG、多模态、MLOps 六个 skill 归入本层并注明"应用与交叉学科"——主题横跨统计学、博弈论、密码学与 ML 工程，素材为 Pearl/Rubin、LIME/SHAP、FedAvg/Dwork、Lewis RAG、CLIP、Sculley 技术债等公认文献与业界白皮书的转述。它们是纪律与通行做法，不是定理。
 
 每个 skill 都带：
 
@@ -38,10 +39,10 @@
 
 ## ✨ 特性
 
-- **🔬 97 处三重验证单元 + 18 处扩展单元** — 书内内容全部通过 V1 跨域复现 / V2 预测力 / V3 独特性三关验证，淘汰明细留档可追溯；扩展单元按同规格测试
-- **📐 RIA++ 六段同构** — 28 个 skill 共享同一结构（Reading / Interpretation / Past Application / Future Trigger / Execution / Boundary），agent 读一个就认识全部
+- **🔬 97 处三重验证单元 + 29 处扩展单元** — 书内内容全部通过 V1 跨域复现 / V2 预测力 / V3 独特性三关验证，淘汰明细留档可追溯；扩展单元按同规格测试
+- **📐 RIA++ 六段同构** — 39 个 skill 共享同一结构（Reading / Interpretation / Past Application / Future Trigger / Execution / Boundary），agent 读一个就认识全部
 - **🧭 总控路由** — `ml-methodology-router` 是唯一调度入口：先定位你卡在工作流哪一段，再派发对应子 skill
-- **🧪 252 条盲测全部通过** — 每个 skill 配 `test-prompts.json`（should_trigger + 混淆诱饵 + edge case），由未接触期望答案的独立盲测员判卷，darwin-skill 兼容可直接进化
+- **🧪 351 条盲测用例同规格覆盖** — 每个 skill 配 `test-prompts.json`（should_trigger + 混淆诱饵 + edge case），由未接触期望答案的独立盲测员判卷，darwin-skill 兼容可直接进化
 - **🔗 Zettelkasten 链接网络** — skill 间的关系（depends-on / contrasts-with / composes-with）全部显式声明，见 [INDEX.md](./INDEX.md) 的引用图
 
 ## 📦 安装
@@ -49,8 +50,8 @@
 **方式一：Claude Code 用户级安装（推荐）**
 
 ```bash
-# v0.0.1 首个发布版本
-git clone -b v0.0.1 https://github.com/fieldlu/Machine-learning-skills.git
+# v0.0.2 最新发布版本
+git clone -b v0.0.2 https://github.com/fieldlu/Machine-learning-skills.git
 cp -r Machine-learning-skills/skills/* ~/.claude/skills/
 ```
 
@@ -64,11 +65,11 @@ cp -r skills/<skill-slug> <project>/.cursor/skills/    # Cursor
 
 **方式三：手动复制单个 skill**
 
-只需要某个专项（比如只要泄漏防御）？直接把 `skills/ml-leakage-defense/` 一个目录拷进宿主 skills 目录即可。每个 skill 目录自包含（SKILL.md + 测试文件），不依赖仓库其他文件。唯一建议：如果全装，router 会自动帮你串联其余 27 个。
+只需要某个专项（比如只要泄漏防御）？直接把 `skills/ml-leakage-defense/` 一个目录拷进宿主 skills 目录即可。每个 skill 目录自包含（SKILL.md + 测试文件），不依赖仓库其他文件。唯一建议：如果全装，router 会自动帮你串联其余 38 个。
 
 ## 🚀 快速开始
 
-装好后，像平常一样向 agent 提问即可。五个真实场景：
+装好后，像平常一样向 agent 提问即可。六个真实场景：
 
 **① "该用什么算法？"** → router 定位到选型前思考 → 派发 `ml-task-matching`
 
@@ -100,11 +101,21 @@ cp -r skills/<skill-slug> <project>/.cursor/skills/    # Cursor
 >
 > **agent**：先别跳到最高档。适配任务的手段是一个四档成本阶梯：提示工程（零训练）→ LoRA 等 PEFT（冻结原权重，千级数据即可）→ 全参微调（十万级以上才值得，且最容易把预训练能力冲掉）→ 从零预训练（绝大多数团队终生不需要）。正确顺序是先做提示工程与少样本基线：数据不足 1k 条时禁止直接微调。若最终走到微调，两条纪律提前立好——留一组通用能力回归测试检测灾难性遗忘；领域离预训练分布越远，才越有升档的理由。
 
+> **你**：我们想微调 LLaMA 做客服问答，直接全参微调行吗？
+>
+> **agent**：先别跳到最高档。适配任务的手段是一个四档成本阶梯：提示工程（零训练）→ LoRA 等 PEFT（冻结原权重，千级数据即可）→ 全参微调（十万级以上才值得，且最容易把预训练能力冲掉）→ 从零预训练（绝大多数团队终生不需要）。正确顺序是先做提示工程与少样本基线：数据不足 1k 条时禁止直接微调。若最终走到微调，两条纪律提前立好——留一组通用能力回归测试检测灾难性遗忘；领域离预训练分布越远，才越有升档的理由。
+
+**⑥ "这个结论是因果关系吗？"** → router 定位到专项进阶 → 派发 `ml-causal-inference`
+
+> **你**：我们分析了半年数据：开通会员的用户流失率 8%，没开通的 15%。所以会员功能能留住用户，下季度要大力推广？
+>
+> **agent**：先别急着下结论——这是拿观测关联冒充因果的典型场景。"愿意开会员的用户"本身可能就是高意愿留存人群（混杂/自选择）。你的问题本质是干预问题（"开通会员会怎样"，即 do 层），预测模型消费的 P(Y|X) 回答不了它。可行路线：要么补一个随机分流的 A/B 实验（金标准），要么走观测路线——倾向得分匹配按"被处理的倾向"平衡可比组，并把全部不可检验假设显式摆上台面再谈效应大小……
+
 纯代码实现问题（sklearn 语法、报错栈）不会被路由——直接回答，不走方法论流程。
 
-## 🗂️ 28 个 Skill 全景
+## 🗂️ 39 个 Skill 全景
 
-来源标注：🍉 西瓜书原文锚点·三重验证（原批）｜🌱 西瓜书池外补全·同规格验证（批A）｜📜 经典文献共识（批B）｜🛠️ 工程实践共识（批C）
+来源标注：🍉 西瓜书原文锚点·三重验证（原批）｜🌱 西瓜书池外补全·同规格验证（批A）｜📜 经典文献共识（批B；批D 的优化/CNN/RNN/AutoML-NAS/对齐 RLHF 同属此性质）｜🛠️ 工程实践共识（批C）；🌐 应用与交叉学科共识（批E 六个：因果推断/XAI/联邦隐私/RAG/多模态/MLOps——归入第四层"工程与交叉学科共识"，素材横跨统计学、博弈论、密码学与 ML 工程）
 
 ### 🧭 总控路由
 
@@ -162,6 +173,27 @@ cp -r skills/<skill-slug> <project>/.cursor/skills/    # Cursor
 | [`ml-pretraining-paradigm`](./skills/ml-pretraining-paradigm/SKILL.md) 📜 | 预训练范式四档决策树：提示→PEFT→全参微调→从零，选最低够用档 | "要不要自己训模型""LoRA 和全参微调怎么选" |
 | [`ml-prompting-methodology`](./skills/ml-prompting-methodology/SKILL.md) 📜 | 提示即编程：few-shot 选择、CoT 边界、schema 约束、回归测试驱动迭代 | "prompt 改来改去时好时坏" |
 
+### 🔬 数学与架构基础
+
+| Skill | 一句话 | 典型触发语 |
+|---|---|---|
+| [`ml-optimization-methods`](./skills/ml-optimization-methods/SKILL.md) 📜 | 优化方法选型：凸性判定→一阶/二阶/拟牛顿→拉格朗日与 KKT 对偶→收敛曲线归因 | "牛顿法还是梯度下降""KKT 条件有什么用""是不是陷局部最优了" |
+| [`ml-cnn-vision`](./skills/ml-cnn-vision/SKILL.md) 📜 | 卷积网络适用判断：归纳偏好匹配→组件链→ResNet 残差动机→ViT 后的先验重估 | "该不该用 CNN""BN 放激活前还是后""为什么越深反而越差" |
+| [`ml-rnn-sequence`](./skills/ml-rnn-sequence/SKILL.md) 📜 | 序列建模路线决策：任务定形→门控治时序梯度消失→RNN 系还是 Transformer | "LSTM 还是 GRU""seq2seq 长句崩塌""流式识别边缘部署" |
+
+### 🌐 应用与交叉学科
+
+| Skill | 一句话 | 典型触发语 |
+|---|---|---|
+| [`ml-alignment-rlhf`](./skills/ml-alignment-rlhf/SKILL.md) 📜 | 对齐方法论：RLHF 三阶段、PPO vs DPO 路线裁决、奖励黑客识别、对齐税 | "RLHF 怎么回事""模型学会讨好刷分了""base 和 chat 差在哪" |
+| [`ml-automl-nas`](./skills/ml-automl-nas/SKILL.md) 📜 | AutoML 与 NAS 适用判断：自动化的是选择，不是判断；代理指标偏差校准 | "AutoML 靠谱吗""NAS 怎么回事""搜出来的架构训完不行" |
+| [`ml-causal-inference`](./skills/ml-causal-inference/SKILL.md) 🌐 | 因果思维入门：三阶梯定位问题本质→混杂机制识别→RCT 或观测路线速览 | "相关还是因果""这波增长该归功给谁""不做会怎样" |
+| [`ml-explainability-xai`](./skills/ml-explainability-xai/SKILL.md) 🌐 | 黑箱解释技术选型与正确用法：按动机定档→内在可解释 vs 事后解释→解释非因果 | "SHAP 还是 LIME""两个方法排序不一致""监管要每个决定可解释" |
+| [`ml-federated-privacy`](./skills/ml-federated-privacy/SKILL.md) 🌐 | 隐私保护 ML 决策链：集中化资格判定→FedAvg 与 non-IID→威胁模型与 DP 预算 | "数据不出域怎么建模""ε 设多少""模型会不会泄露训练样本" |
+| [`ml-rag-systems`](./skills/ml-rag-systems/SKILL.md) 🌐 | 检索增强生成决策链：三路对比→切块/embedding/重排→检索生成分段评估归因 | "RAG 还是长上下文""chunk 怎么切""明明文档里有却答错" |
+| [`ml-multimodal`](./skills/ml-multimodal/SKILL.md) 🌐 | 多模态建模决策：单模态够吗→融合三型选型→CLIP 对齐→消融检验真融合 | "图文要不要都喂进去""early 还是 late fusion""CLIP 零样本原理" |
+| [`ml-mlops-deployment`](./skills/ml-mlops-deployment/SKILL.md) 🌐 | 上线后生命周期纪律：skew 一致性检查→部署三策略→三层监控→再训练与回滚 | "影子金丝雀 A-B 怎么选""PSI 阈值多少""什么时候该重训" |
+
 ### 🛡️ 防御与理论
 
 | Skill | 一句话 | 典型触发语 |
@@ -173,7 +205,7 @@ cp -r skills/<skill-slug> <project>/.cursor/skills/    # Cursor
 
 ## 🧠 这套东西怎么造出来的
 
-采用 cangjie-skill 的 **RIA-TV++ 六阶段流水线**，从原书 440 页出发，全程人工把关；2026-08 起以同一流水线与同一验收规格扩充至 28 个 skill：
+采用 cangjie-skill 的 **RIA-TV++ 六阶段流水线**，从原书 440 页出发，全程人工把关；2026-08 起以同一流水线与同一验收规格扩充至 39 个 skill：
 
 ```mermaid
 graph LR
@@ -184,21 +216,31 @@ graph LR
         D --> E["92 条通过<br/>55 条淘汰入 rejected/"]
         E --> F["RIA++ 构造<br/>97 处单元组装"]
     end
-    subgraph EXT["增补 · 扩展至 28 skills（2026-08）"]
+    subgraph EXT["增补 · 扩展至 28 skills（2026-08 v0.0.1）"]
         G["批A · 书内补全 ×8<br/>ch5/6/9/13/14/15/16 · 多分类主线"]
         H["批B · 经典文献共识 ×6<br/>Transformer/预训练/CoT/深训排障…"]
         I["批C · 工程实践共识 ×4<br/>泄漏/特征/复现/HPO"]
         J["+18 处扩展单元<br/>同规格三关复核"]
         K["阶段4 盲测<br/>252/252 通过"]
     end
+    subgraph EPIC["史诗扩充 · 扩展至 39 skills（2026-08 v0.0.2）"]
+        L["批D · 数学与架构基础 ×5<br/>优化方法/CNN/RNN/AutoML-NAS/对齐RLHF"]
+        M["批E · 应用与交叉学科 ×6<br/>因果/XAI/联邦隐私/RAG/多模态/MLOps"]
+        N["+11 处扩展单元<br/>文献与交叉学科共识, 同规格测试"]
+        O["阶段4 盲测扩容<br/>351 条用例(39×9)"]
+    end
     F --> G
     G --> J
     H --> J
     I --> J
     J --> K
+    K --> L
+    L --> N
+    M --> N
+    N --> O
 ```
 
-流水线关键纪律：**提取 ≠ 录取**。原批的五路提取器（框架/原则/反例/案例/术语）各自动扫全书产出候选后，独立验证员对每条候选跑三道关卡——能否跨域复现（V1）、能否预测真实场景（V2）、是否只是常识包装（V3）——三条全过才录取，淘汰记录留档可查。批A 沿用同一套流程对阶段 1.5 池外补充单元做验证；批B/C 的主题不在书内，改为从奠基文献与业界公开共识构造，但 R 段逐条标注来源与转述性质，并通过与书内单元同规格的测试。
+流水线关键纪律：**提取 ≠ 录取**。原批的五路提取器（框架/原则/反例/案例/术语）各自动扫全书产出候选后，独立验证员对每条候选跑三道关卡——能否跨域复现（V1）、能否预测真实场景（V2）、是否只是常识包装（V3）——三条全过才录取，淘汰记录留档可查。批A 沿用同一套流程对阶段 1.5 池外补充单元做验证；批B/C 的主题不在书内，改为从奠基文献与业界公开共识构造，但 R 段逐条标注来源与转述性质，并通过与书内单元同规格的测试。批D/E 沿同一纪律：批D 补数学与架构基础（优化方法/CNN/RNN/AutoML-NAS/对齐 RLHF，素材为 Boyd & Vandenberghe、LeCun、He、Hochreiter、Elsken、Ouyang 等奠基文献），批E 补应用与交叉学科（因果推断/XAI/联邦隐私/RAG/多模态/MLOps，素材横跨统计学、博弈论、密码学与 ML 工程共识），R 段逐条标"（转述）"并带时代边界声明。
 
 ## 📊 验证漏斗
 
@@ -214,23 +256,25 @@ graph LR
 | 批C · 工程共识 | **4 个新 skill** | scikit-learn 官方文档、Google《Rules of ML》、*Hidden Technical Debt* 等业界公开共识 |
 | 扩展单元合计 | **+18 处** | 批A 池外补充 + 批B/C 文献/工程共识单元，同规格 V1/V2/V3 复核 |
 | 盲测压测 | **252/252 通过** | 每 skill 9 题：4 trigger + 3 诱饵 + 2 边界（原批 90 + 增补 162） |
+| v0.0.2 · 史诗扩充 | **+11 skill** | 批D 数学与架构基础 ×5 + 批E 应用与交叉学科 ×6：文献与交叉学科共识, 同规格测试（Boyd/Nocedal/LeCun/He/Hochreiter/Elsken/Ouyang/Rafailov/Pearl/Rubin/Ribeiro/Lundberg/McMahan/Kairouz/Lewis/Radford/Sculley 等），每 skill 配 9 条同规格盲测用例 |
 
-其中 **97 处单元来自西瓜书三重验证**；批B/C 单元为文献与工程共识构造，但通过与书内单元同规格的测试关卡。盲测方法：盲测员只拿到 28 个 skill 的 name + description 目录（不接触期望答案与内部结构），对 252 条测试提示逐一选择应否触发及路由去向。判卷明细见各 skill 的 [`test-results.md`](./skills/ml-diagnosis/test-results.md)。
+其中 **97 处单元来自西瓜书三重验证**；批B/C/D/E 单元为文献、工程与交叉学科共识构造，但通过与书内单元同规格的测试关卡。盲测方法：盲测员只拿到 39 个 skill 的 name + description 目录（不接触期望答案与内部结构），对 351 条测试提示逐一选择应否触发及路由去向。判卷明细见各 skill 的 [`test-results.md`](./skills/ml-diagnosis/test-results.md)。
 
 ## ⚠️ 边界声明
 
-诚实地讲清三层来源各自的边界，正如每个 skill 自己的 B 段所要求的那样：
+诚实地讲清四层来源各自的边界，正如每个 skill 自己的 B 段所要求的那样：
 
-- **层一（西瓜书单元）的边界**：原书成书于 2015–2016 年，i.i.d. 假设贯穿全书，对分布漂移、域适应只有只言片语（原书序言中李未院士已专门指出这一点）；教材体例还牺牲了对"多个技巧组合使用时的相互作用"的讨论。本层内容忠实于原书语境——涉及大模型时代的判断，请不要在本层内寻找答案，那是层二的辖区。
-- **层二（批B 文献共识）的边界**：R 段是对奠基文献的转述而非逐字原文（均标"（转述）"）；共识快照大体止于 2017–2023 年的方法论文献，此后的进展（MoE、长上下文的最新实践、多模态 agent 等）未收录；文献共识本身也可能被后续研究修正——它比原书新，但不比未来新。
-- **层三（批C 工程共识）的边界**：业界通行做法不是定理，具体工具载体（Hydra、Optuna、`pip freeze`）会过时。应当继承的是纪律内核——"统计量只认训练折"、"五元组钉住实验"、"归因未做不开搜"——而不是某个工具名。
+- **层一（西瓜书单元）的边界**：原书成书于 2015–2016 年，i.i.d. 假设贯穿全书，对分布漂移、域适应只有只言片语（原书序言中李未院士已专门指出这一点）；教材体例还牺牲了对"多个技巧组合使用时的相互作用"的讨论。本层内容忠实于原书语境——涉及大模型时代的判断，请不要在本层内寻找答案，那是后续各层的辖区。
+- **层二（批A 书内补全）的边界**：与层一同源同规格——素材仍在书内但属阶段 1.5 池外补充，验证流程一致；同样受原书时代语境约束。
+- **层三（批B/D 文献共识 + 批C 工程共识）的边界**：R 段是对奠基文献的转述而非逐字原文（均标"（转述）"）；共识快照大体止于 2017–2023 年的方法论文献，此后的进展（MoE、长上下文的最新实践、多模态 agent 等）未收录；业界通行做法不是定理，具体工具载体（Hydra、Optuna、`pip freeze`）会过时。应当继承的是纪律内核——"统计量只认训练折"、"五元组钉住实验"、"归因未做不开搜"、"先判凸性与划算性再选方法"——而不是某个工具名。
+- **层四（批E 应用与交叉学科共识）的边界**：六个 skill 的主题横跨统计学（因果推断）、博弈论（SHAP）、密码学与隐私工程（联邦学习/DP）、检索与信息获取（RAG）、多模态感知与 ML 系统运维——这些领域本身仍在快速演化（DML/因果森林的适用条件之争、机械可解释性、个性化 FL、GraphRAG、LLM 监控维度），本层的结论是"截至共识快照时点的操作纪律"，执行时应核对最新实证；合规判断（GDPR/HIPAA 适用性）是法律问题，技术 skill 不能替代法律意见。
 
-但反方向的辩护依然成立：凡进入严肃生产或科研的场景（医疗、工业、科研发现），样本昂贵、错误代价高——三层评估体系与偏差-方差思维依然是不可替代的基本功；而在大模型时代，"榜单分数是参照物不是成绩单"、"prompt 改动要过回归测试"这些新纪律，正是同一套怀疑与验证态度在新地形上的延续。它教的不是某个算法，而是**对任何学习结果保持怀疑并科学验证的态度**。
+但反方向的辩护依然成立：凡进入严肃生产或科研的场景（医疗、工业、科研发现），样本昂贵、错误代价高——多层评估体系与偏差-方差思维依然是不可替代的基本功；而在大模型时代，"榜单分数是参照物不是成绩单"、"prompt 改动要过回归测试"、"相关不等于因果要先问机制"、"上线不是终点而是漂移的起点"这些新纪律，正是同一套怀疑与验证态度在新地形上的延续。它教的不是某个算法，而是**对任何学习结果保持怀疑并科学验证的态度**。
 
 ## 🙏 致谢
 
 - 本仓库的**主知识源**是周志华所著《机器学习》（清华大学出版社，2016，"西瓜书"）。原批与批A 的所有书内引用版权归原书作者与出版社所有；本仓库是对其方法论结构的二次组织与工程化封装，用于学习与研究目的。
-- 批B/批C 的 R 段分别转述或引用自公开学术文献（Vaswani、Kaplan、Devlin、Brown、Wei、Glorot、He、Ioffe、Srivastava、Szegedy、Belkin、Zheng、Liang 等）与业界公开文档（scikit-learn 官方文档、Google《Rules of Machine Learning》、*Hidden Technical Debt in Machine Learning Systems* 等），均已在使用处标注来源与转述性质。
+- 批B/C/D/E 的 R 段分别转述或引用自公开学术文献与业界文档：批B（Vaswani、Kaplan、Devlin、Brown、Wei、Glorot、He、Ioffe、Srivastava、Szegedy、Belkin、Zheng、Liang 等）、批C（scikit-learn 官方文档、Google《Rules of Machine Learning》、*Hidden Technical Debt in Machine Learning Systems* 等）、批D（Boyd & Vandenberghe《Convex Optimization》、Nocedal & Wright《Numerical Optimization》、LeCun LeNet-5、He ResNet、Hochreiter & Schmidhuber LSTM、Cho/Sutskever/Bahdanau 序列建模、Elsken NAS 综述、Zoph & Le、Feurer Auto-Sklearn、Christiano RLHF、Ouyang InstructGPT、Rafailov DPO 等）、批E（Pearl《Causality》/《The Book of Why》、Rubin 1974、Ribeiro LIME、Lundberg SHAP、McMahan FedAvg、Kairouz 联邦综述、Dwork 差分隐私、Lewis RAG、Radford CLIP、Sculley 技术债等），均已在使用处标注来源与转述性质。
 - 若本仓库内容对你的工作有帮助，请同时引用原书：周志华. 机器学习. 北京：清华大学出版社，2016。
 - 本仓库与原作者及出版社无隶属关系；发现引用与原出处不符请提 Issue 并附出处页码/链接。
 - 流水线工具：cangjie-skill（拆书蒸馏）；测试兼容：darwin-skill；构建过程由 Claude Code 辅助完成。

@@ -6,6 +6,8 @@
 >
 > **批B/批C 增补**：合集扩容后新增 18 个子 skill 覆盖深度训练与大模型场景，这些 skill 的关键概念不在原书内——按主题分组追加于各节末尾（标注 ◆），定义来自对应子 skill 锚定的经典文献共识/工程实践共识，引用时注意与原书语境的外推边界。
 >
+> **批D/批E 增补（v0.0.2）**：史诗扩充新增 11 个子 skill（数学与架构基础 ×5、应用与交叉学科 ×6），其关键概念同样不在原书内——追加于第七、八节（标注 ◇），定义来自对应子 skill 锚定的文献与交叉学科共识，引用时注意各自的外推边界。
+>
 > "关联 skill"列指向仓库 `skills/` 下对应子 skill；路由入口见 `skills/ml-methodology-router`。
 
 ---
@@ -123,11 +125,44 @@
 | 缩放定律 | scaling law | 模型参数量、数据量、算力与损失之间跨越多个数量级近似成立的幂律关系；推论：loss 平滑但绝对值偏高可能是算力预算问题而非 bug，经典"loss 不降=出故障"直觉在大模型语境失效 | ml-deep-training-playbook, ml-transformer-era |
 | 灾难性遗忘 | catastrophic forgetting | 微调分布挤压预训练通用能力、旧技能崩坏的现象；缓解手段：低学习率/混入通用语料/更小 PEFT 秩/冻结策略——微调后必须做通用能力回归测试 | ml-pretraining-paradigm |
 | LLM 裁判 | LLM-as-judge | 用强模型给候选输出批量打分的自动评估方式；已知系统性偏差：位置偏差（偏先答者）、自偏爱（偏自家输出）、长度偏好——须换序平均/匿名化/长度控制校正 | ml-llm-evaluation |
+| ◇ 凸优化 | convex optimization | 目标函数与可行域皆为凸的优化问题——局部最优即全局最优、存在多项式时间可靠求解器；凸性判定是优化方法选型的第一问，一旦非凸一切全局保证作废 | ml-optimization-methods |
+| ◇ KKT 条件/对偶 | Karush-Kuhn-Tucker conditions / duality | 约束优化驻点的必要条件（可行/平稳/互补松弛；凸问题下充分）；拉格朗日对偶把"哪些约束贴边起作用"编码进求解结构——SVM 的支持向量与核技巧入口皆由此而来 | ml-optimization-methods, ml-svm-playbook |
+| ◇ 鞍点 | saddle point | 某些方向向上、某些方向向下的临界点；高维非凸景观中严格局部极小稀少而鞍点占绝大多数——"陷入局部最优"的旧直觉被修正，SGD 的随机扰动天然助逃逸 | ml-optimization-methods |
+| ◇ 卷积归纳偏好 | convolutional inductive bias | 局部感受野+权值共享（平移不变）+层次化下采样三件套；信号结构匹配时是高性价比先验（图像），不匹配时变成枷锁（表格）——ViT 证明它是"小数据时代的拐杖、大数据时代的脚镣" | ml-cnn-vision |
+| ◇ 残差连接 | residual connection | 让堆叠层拟合 F(x)=H(x)−x 并配恒等捷径的结构；深层的退化问题（训练误差反升）是优化困难而非容量问题，残差给恒等映射留默认通路、梯度获得跨层高速通道 | ml-cnn-vision |
+| ◇ 门控机制 | gating mechanism (LSTM/GRU) | 用输入/输出/遗忘门控制细胞状态这条"传送带"的写入读出清空，让误差沿时间近无衰减回传——治愈 BP 梯度消失的**时序版**；GRU 是两门简化变体，效果多数场合相当 | ml-rnn-sequence |
+| ◇ seq2seq 信息瓶颈 | seq2seq information bottleneck | 把变长源序列压成固定向量导致长句性能骤降的结构缺陷；注意力让解码器每步软回看全部编码状态——后来独立壮大为 Transformer 的核心 | ml-rnn-sequence, ml-transformer-era |
+| ◇ 神经架构搜索三要素 | NAS triad: search space / strategy / estimation | 搜索空间（允许哪些结构存在）×搜索策略（怎么走：RL/进化/贝叶斯/DARTS 类可微）×性能估计（低保真+外推如何给候选拍板）；空间决定天花板、代理指标有系统性偏差——top-k 只是短名单 | ml-automl-nas |
+| ◇ 奖励黑客 | reward hacking (reward model exploitation) | 策略精准钻奖励模型这个有损代理的空子——堆砌套话/拉长篇幅/谄媚口吻使 RM 分数涨而真实质量不涨甚至下降；Goodhart 定律的对齐版："当代理指标成为目标，它就不再是好指标"；缓解靠 KL 锚定/RM 集成/偏好数据保鲜 | ml-alignment-rlhf |
+| ◇ DPO | Direct Preference Optimization | 从 RLHF 目标闭式解推导出的免强化学习对齐路线：偏好数据上直接构造分类损失、隐式完成策略优化——跳过显式 RM 与在线采样，稳定便宜工程简单；代价是无法在线迭代、上限受离线数据限制 | ml-alignment-rlhf |
+
+---
+
+## 八、◇ 应用与交叉学科增补（批E 子 skill 关键概念，非原书内容）
+
+| 术语 | 英文 | 一句话定义（文献共识用法） | 关联 skill |
+|---|---|---|---|
+| ◇ 因果推断/因果之梯 | causal inference / ladder of causation | Pearl 三阶梯：关联（看见 X 时 Y 的似然）→干预（do(X) 后 Y 如何）→反事实（假如当初不 X）；每层的答案都无法由下一层的数据单独得出——观察吸烟与癌症的相关回答不了"戒烟会怎样" | ml-causal-inference |
+| ◇ 混杂变量 | confounder | 同时影响处理与结果的共同原因（冰淇淋销量与溺水正相关，背后是气温）；观测数据下因果结论的头号威胁，RCT 用随机化从机制上切断其后门路径 | ml-causal-inference |
+| ◇ 反事实/潜在结果 | counterfactual / potential outcomes | Rubin 框架：因果效应=同一单元在"接受处理"与"不接受处理"两种潜在结果间的差异，但任一单元同时只能观测其一——缺失的那一半正是因果推断的根本问题 | ml-causal-inference |
+| ◇ 倾向得分 | propensity score | 个体"被处理"的概率；按它做匹配/加权可平衡可比组——但只平衡已观测协变量，未观测混杂原封不动留在估计里（PSM 万能论是被警告的失败模式） | ml-causal-inference |
+| ◇ 后门调整 | backdoor adjustment | 在因果图上列出所有从处理到结果的混杂路径（后门路径）并以条件化阻断之、从而识别干预效应的公式化方法；控制集合必须来自因果论证——控制了碰撞变量反而制造虚假关联 | ml-causal-inference |
+| ◇ LIME | Local Interpretable Model-agnostic Explanations | 在目标样本邻域扰动采样、拟合稀疏线性代理以近似黑箱在该点附近的决策依据——快、直观、任意模型可用；但每次运行有随机波动，适合快速个案侦查而非稳定证据 | ml-explainability-xai |
+| ◇ SHAP | SHapley Additive exPlanations | 把合作博弈论的 Shapley 值引入特征归因：按公理化公平原则（有效性/缺失性/一致性）将预测贡献唯一地分派给每个特征；理论性质好但计算贵，且"分派公平"≠"特征在现实中起因果作用" | ml-explainability-xai |
+| ◇ 联邦学习/FedAvg | federated learning / FedAvg | 数据不动模型动：各客户端本地训练、只上传权重更新，服务器按样本量加权平均再下发；前提是数据因法规/主权确实不能集中——可集中时 FL 几乎在所有维度劣于集中训练 | ml-federated-privacy |
+| ◇ 差分隐私 | differential privacy (DP) | 任意单条记录加入或移除对输出分布的改变不超过 ε 刻画的倍数——隐私因此成为可量化、可组合的数学性质而非一句"我们脱敏了"；ε 越小越私密噪声越大，预算随查询次数累积是一笔会花完的钱 | ml-federated-privacy |
+| ◇ 成员推断 | membership inference | 仅凭模型输出的置信度向量判断某条记录是否在训练集里的攻击；过拟合越严重越易命中——记忆正是隐私风险的来源，医疗场景暴露"某人是否患病"即致命 | ml-federated-privacy |
+| ◇ RAG/检索增强生成 | Retrieval-Augmented Generation | 把非参数的可检索语料与生成器联合：检索器按查询取文档、生成器以"查询+文档"为条件作答；核心立场是检索质量决定上限——检索不到正确片段，换更大的模型毫无用处 | ml-rag-systems |
+| ◇ 多模态融合三型 | multimodal fusion: early / late / intermediate | 早期（特征级拼接，信息全但噪声互扰）、晚期（决策级合并，稳健且天然抗单模态缺失）、中间（cross-attention，表达力强成主流）；没有普适最优，取决于模态互补度与数据规模 | ml-multimodal |
+| ◇ 模态坍塌 | modality collapse | 强模态吃掉全部梯度、弱模态沦为摆设——名义双模态实际单模态还白付成本；诊断靠单模态消融对照，语言捷径（不看图也能答大半）是其著名变体 | ml-multimodal |
+| ◇ 训练-服务偏移 | training-serving skew | 同一特征离线训练与在线服务两套实现口径不一致（时区/边界/空值处理），训练良好上线即劣化且无声无息；ML 系统最隐蔽的技术债，一致性测试是唯一防线 | ml-mlops-deployment |
+| ◇ PSI | Population Stability Index | 度量特征分布相对基准期偏移程度的监控指标（行业惯例 0.1/0.25 分界，但阈值须按特征基数校准禁止照抄）；其价值是把发现退化的时钟从业务指标的数周提前到数小时级 | ml-mlops-deployment |
+| ◇ 金丝雀发布 | canary deployment | 先放 1%-5% 流量给新模型、出问题爆炸半径小、逐级放量的部署策略；与影子模式（并行收流不返回结果）和 A/B 测试（统计验证业务指标）常串联使用——金丝雀求稳、A/B 求证 | ml-mlops-deployment |
 
 ---
 
 ## 统计与使用说明
 
-- **收录词条：79 条**（西瓜书原文 62 条，源：candidates/glossary.md 的 193 条；批B/批C 增补 17 条，标注 ◆，定义来自对应子 skill 锚定的经典文献共识/工程实践共识）
-- 按主题分组：基本概念 9 · 模型评估 22 · 经典模型 17 · 集成 6 · 聚类降维 8 · 理论与进阶 7 · 深度与大模型时代增补 10（原书裁掉的主要是各章算法专属细节词，如增益率/SMO/势函数/FOIL 增益/Q-学习等——它们服务于具体算法实现，而非跨场景的方法论判断）
-- 使用方式：任一子 skill 被 ml-methodology-router 派发后，若用户对术语含义有疑问，回查本表而非重新解释；一至六节定义均为周志华原书语境下的用法，第七节为现代文献语境——引用到其他语境时注意各自的外推边界。
+- **收录词条：105 条**（西瓜书原文 62 条，源：candidates/glossary.md 的 193 条；批B/批C 增补 17 条，标注 ◆；批D/批E 增补 26 条（v0.0.2），标注 ◇，定义来自对应子 skill 锚定的文献共识与应用/交叉学科共识）
+- 按主题分组：基本概念 9 · 模型评估 22 · 经典模型 17 · 集成 6 · 聚类降维 8 · 理论与进阶 7 · 深度与大模型时代增补 20（◆10+◇10，第七节批D 追加凸优化/KKT/鞍点/卷积归纳偏好/残差/门控/信息瓶颈/NAS 三要素/奖励黑客/DPO）· 应用与交叉学科增补 16（◇，批E：因果三梯度和混杂反事实倾向得分后门调整、LIME/SHAP、联邦学习与差分隐私和成员推断、RAG、融合三型与模态坍塌、skew/PSI/金丝雀）（原书裁掉的主要是各章算法专属细节词，如增益率/SMO/势函数/FOIL 增益/Q-学习等——它们服务于具体算法实现，而非跨场景的方法论判断）
+- 使用方式：任一子 skill 被 ml-methodology-router 派发后，若用户对术语含义有疑问，回查本表而非重新解释；一至六节定义均为周志华原书语境下的用法，第七、八节为现代文献与交叉学科语境——引用到其他语境时注意各自的外推边界。

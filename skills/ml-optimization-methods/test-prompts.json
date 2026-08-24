@@ -1,0 +1,73 @@
+{
+  "skill": "ml-optimization-methods",
+  "version": "0.0.2",
+  "source_book": "经典文献共识（Boyd & Vandenberghe《Convex Optimization》2004; Nocedal & Wright《Numerical Optimization》2006; 深度学习优化文献，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "手里有个带约束的投资组合优化问题，目标函数看着挺光滑但我不确定它凸不凸。朋友让我直接上梯度下降，也有人推荐什么内点法。到底该怎么判断该用什么求解方法？",
+      "expected_behavior": "应激活 ml-optimization-methods，先做凸性判定（列出目标与约束逐一检查，拿不准按非凸保守处理）：凸问题局部最优即全局最优、可上成熟求解器；非凸则一切全局保证作废，选型逻辑变为预算内找足够好的点。凸性永远第一步。",
+      "notes": "正面场景: 带约束问题的方法选型（A2 场景 1，命中『凸不凸』『该用什么求解方法』语言信号，E 段步骤 1 资格判定）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "读 SVM 推导卡住了：为什么要转对偶？拉格朗日乘子和 KKT 条件在那里头到底起什么作用？互补松弛那一行完全看不懂。",
+      "expected_behavior": "应激活 ml-optimization-methods，讲清约束优化的数学语言：拉格朗日函数把约束以乘子并入目标，KKT 四条件（可行/平稳/互补松弛/对偶）是驻点的必要条件（凸下充分）；SVM 对偶视角中互补松弛自动筛出支持向量、核技巧由内积形式接入。",
+      "notes": "正面场景: KKT/对偶来龙去脉（A2 场景 3，命中『为什么转对偶』『KKT 条件』『互补松弛』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我的迭代求解 loss 曲线先快后卡在一个高位就不动了，学习率调小一点就爬得极慢。这是不是陷进局部最优了？要不要搞多次随机重启？",
+      "expected_behavior": "应激活 ml-optimization-methods，按曲线形态归因（先快后卡高位指向病态曲率或鞍点停滞而非局部最优），并做现代校准收尾：高维非凸景观中鞍点远多于严格局部极小，SGD 随机扰动天然助逃逸，多数情况无需多重启；真正拖慢的是平坦区与病态曲率。",
+      "notes": "正面场景: 收敛曲线归因 + 局部最优恐惧的现代重估（A2 场景 4/5，E 段步骤 4-5，命中『卡住不动』『局部最优』『多重启』）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "逻辑回归大概几万维特征，scipy 里 minimize 该选哪个 method？L-BFGS-B 是什么？为什么深度学习里反而都不用牛顿法？",
+      "expected_behavior": "应激活 ml-optimization-methods，做导数成本与方法族匹配：牛顿法 Hessian 存储分解 O(n³) 在数万维不可承受；L-BFGS 用梯度历史隐式近似曲率、内存 O(mn)，是中等规模光滑问题的默认强基线；深度网络走一阶随机方法（SGD+动量/Adam 族）。",
+      "notes": "正面场景: 一阶/二阶/拟牛顿方法族选型（A2 场景 2，命中『minimize 选哪个』『L-BFGS』『为什么不用牛顿法』）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "模型架构和网络结构都定好了，现在要搜最优的学习率和 batch size 组合。预算够跑两百次训练，Optuna、网格、随机搜索选哪个比较划算？",
+      "expected_behavior": "不应激活 ml-optimization-methods——方法族与收敛诊断都不是问题，问的是给定方法后搜超参配置的预算分配策略，应激活 ml-hpo-strategy。两 skill 分界：本 skill 定『用什么优化方法、为何如此』，那边定『在配置空间里怎么搜得聪明』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-hpo-strategy 的最关键分界——优化方法选型 vs 超参搜索策略；『学习率』二字出现但消费场景是搜索而非收敛诊断"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "深度网络训练到第三个 epoch loss 直接 NaN 了，梯度也爆炸。初始化用的默认的，batch size 128。帮我看看是哪里出问题了？",
+      "expected_behavior": "不应激活 ml-optimization-methods——NaN/发散是训练动力学故障的具体排查诉求，属于工程排障而非方法选型与原理决策，应激活 ml-deep-training-playbook 的固定排查链（数据管道→小样本过拟合→初始化归一化→学习率）。用户报故障走 playbook，问方法与数学结构才走本 skill。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-deep-training-playbook 的分界（frontmatter 不适用项明写『训练排障』）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我的 RBF 核 SVM 在验证集上表现不好，C 和 gamma 该设多少？现在 C=1 gamma=0.01，要不要调大？",
+      "expected_behavior": "不应激活 ml-optimization-methods——SVM 使用层的参数决策（软间隔容忍度与影响半径）是 ml-svm-playbook 的地盘；本 skill 解释其对偶/KKT 数学骨架但不接管调参。合理行为是派发到 svm-playbook（其调参环节再接 hpo-strategy）。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-svm-playbook 的分界——『推导卡壳→本 skill；调 C/γ→svm-playbook』（A2 区分节原文）"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "训练 Transformer 该用 Adam 还是 SGD？有人说大模型都用 AdamW，又说 SGD 泛化更好，到底听谁的？这算是优化方法选型问题吗？",
+      "expected_behavior": "合理判断: 可激活 ml-optimization-methods 但按 E 段步骤 3 判停——目标是深度神经网络时一阶随机方法是事实默认，本步只做确认（Adam 族自适应步长被视为穿越平坦区的手段），细节排障移交 ml-deep-training-playbook；考察是否确认边界后收尾而非展开全套五步流程。",
+      "notes": "边界: 方法选型与深度训练栈的交界——本 skill 自己声明的判停条件（步骤 3），考察是否会把深度训练细节误揽过来"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我要给仓库做拣货路径规划，变量是每个订单走哪个货架的排列组合，能用梯度下降优化吗？或者你们那套凸优化理论管不管这个？",
+      "expected_behavior": "合理判断: 应激活 ml-optimization-methods 但立即触发 E 段步骤 2 判停——排列组合是离散/组合优化，连续优化框架（梯度/凸性/KKT）基本失效，须明说并转向启发式或专用求解器（整数规划/TSP 算法），本链终止；考察是否诚实划界而非硬套梯度叙事。",
+      "notes": "边界: 连续优化与组合优化的分界——skill B 段明写『纯组合优化/整数规划/运筹排产不要使用』，此 prompt 正考这条边界声明"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 配置空间搜索(ml-hpo-strategy)、训练排障流水线(ml-deep-training-playbook)、模型族参数层(ml-svm-playbook)。should-not-trigger 全部必须通过。"
+}

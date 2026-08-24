@@ -1,0 +1,73 @@
+{
+  "skill": "ml-cnn-vision",
+  "version": "0.0.2",
+  "source_book": "经典文献共识（LeCun LeNet-5 1998; He ResNet 2016; Dosovitskiy ViT 2021; Goodfellow《Deep Learning》第9章，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "拿到一个工业缺陷检测任务，图片是流水线相机拍的 512×512 灰度图，大概两万张。想问下这种任务是不是就该用 CNN？自己搭的话该多深？",
+      "expected_behavior": "应激活 ml-cnn-vision，先做归纳偏好匹配检验（局部性/平移不变/层次化语义三问——图像通常三条全中），再给起点建议（默认预训练 backbone 微调）与组件纪律（小核堆叠/池化/BN 位置/通道随深度翻倍），深度随数据量伸缩而非照抄 ImageNet 配方。",
+      "notes": "正面场景: 图像任务的 CNN 资格判定与设计起点（A2 场景 1，命中『图像分类用什么网络』『该不该用 CNN』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "设计网络的时候纠结几个组件：卷积核统一 3×3 还是混着上 5×5？BatchNorm 到底放激活前还是激活后？池化层要不要保留还是全换成 stride 卷积？",
+      "expected_behavior": "应激活 ml-cnn-vision，按组件决策链作答：两层 3×3 堆叠等效 5×5 视野但参数更少非线性更多（VGG 式小核堆叠是默认）；BN 插在卷积后、激活前让深层可训；池化的职责是降分辨率换平移鲁棒性，现代替代品是步长卷积但『完全不要下采样』会让计算量失控。",
+      "notes": "正面场景: 组件级设计决策（A2 场景 2，命中『卷积核多大』『BN 放哪里』『池化要不要』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我把网络从 20 层加到 56 层，结果训练误差反而变高了，验证集也更差。不是说模型越深越强吗？这是过拟合了吗，还是我代码写错了？",
+      "expected_behavior": "应激活 ml-cnn-vision，按退化问题作答：He 等发现更深普通网络的**训练**误差也更高——这不是过拟合（过拟合是训练好验证差），而是优化困难；残差连接 F(x)+x 给恒等映射留默认通路、梯度获得跨层高速通道，上百层从此可训。",
+      "notes": "正面场景: ResNet 残差动机（A2 场景 3，命中『为什么更深反而更差』『deeper worse』语言信号，E 步骤 4 直接按退化问题作答）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "ViT 都出来这么久了，CNN 是不是已经彻底过时了？我现在做医学影像小数据集，还应该从 CNN 开始吗？",
+      "expected_behavior": "应激活 ml-cnn-vision，按 B 段 ViT 挑战条目回答：Dosovitskiy 显示纯 Transformer 需 JFT-300M 量级数据才超越最强 CNN，ImageNet-1k 中等数据上仍弱于 CNN——卷积先验是『小数据时代的拐杖、大数据时代的脚镣』；小数据医学影像场景 CNN 先验仍是正解，选型视角可提示转 ml-transformer-era 补规模判断。",
+      "notes": "正面场景: ViT 时代 CNN 先验价值重估（A2 场景 5，命中『CNN 过时了吗』『ViT 还需要 CNN 吗』语言信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "手头有个文本情感分类任务，同事说现在视觉里 CNN 效果很好，要不咱们把评论数据当一维信号也上个 CNN？另外我还听说 BERT 也不错，到底该选哪个路线啊？",
+      "expected_behavior": "不应直接在 cnn-vision 内展开——用户还在跨架构族横向摇摆（CNN vs 预训练语言模型），且序列数据主干另有路线：应先激活 ml-transformer-era 做三方对照与规模判断（或 ml-rnn-sequence 评估序列路线）。本 skill 的边界明写『用户还在 CNN/RNN/Transformer 三方摇摆 → transformer-era 先行』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-transformer-era 的横纵分界——『选谁』归那边，选定后的纵向设计归本 skill"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我有 500 条客户记录的表格数据（年龄、收入、历史消费这些列），想试试用 CNN 来做流失预测，听说 CNN 很厉害。这个思路可行吗？",
+      "expected_behavior": "不应激活 ml-cnn-vision 并顺势施工——表格数据无空间局部结构，卷积先验无处安放甚至有害，GBDT 几乎总是更好更省。E 段步骤 1 判停条件正是『表格数据→劝退 CNN 转 ml-task-matching 复核，本链终止』；正确行为是劝退并派发，不是给表格 CNN 出架构草案。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 表格硬上 CNN 的劝退场景（B 段第一条 + E 判停条件双重覆盖）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我的 ResNet 训练到一半 loss 变成 NaN 了，学习率已经降到 1e-5 还是不行，batch 也试过调大。帮我排查一下到底是哪一步出了毛病？",
+      "expected_behavior": "不应激活 ml-cnn-vision——架构设计已定且问题不在设计层，NaN/发散是训练执行层故障，应激活 ml-deep-training-playbook 按固定排查链排查。本 skill 只管设计与原理层，B 段明写『训练过程故障 → deep-training-playbook』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 设计层 vs 执行层的分界——『网络设计得对但训不动』是那边的事"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我要做一个心电图的一维时序分类，朋友说可以用一维卷积提特征，又有人说该上 LSTM。这算你们 CNN 的地盘还是序列模型的地盘？",
+      "expected_behavior": "合理判断: 两 skill 边界区，rnn-sequence 的 A2 已声明分工——1D 卷积用于序列作为特征提取技巧属 cnn-vision 思路（局部性成立），作为序列主干对比归 rnn-sequence。合理输出是识别共管并给出主责路由：序列主干选型走 ml-rnn-sequence，同时说明 1D conv 可作轻量基线。",
+      "notes": "边界: 1D 序列上 CNN 与 RNN 的管辖分界——两个 skill 的 A2/B 段都显式声明了这条边界线"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我想从零预训练一个自己的视觉骨干网，而不是微调现成的 ImageNet 模型——我的医学影像模态很特殊。这个决定本身该怎么评估？定了之后架构怎么搭？",
+      "expected_behavior": "合理判断: 问题前半（自训还是微调的起点选择）归 ml-pretraining-paradigm 决策树，后半（架构草案）归本 skill——cnn-vision E 步骤 2 的判停条件正是『实际要解决的是自训还是微调 → 转 pretraining-paradigm，本链终止』。合理行为是拆分两问并分别路由，只保留架构部分亲自作答。",
+      "notes": "边界: 起点选择与架构设计的工序交界——考察串联意识而非把两问都吞进一个 skill"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 横向选型(ml-transformer-era)、训练排障(ml-deep-training-playbook)、表格误用劝退(ml-task-matching)。should-not-trigger 全部必须通过。"
+}

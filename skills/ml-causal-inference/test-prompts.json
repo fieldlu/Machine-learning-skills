@@ -1,0 +1,73 @@
+{
+  "skill": "ml-causal-inference",
+  "version": "0.0.2",
+  "source_book": "交叉学科文献共识（Pearl《Causality》2009; Rubin 1974; 《The Book of Why》2018，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们分析了半年的用户数据：开通了会员功能的用户流失率是 8%，没开通的是 15%。所以结论很清楚——会员功能能留住用户，下季度要大力推广。这个分析有什么漏洞吗？",
+      "expected_behavior": "应激活 ml-causal-inference，指出这是拿观测关联冒充因果的典型场景：『愿意开会员的用户』本身可能就是高意愿留存人群（混杂/自选择）；应走三阶梯定位（这是干预问题 do(开通会员)）→机制扫描找混杂→给识别路线（随机实验或倾向得分/后门调整），而不是附和或空喊口号。",
+      "notes": "正面场景: 观测数据下的因果结论审查（A2 场景 1 原文场景变体——『用了会员功能的用户流失率更低所以要大力推会员』）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "上个月做了次大促活动，GMV 涨了 30%。老板问这 30% 里有多少是该记在活动头上的？可是我们没有留对照组，现在还能算出来吗？",
+      "expected_behavior": "应激活 ml-causal-inference，这是效应归因问题（treatment effect）：无对照组时走观测路线评估——倾向得分匹配/加权按『被处理的倾向』平衡可比组、DML 用 ML 模型剥离混杂影响；同时显式列出不可检验假设（无未测混杂等）并声明估计的方向性偏差；归因须在干预前预注册指标，事后归因要格外谨慎。",
+      "notes": "正面场景: 干预效果归因 + 无对照困境（A2 场景 2/4，命中『效果是真的吗』『没法随机分组怎么评估』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "看数据发现一个奇怪现象：整体上看我们新版 App 的用户留存更低，但按渠道分层之后，每个渠道内部新版留存反而都更高了。这不是矛盾了吗？该信哪个数？",
+      "expected_behavior": "应激活 ml-causal-inference，识别辛普森悖论结构：聚合与分层的方向反转来自渠道构成的混杂（或碰撞）结构；正确回应不是『永远相信分层』而是先定因果结构再定聚合层级——分不分层取决于哪个变量是混杂哪个是碰撞，必须来自业务论证。",
+      "notes": "正面场景: 辛普森悖论机制判定（A2 场景 5，命中『Simpson's paradox』主题，I 段三种机制之一）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "如果当初没有上线这套智能推荐算法，现在的日活大概会是什么水平？领导想评估这套算法三年下来的真实贡献。",
+      "expected_behavior": "应激活 ml-causal-inference，定位为反事实问题（Pearl 第三阶梯）：『假如当时不做 X 会怎样』无法由观测数据直接回答，预测模型消费 P(Y|X) 答不了 P(Y|do(X))；可行路线是用未受干预时期/相似群体构造对照（如双重差分思路），并声明全部假设不可由当前数据最终检验、结论须带限定语。",
+      "notes": "正面场景: 反事实追问（A2 场景 3，命中『如果不这么做会怎样』『what-if 当时』语言信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "新模型下周就要上线了，离线 AUC 高达 0.985。帮我做个上线前的全面检查：采样有没有偏、指标有没有泄漏、各种隐藏前提站不站得住，一次查完。",
+      "expected_behavior": "不应激活 ml-causal-inference——诉求是上线前的六问前提总审（无偏采样/独立采样/分布形式/误差独立/桥接假设/信息泄露一次查完），覆盖宽但不展开因果路线，应激活 ml-pitfall-audit。分界原文：audit 六问中发现『相关被当成因果』时才深挖移交本 skill——问题本质判定 vs 上线前审查。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-pitfall-audit 的最难混淆对——问题本质是不是因果的定向判定 vs 上线前六问总审"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我想预测明天哪些用户会 churn，纯粹是为了提前发优惠券触达名单，不需要向任何人解释为什么走，也不关心变量之间谁导致谁。该用什么模型好？",
+      "expected_behavior": "不应激活 ml-causal-inference——纯预测任务（不打算据此做机制性干预、不追问归因反事实），因果工具不会提升预测精度，强行上反而因剔除坏但有用的特征而掉点。E 步骤 1 判停条件原文：『用户只要对未来做预测 → 移交 ml-task-matching/ml-diagnosis 并明确告知无需因果工具』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 预测 vs 因果的反向边界（B 段第一条——预测问题交给预测的方法）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我在用 pgmpy 构建患者症状的贝叶斯网做诊断推理，图里的边是数据里学出来的依赖关系。有人提醒我说不能把这些边当因果关系读，为什么？那这个网到底该怎么用？",
+      "expected_behavior": "不应滞留在 ml-causal-inference 讲概率图技术——贝叶斯网的结构学习与推断算法归 ml-graphical-models；本 skill 只在其 B/A2 分界处出场：确认『概率依赖的边 ≠ 因果的边』这一警告成立（把贝叶斯网当因果模型直接读边是已知的坑），但图的构建推断施工应派发 graphical-models。合理输出是简短边界说明+转介。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-bayesian-thinking/ml-graphical-models 的分界——概率依赖边 ≠ 因果边的警告归这边，网络施工归那边"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我们可以做 A/B 实验！新推荐策略已经随机分流跑起来了，数据也够。这种情况下还需要什么因果推断方法吗？还是随机化就万事大吉了？",
+      "expected_behavior": "合理判断: 应激活 ml-causal-inference 并触发 E 步骤 2 判停——随机分组数据（天然实验/RCT）中混杂已被分配机制切断，跳过观测路线之争直接走假设核查与解读纪律（SUTVA 溢出/一致性仍需检查）；协议设计细节移交 ml-evaluation-design。考察是否讲清『为什么随机化支持因果声明』而非简单说不用管了。",
+      "notes": "边界: RCT 场景下本 skill 的剩余职责——判停条件原文应用+与 evaluation-design 的串联"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "SHAP 分析显示『账户余额』是我们风控模型最重要的特征。我们计划明年主推理财业务提升客户余额，预计违约率就会下降。这个推理链有问题吗？",
+      "expected_behavior": "合理判断: 问题本质是因果滑坡——事后解释的归因不是因果效应（『SHAP 说 X 重要』只说明模型用了 X，不说明改 X 会改变真实结果）。xai 与 causal 两 skill 在此共管：先拦住滑坡（解释≠因果），再按因果流程重新立项检验『余额↑→违约↓』是否成立（可能又是混杂）。考察路由到 ml-causal-inference 主答并回扣 xai 的警告。",
+      "notes": "边界: 解释驱动决策的因果移交——两 skill B 段互相引用的经典联动场景，考主责归属判断"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 六问总审(ml-pitfall-audit)、纯预测反场景(ml-task-matching)、概率图施工(ml-graphical-models)。should-not-trigger 全部必须通过。"
+}

@@ -1,0 +1,73 @@
+{
+  "skill": "ml-explainability-xai",
+  "version": "0.0.2",
+  "source_book": "交叉学科文献共识（Ribeiro LIME 2016; Lundberg SHAP 2017; Adebayo 健全性检验 2018，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们给银行做了个 XGBoost 风控模型，AUC 不错，但合规部门要求每个被拒绝的申请都要能给客户讲清楚原因。黑箱模型加事后解释这条路走得通吗？LIME 和 SHAP 该用哪个？",
+      "expected_behavior": "应激活 ml-explainability-xai，先做动机定档（这是合规审计动机：要稳定、有文档、可复现、经得起质证的解释）→路线第一刀（若可解释是硬约束且精度代价可承受，先考虑透明模型族；必须用黑箱才进事后解释）→工具匹配（树模型 TreeSHAP 精确高效），并声明合规有效性本身存疑的边界。",
+      "notes": "正面场景: 合规动机的解释选型（A2 场景 3/1，命中『监管要解释』『SHAP/LIME 怎么选』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "同一个模型我跑了 SHAP 和 LIME，两个方法给出的特征重要性排序完全不一样；而且 SHAP 跑两次结果也有细微差别。到底哪个是对的？该信谁？",
+      "expected_behavior": "应激活 ml-explainability-xai，按 B 段『相同样本不同解释』作答：同一样本上 LIME 多次运行、不同解释方法之间、超参微调都会改变归因排序——只跑一次就下结论等于掷骰子；正确做法是重复运行取稳健集合、对关键结论做扰动复核，不稳定的解释降级为仅供探索。",
+      "notes": "正面场景: 解释矛盾与稳定性困惑（A2 场景 2 原文场景——重要性排序不一致不知道信谁）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我看模型的全局特征重要性里『用户注册序号』排进了前五。这个字段理论上不该有任何预测力吧？是不是哪里出问题了？",
+      "expected_behavior": "应激活 ml-explainability-xai 的调试动机分支：全局重要性排序用于找数据与管道问题——不可能的特征冒进前列是数据泄漏或管道 bug 的信号（序号可能编码了时间先后与获客批次）；线索确认后移交 ml-leakage-defense 深挖专项清单，而非就地拍板。",
+      "notes": "正面场景: 重要性异常作为调试信号（A2 场景 4，命中『特征重要性为什么这么怪』语言信号；E 步骤 1 判停转 leakage-defense）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "业务方看了 SHAP 报告说：既然『账户余额』贡献最大，那我们主推理财把客户余额拉上去，违约率自然就降了。这个推理听起来挺顺的，有什么问题吗？",
+      "expected_behavior": "应激活 ml-explainability-xai 并拦住因果滑坡（B 段首条失败模式）：事后解释读成因果声明是最危险误用——『SHAP 说收入最重要』只说明模型用了收入，不说明改收入会改变真实结果；干预问题只有因果工具能答，交付纪律禁止因果措辞并移交 ml-causal-inference 重新立项。",
+      "notes": "正面场景: 把解释当因果证据的拦截（A2 场景 5 原文场景——需要有人拦住这个滑坡；E 步骤 5 判停条件原文应用）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我们信贷业务监管明确要求每个审批决定可解释可申诉，精度损失一点能接受。是不是干脆别用 XGBoost 了，直接换成规则引擎或者打分卡？这两条路怎么权衡？",
+      "expected_behavior": "不应在 xai 内展开事后解释工具对比——可解释是硬约束且精度代价可承受时正解是从源头选透明模型（规则/线性/打分卡），这属于 ml-rule-learning 与 task-matching 的辖区。xai E 步骤 2 判停条件原文：『选定透明模型路线 → 本 skill 使命完成，移交对应模型族 skill 施工』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 内在可解释 vs 事后解释的第一刀——透明建模归 rule-learning，本 skill 只管黑箱外挂解释"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我的逻辑回归模型验证集只有 62% 准确率，训练集也就 64%。系数倒是都能看懂很透明，但就是想知道为什么效果这么差、该往哪个方向改进？",
+      "expected_behavior": "不应激活 ml-explainability-xai——模型本身就是透明的（线性系数内建解释，B 段明写再套 LIME/SHAP 是脱裤子放屁还会引入代理误差）；真实诉求是效果差的归因与改进方向，应激活 ml-diagnosis 做偏差-方差分解。考察识别『透明模型+效果问题』的双重错配。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): B 段反场景第一条（透明模型不需要事后解释）× 效果归因诉求（diagnosis 辖区）双重错配"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我想知道训练数据里的样本量够不够支撑现在这个模型的复杂度、泛化误差界大概是多少、VC 维这套理论在这里怎么算。想做个理论层面的评估。",
+      "expected_behavior": "不应激活 ml-explainability-xai——诉求是理论保证的条件与刻度（PAC 三问/容量刻度/误差界），应激活 ml-theory-compass。与解释无关：解释回答『模型用了什么』，理论回答『保证何时可信』，两者词汇零重叠但仍需路由正确。",
+      "notes": "跨 skill 混淆诱饵: 理论评估诉求的路由——考察不因『评估/分析』字样误激活"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我的 Transformer 分类器里 cross-attention 权重可视化出来特别好看，注意力热区正好落在关键词上。我能直接拿这个图当模型解释的证据交差吗？",
+      "expected_behavior": "合理判断: 应激活 ml-explainability-xai 并触发 B 段警告——注意力 ≠ 归因（多层传播后权重语义漂移），要用作解释须另行论证不能默认成立； saliency/热力图类解释还须过健全性抽检（随机权重网络也能产出貌似合理的显著图）。合理输出是不直接否决但要求稳定性检验后再定证据资格。",
+      "notes": "边界: 注意力可视化的解释资格——B 段『注意力=解释?』条款的直接应用"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "老板只给了我一页纸的预算：明天之前给监管交一份『模型为什么这样判』的说明。来不及做完整的稳健性验证了，随便跑个 SHAP 截图行不行？",
+      "expected_behavior": "合理判断: 应激活 ml-explainability-xai 并守住 E 步骤 4-5 判停底线——所有候选解释均不稳定且场景是合规审计时，禁止拿不稳定解释交差；合理输出是降级方案（单棵代理树/局部个案解释+显式局限声明）并书面标注『未完成稳健性验证』，而非默默交付一张截图。",
+      "notes": "边界: 时间压力下的交付纪律——考察能否顶住压力守住『不稳定的解释不得作为合规证据』的判停条件"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 内在可解释(ml-rule-learning)、效果归因(ml-diagnosis)、因果归因(ml-causal-inference)。should-not-trigger 全部必须通过。"
+}

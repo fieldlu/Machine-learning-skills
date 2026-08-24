@@ -1,0 +1,73 @@
+{
+  "skill": "ml-rnn-sequence",
+  "version": "0.0.2",
+  "source_book": "经典文献共识（Hochreiter & Schmidhuber LSTM 1997; Cho GRU/seq2seq 2014; Sutskever seq2seq 2014; Bahdanau 注意力 2015，非书内内容）",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "要做传感器数据的时序异常检测，每分钟一个采样点。同事说直接上 Transformer，我觉得数据就几万条是不是太奢侈了。RNN 系现在还能用吗？LSTM 和 GRU 又怎么选？",
+      "expected_behavior": "应激活 ml-rnn-sequence，走任务定形→依赖跨度与数据量评估→单元选型：小数据上 RNN 系先验更省仍是正解；GRU 与 LSTM 按『先简后繁』原则建议先 GRU 起步、效果不足再对照 LSTM；普通 RNN 默认排除。",
+      "notes": "正面场景: 小数据时序的序列主干选型（A2 场景 1/5，命中『RNN/LSTM/GRU 怎么选』『时序任务小数据』语言信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "读论文遇到 LSTM 的门控机制看不明白：遗忘门、输入门、输出门各自在干什么？为什么普通 RNN 会梯度消失而加了门就好了？cell state 是干嘛的？",
+      "expected_behavior": "应激活 ml-rnn-sequence，讲清病因与对症药：BPTT 沿时间反传的连乘使远距离误差指数消失——BP 梯度消失的时序版；LSTM 用细胞状态当『传送带』近乎无衰减穿越时间步、三个门控制写入/读出/清空；GRU 是两门简化变体效果多数场合相当。",
+      "notes": "正面场景: 门控机制动机理解（A2 场景 2，命中『门控是干嘛的』『forget gate 作用』『cell state』语言信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我在搭一个中译英的模型（不是调 API，是课程作业要从头实现），encoder-decoder 结构短句还行，句子一长翻译质量就崩了。听说要加 attention？为什么要加？",
+      "expected_behavior": "应激活 ml-rnn-sequence，按 seq2seq 信息瓶颈作答：把变长源句压进固定向量是长句崩塌的根因；注意力让解码器每步对全部编码状态加权回看（软对齐），顺带获得可解释的对齐矩阵；异步任务配 seq2seq 且源序列较长必须加注意力。",
+      "notes": "正面场景: seq2seq+注意力的动机（A2 场景 3，命中『机器翻译怎么建』『attention bottleneck』语言信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "要在嵌入式设备上做一个实时语音命令识别，内存只有几百兆，要求边说边出结果不能等说完。用双向 LSTM 可以吗？还是有什么讲究？",
+      "expected_behavior": "应激活 ml-rnn-sequence：流式场景双向结构禁用（不存在未来帧），改单向后行并重出结构卡；RNN 系推理内存恒定 O(1)、与流式天然契合、边缘设备友好正是其存留理由；训练侧注明 BPTT 截断与梯度裁剪必开。",
+      "notes": "正面场景: 流式+边缘约束下的序列建模（A2 场景 4，命中『流式/streaming 实时识别』『边缘设备部署序列模型』）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我要做一个文本分类项目，在纠结整体技术路线：是用 CNN、RNN 还是 Transformer？我的数据有几十万条标注。想先听听三方对比和选型建议再定方向。",
+      "expected_behavior": "不应激活 ml-rnn-sequence 作为主答——这是跨族架构总选型（数据形态×规模×算力三轴），应激活 ml-transformer-era 给规模判断。rnn-sequence 只管序列一族内部纵深（RNN→门控→seq2seq→注意力的演进与适用面）；两边共管场景下 transformer-era 先给横向裁决。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-transformer-era 的总选型 vs 族内纵深分界——『CNN/RNN 还是 Transformer 三方摇摆』是那边的 A2 原文信号"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我想做个游戏 AI，agent 在网格世界里移动吃金币，每一步的动作会影响后面的局面，只有吃到金币才有奖励。这种延迟奖励的问题该用什么方法建模？",
+      "expected_behavior": "不应激活 ml-rnn-sequence——虽涉『序贯』但本质是序贯决策（交互轨迹+奖赏信号），不是观测序列的监督学习，应激活 ml-rl-decision-loop 做范式资格验证。分水岭是有无环境交互与奖赏信号：『序列』二字重叠但问题本质不同（B 段原文边界）。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 序列监督 vs 序贯决策的分界（与 rl-decision-loop 的 contrasts-with 关系）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我的 LSTM 训练到第 5 个 epoch loss 就不降了还震荡得厉害，学习率从 0.001 试到 0.0001 都不行，初始化换了好几种。帮我看看训练哪里出了故障？",
+      "expected_behavior": "不应滞留在 ml-rnn-sequence 内做排障——结构路线已定，loss 不降/震荡是训练执行层故障，应移交 ml-deep-training-playbook 固定排查链（rnn-sequence E 步骤 5 明写『训练故障交 deep-training-playbook』）。本 skill 只负责结构出口与训练配置定型（截断长度/裁剪阈值），不做动力学排障。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 结构设计层 vs 训练排障层的分界（E 段交接步骤的原文判停）"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我有个短文本分类任务，评论平均十几个词。感觉词序好像不太重要，词袋模型也还行。这种情况有必要专门上序列模型吗？",
+      "expected_behavior": "合理判断: 应激活 ml-rnn-sequence 并触发 E 步骤 1 判停——打乱元素顺序任务不变说明没有真正的顺序依赖，建议先试无序模型作基线，序列结构未必必要；考察是否诚实劝退而非默认套上 LSTM 叙事。",
+      "notes": "边界: 无顺序依赖数据的拦截条款（B 段第二条 + E 判停条件双重覆盖）——考察克制与资格判定"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "做股价预测，朋友推荐 ARIMA，我想上深度模型显得高级一点。几百条日频数据，这种量级深度序列模型能打吗？还是传统统计方法更稳？",
+      "expected_behavior": "合理判断: 可激活 ml-rnn-sequence 但须按 B 段时代局限声明作答——时间序列领域统计方法（ARIMA/状态空间/GBDT）与深度方法同台竞技且深度并非默认最优，选型前应先跑传统基线；小样本场景尤其如此。考察是否给出『先跑 ARIMA 基线』的纪律而非迎合深度偏好。",
+      "notes": "边界: 深度序列 vs 传统时序方法的分界——skill B 段明写的外推警告，考察不吹深度"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 跨族总选型(ml-transformer-era)、序贯决策(ml-rl-decision-loop)、训练排障(ml-deep-training-playbook)。should-not-trigger 全部必须通过。"
+}
