@@ -101,10 +101,6 @@ Once installed, simply ask your agent questions as usual. Six real scenarios:
 >
 > **Agent**: Don't reach for the highest tier first. Task adaptation is a four-tier cost ladder: prompt engineering (zero training) → PEFT such as LoRA (base weights frozen; around a thousand examples suffice) → full fine-tuning (only worth it above the ~100k mark, and the fastest way to wash out pretrained capabilities) → pretraining from scratch (the vast majority of teams will never need this). The correct order is to start with prompt engineering and few-shot baselines: direct fine-tuning is forbidden below 1k samples. If you do eventually reach fine-tuning, put two disciplines in place beforehand — hold back a set of general-capability regression tests to detect catastrophic forgetting, and remember: the farther your domain sits from the pretraining distribution, the stronger your case for moving up a tier.
 
-> **You**: We want to fine-tune LLaMA for customer-support QA. Can we jump straight to full-parameter fine-tuning?
->
-> **Agent**: Don't reach for the highest tier first. Task adaptation is a four-tier cost ladder: prompt engineering (zero training) → PEFT such as LoRA (base weights frozen; around a thousand examples suffice) → full fine-tuning (only worth it above the ~100k mark, and the fastest way to wash out pretrained capabilities) → pretraining from scratch (the vast majority of teams will never need this). The correct order is to start with prompt engineering and few-shot baselines: direct fine-tuning is forbidden below 1k samples. If you do eventually reach fine-tuning, put two disciplines in place beforehand — hold back a set of general-capability regression tests to detect catastrophic forgetting, and remember: the farther your domain sits from the pretraining distribution, the stronger your case for moving up a tier.
-
 **⑥ "Is this conclusion causal?"** → the router locates advanced specialties → dispatches `ml-causal-inference`
 
 > **You**: We analyzed half a year of data: users with the membership plan churn at 8%, those without at 15%. So the membership feature retains users — next quarter we should push it hard?
