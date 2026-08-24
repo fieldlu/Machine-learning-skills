@@ -1,0 +1,73 @@
+{
+  "skill": "ml-dimensionality",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 — 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "基因表达数据，只有 200 个样本但有两万多个基因特征，p 远大于 n。第一步到底该做降维、挑特征，还是直接上个带正则的模型？完全没头绪。",
+      "expected_behavior": "应激活 ml-dimensionality，启动诊断链：先确认维数灾难症状（距离集中/样本稀疏），再按几何形态与任务在降维（PCA/核化/流形）、特征选择（过滤/包裹/嵌入）、L1 稀疏正则三条主线中选路；p≫n 时点明正则化不是可选项。",
+      "notes": "正面场景: 高维小样本选路困境（A2 场景 1，命中『p much larger than n / 高维小样本』信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "kNN 在我们 d=5000 的文本向量上表现特别玄学：有时候准得离谱有时候乱猜。调大调小 k 都没用，是不是距离这东西在高维下根本靠不住？",
+      "expected_behavior": "应激活 ml-dimensionality：用维数灾难症状学解释——最近邻与最远邻距离比值趋近 1（距离集中）宣告 kNN 类方法失效，别再调 k 硬扛；转入降维或度量学习等结构性方案。",
+      "notes": "正面场景: 距离类方法忽好忽坏（A2 场景 2，命中 trigger 词 curse of dimensionality 的症状描述）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "PCA 按累计方差 95% 保留了 60 个主成分，业务方完全看不懂这些成分是什么意思，而且下游模型效果还比用原始特征差了点。是 PCA 哪里用错了吗？",
+      "expected_behavior": "应激活 ml-dimensionality，处理 PCA 效果差的诊断：检查数据是否沿弯曲流形分布（线性 PCA 会破坏拓扑，考虑 Isomap/LLE 或核化 KPCA）、95% 阈值是否合理、以及是否该改走特征选择路线保留原始语义。",
+      "notes": "正面场景: PCA 主成分不可解释且效果变差（A2 场景 3，命中『PCA 之后效果变差/主成分看不懂』信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "把星期几和颜色这类字段 label encoding 成 1 到 7 的整数直接喂进模型，效果反而比不喂还差。这是为什么啊？类别特征到底该怎么处理？",
+      "expected_behavior": "应激活 ml-dimensionality，用序关系判据回答：无序属性引入伪序会误导偏好有序切分的模型，应 one-hot 连续化（有序属性才可序编码）；此即 SKILL.md 附带的『有序属性连续化/无序属性 one-hot』判据。",
+      "notes": "正面场景: 无序属性错误编码（A2 场景 6），考察 description 附带判据的召回"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我的 fraud 模型正负样本比是 1:2000，模型总把欺诈判成正常。想问下过采样欠采样怎么选，SMOTE 靠谱吗？",
+      "expected_behavior": "不应激活 ml-dimensionality——没有任何高维/维数灾难信号，这是纯类别不平衡问题，应激活 ml-imbalanced-learning 走再缩放三路线选型。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-imbalanced-learning 的区分——SKILL.md 明示本 skill 不适用于类别不平衡"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "kNN 的 k 取 3 还是 5 好？还有欧氏距离和曼哈顿距离一般选哪个？就这点事，不想搞太复杂。",
+      "expected_behavior": "不应激活 ml-dimensionality——description 明确排除『单纯调 kNN 的 k 值或换距离度量就能解决的小问题』。常规超参建议直接回答。",
+      "notes": "诱饵: 字面含 kNN 与距离词汇的轻量问题——考察与 should-trigger-02 的区分度: 后者有『高维+失效』的结构性症状，前者只是日常调参"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我搬家东西太多了，小房间塞不下，你说我是该扔点东西还是租个小仓库存起来？",
+      "expected_behavior": "不应激活任何 ML 方法论 skill——生活琐事。（注: 『太多→压缩/取舍』的表面结构与降维决策同构。）",
+      "notes": "诱饵: 完全无关场景(『减维式取舍』隐喻)"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "推荐系统的评分矩阵，用户只对不到 1% 的商品有过评分，大片空白。这种缺失严重的数据还能用吗？能不能把没打过的分补出来？",
+      "expected_behavior": "合理判断: 应激活 ml-dimensionality——A2 场景 5 与 trigger 词 matrix completion 明确覆盖：先问『信号在哪个域稀疏』（题材因素驱动 → 低秩稀疏 → 可恢复），给出矩阵补全可行性判断而非直接说不能用。",
+      "notes": "边界: 表面像缺失值处理(通常归数据清洗)，实质是压缩感知/矩阵补全的结构问题——考察 A2 细粒度场景召回"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我想用 t-SNE 把数据降到二维给老板展示聚类效果，结果每次跑出来形状都不一样，老板问我哪个是真的，我该怎么解释？",
+      "expected_behavior": "合理判断: 应激活 ml-dimensionality 但以澄清定位为主——t-SNE 属流形/可视化降维范畴在本 skill 辐射内（trigger 词含 LLE/t-SNE）；动作是解释随机性与超参敏感性、声明可视化降维不能当特征输入下游，同时说明这不是模型不稳定 bug。若对话核心转向聚类方法本身则部分转介。",
+      "notes": "边界: 降维用于可视化 vs 用于建模两种用途的混淆——skill 需先厘清用途再给处方，避免机械套 p≫n 流程"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴是与 ml-imbalanced-learning 的结构分界(高维 vs 类别比例)。should-not-trigger-02 是刻画的近界诱饵: 与 should-trigger-02 仅一词之差, 盲测时须能分辨『结构性失效』与『普通调参』。should-not-trigger 全部必须通过。"
+}

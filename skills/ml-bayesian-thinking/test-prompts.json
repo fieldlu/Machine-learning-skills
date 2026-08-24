@@ -1,0 +1,73 @@
+{
+  "skill": "ml-bayesian-thinking",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 — 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "用朴素贝叶斯做文本分类，特征词之间明明明显相关（比如『纽约』后面常跟『时报』），这个独立性假设这么离谱为什么模型还能用？我要不要处理属性相关性？怎么处理？",
+      "expected_behavior": "应激活 ml-bayesian-thinking，按独立性放松谱系给档位建议：朴素 → 半朴素（SPODE/TAN/AODE 放松一阶依赖）→ 贝叶斯网，并用天平逻辑（假设越弱表达力越强、所需样本指数增长）结合数据量选档，而非直奔表达力最强的。",
+      "notes": "正面场景: 独立性假设的处理（A2 场景 1，命中『naive Bayes independence assumption 太强』信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我在用极大似然估计保险索赔金额的分布参数，直接假设了正态。同事说索赔额都是右偏重尾的，高斯假设会不会让我估出来的东西全错？",
+      "expected_behavior": "应激活 ml-bayesian-thinking，执行纪律 1『分布形式先于参数』：MLE 只在给定分布族内找最优，族猜错则参数再优也是错模型；要求用领域知识/Q-Q 图论证分布形式，重尾改厚尾分布或稳健方法，禁止默认正态。",
+      "notes": "正面场景: MLE 分布形式假设审查（A2 场景 2/5 重尾质疑，命中『MLE 的分布假设』信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "GMM 聚类每次跑出来分组都不一样，有时候还差挺多。我检查过随机种子确实设了不同的初值……等等，这到底是 bug 还是 EM 就这德行？",
+      "expected_behavior": "应激活 ml-bayesian-thinking，解释隐变量交替优化的本性：EM 只保证收敛到局部最优、对初值敏感——结果漂移是方法特性不是代码 bug；给出纪律：多组初值取优、报告初值敏感性，并点明 k-means 是其硬分配特例。",
+      "notes": "正面场景: GMM/EM 结果不稳定归因（A2 场景 3，命中『EM 每次结果不一样』信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "医疗诊断的贝叶斯网加到四十多个节点之后精确推断彻底跑不动了。听说有近似推断，变分推断和 MCMC 该选哪个？我们是在线服务不能等太久。",
+      "expected_behavior": "应激活 ml-bayesian-thinking，执行纪律 4 推断降级选路：精确推断 NP 难后按延迟预算分流——在线延迟敏感走变分推断（确定性快、可能有系统性偏差），离线分析可走 MCMC（渐近正确但慢，注意 burn-in）；说明降级路线各有代价。",
+      "notes": "正面场景: 近似推断选型（A2 场景 4，命中『贝叶斯网推断太慢 / variational vs MCMC』信号 + 部署约束）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我在纠结分类器选 XGBoost 还是 SVM，听说树模型对特征尺度不敏感是真的吗？这两个哪个工程上更好部署？",
+      "expected_behavior": "不应激活 ml-bayesian-thinking——description 明确排除『判别式模型选型(SVM/树/神经网络)』。判别式选型应走 ml-task-matching 的任务匹配框架。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-task-matching 的分界——本 skill 只管概率生成式建模，不含概率成分的判别式选型归兄弟 skill"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "论文里我用了朴素贝叶斯，审稿人没挑模型的毛病，但质疑我 10 折交叉验证配 t 检验的显著性结论，说我这样算出来的 p 值不可信。这该怎么回应？",
+      "expected_behavior": "不应激活 ml-bayesian-thinking——质疑点是评估协议前提（k 折重叠破坏检验独立性），与概率建模假设无关，应激活 ml-pitfall-audit 过六问中的第二问（测试错误率独立采样），或由 ml-evaluation-design 给 5×2cv 方案。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 字面含朴素贝叶斯但病灶在评估协议——考察按问题归属而非实体名词路由"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "PyTorch 里 nn.BCELoss 和 nn.CrossEntropyLoss 到底什么时候用哪个？二分类和多分类的 label 形状要求老是搞混。",
+      "expected_behavior": "不应激活任何 ML 方法论 skill——框架 API 用法问题，与概率建模方法论无关，直接回答。（注: loss 函数字面是概率概念但诉求是 API 使用。）",
+      "notes": "诱饵: 完全无关场景(API 用法, 借概率词汇伪装)"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我想给回归模型换一个自定义的损失函数来拟合我的业务目标，顺便问下损失函数和似然函数是不是一回事啊？总感觉哪里有关系。",
+      "expected_behavior": "合理判断: 可激活 ml-bayesian-thinking 回答概念桥接部分——损失即负对数似然的视角（替代损失推理）确实是本 skill 与理论层交界的话题；正确动作是澄清『选损失=隐式声明分布假设』这一联系并指出其含义，若用户接着要系统优化不可微指标再转介 ml-theory-compass 的替代损失工具组。",
+      "notes": "边界: 概念澄清与建模决策的混合提问——skill 应答联系而不抢跑完整流程"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "半监督项目：标注数据只有几百条，另外捞了百万级未标注样本想一起用，听说这样能白嫖性能，有什么要注意的吗？",
+      "expected_behavior": "合理判断: 不应以 ml-bayesian-thinking 为主 skill——未标记数据的收益风险核心是『桥接假设(同分布+相似样本相似输出)失效会倒扣分』，这是 ml-pitfall-audit 第六问域外的前提审查主题（x45），理论层面的安全性检查归 ml-theory-compass；本 skill 仅在其概率生成式半监督实现上提供假设清单支持。合理行为是识别问题归属为主审计/理论问题并派发。",
+      "notes": "边界: 未标注数据话题横跨三个 skill——考察是否守住 description 的概率建模边界而非被『贝叶斯味』词汇吸走"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 判别式选型(ml-task-matching)、评估协议质疑(ml-pitfall-audit/ml-evaluation-design)、半监督安全(ml-theory-compass/ml-pitfall-audit)。should-not-trigger 全部必须通过。"
+}

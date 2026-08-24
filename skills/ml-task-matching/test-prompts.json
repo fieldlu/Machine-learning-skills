@@ -1,0 +1,73 @@
+{
+  "skill": "ml-task-matching",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 — 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "项目要开工了，我手上是 3000 条带噪声的传感器数据，特征里有连续有离散的，想问下这种情况下该用什么算法做分类比较靠谱？",
+      "expected_behavior": "应激活 ml-task-matching，执行 NFL 三步：先截断『哪个算法靠谱』的无条件命题，再刻画任务画像（样本量/噪声/特征结构），最后按归纳偏好与任务结构的匹配度推荐候选，而非报出『最强算法』。",
+      "notes": "正面场景: 项目启动期选型，用户已给出数据情况但无『问题→偏好』匹配意识（A2 场景 4）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "Kaggle 这个比赛 leaderboard 第一名用的是 LightGBM 加一堆 trick，我把他的方案原样搬到我们公司数据上跑，效果反而比现有规则差不少，为什么同样的方法别人有效我没效？",
+      "expected_behavior": "应激活 ml-task-matching，指出榜单结论只在原任务分布上成立，引导比对两个任务分布（样本量/类别比例/特征语义）的差异来解释外推失败。",
+      "notes": "正面场景: 榜单结论外推失败，命中『benchmark 上赢了为什么我这不行』信号"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "微调一个开源 7B 小模型和直接调 GPT-4 的 API，这两个方案到底谁更强？团队里各执一份评测报告吵得不可开交。",
+      "expected_behavior": "应激活 ml-task-matching，把『谁更强』重述为『各自归纳偏好与任务 T 的结构是否匹配』，并审查两份评测证据的任务分布是否与本任务一致。",
+      "notes": "正面场景: 选型争论各执证据（A2 场景 1）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "两个模型在我们验证集上 AUC 就差了千分之一，基本算打平了。上线只能选一个，总不能掷硬币吧？有什么决胜的办法吗？",
+      "expected_behavior": "应激活 ml-task-matching，处理打平决胜：不靠掷硬币或看谁新，而是回到任务刻画找结构性依据（部署约束、代价结构、可解释性需求、归纳偏好与业务场景的匹配）。",
+      "notes": "正面场景: 两模型打平的决胜依据（A2 场景 3）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我上周用随机森林训好的那个模型，测试集 F1 只有 0.6，训练集上明明有 0.95，帮我看看是哪里出了问题？",
+      "expected_behavior": "不应激活 ml-task-matching——模型已选定且已训完，属于训后效果诊断，应激活 ml-diagnosis 做偏差-方差归因。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-diagnosis 的分界——『用哪个』走本 skill，『为什么不行』走 ml-diagnosis；本条是典型诊断求助"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "能给我讲讲 no free lunch 定理到底说了什么吗？书上那段证明没太看懂。",
+      "expected_behavior": "不应激活 ml-task-matching——description 明确排除『纯科普问答: 什么是 NFL 定理』。概念解释直接回答，本 skill 服务于选型决策而非定理讲解。",
+      "notes": "诱饵: 纯科普/概念问答，字面含本 skill 核心术语但无决策诉求"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "Python 里 list 和 tuple 到底该用哪个啊？网上说法五花八门的。",
+      "expected_behavior": "不应激活任何 ML 方法论 skill——纯编程语法问题，与机器学习无关，直接回答。",
+      "notes": "诱饵: 完全无关场景(『X 和 Y 该用哪个』句式与选型提问同构，考验语义域判断)"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "老板让我调研一下要不要把现在的逻辑评分卡换成 XGBoost，我还没看到数据长什么样，先帮你把背景记一下：我们是信贷场景。",
+      "expected_behavior": "合理判断: 应激活 ml-task-matching 但以轻量模式运行——选型意图已明确，只是任务画像信息不全；正确动作是开始截断『换就一定更好』的预设，并主动向用户索取刻画任务所需的信息（样本量/不平衡度/特征类型），而非等齐信息才启动。",
+      "notes": "边界: 任务画像尚未齐全时是否启动——skill 应作为信息收集框架被激活，而不是等条件完备的被动工具"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "都说大模型是暴力美学，scaling law 一路堆参数就能赢，那 NFL 定理是不是已经过时作废了？",
+      "expected_behavior": "合理判断: 可激活 ml-task-matching 做澄清——这不是纯科普（隐含『NFL 是否还指导实践』的方法论质疑），正确动作是用骑车类比回应：scaling 结论同样绑定特定任务分布，NFL 警示面依然成立；若对话无后续决策需求则答完即止，不展开完整选型流程。",
+      "notes": "边界: 科普与方法论质疑的模糊地带——判据是话语是否在挑战选型决策框架本身"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴是与 ml-diagnosis 的时序分界（选型前 vs 训完后）。should-not-trigger 全部必须通过。"
+}

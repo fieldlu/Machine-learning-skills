@@ -1,0 +1,73 @@
+{
+  "skill": "ml-ensemble-design",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 — 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "单模型卡在 0.79 上不去了，我想再训几个不同种子的模型做个投票平均，这样能不能再涨一点？还是直接叠一层 stacking 更香？",
+      "expected_behavior": "应激活 ml-ensemble-design，先做第一步判断『值不值得集成』：测成员分歧度而非急着堆数量；再按个体质量分布定结合策略（性能相近宜简单平均，stacking 须用 OOF 预测防泄露）。",
+      "notes": "正面场景: 想堆模型涨点（A2 场景 1，命中『投票/平均/stacking』信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我跑了 10 个同配置的 XGBoost 做软投票，结果跟单个模型一模一样，白费一晚上算力。为什么集成完全没涨点？",
+      "expected_behavior": "应激活 ml-ensemble-design，诊断翻车原因：同配置个体高度雷同、错误不互斥 → 集成零收益（三分类器 66.6% 沙盘的情形 b）；给出制造多样性的扰动通道方案（数据/属性/输出/参数四通道），并检查基学习器敏感性。",
+      "notes": "正面场景: 集成零收益翻车诊断（A2 场景 2，命中『堆模型没涨点』信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "GBDT 和随机森林到底选哪个啊？我看两个都是树的集成，比赛里都常见，一直没搞清楚它们本质区别在哪。",
+      "expected_behavior": "应激活 ml-ensemble-design，用偏差-方差语言讲清选型规则：Boosting 串行降偏差（聚焦错例）、Bagging 并行降方差（自助采样平均不稳定学习器）；并指出选择前应先诊断当前误差由哪项主导。",
+      "notes": "正面场景: Boosting vs Bagging 选型（A2 场景 3，命中『bagging 还是 boosting / 随机森林 vs GBDT』信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "打比赛的融合翻车了：五个模型的概率直接混投还不如最好的那个单模；后来试了 stacking，线下 AUC 涨了两个点，提交到线上榜反而掉了。救救。",
+      "expected_behavior": "应激活 ml-ensemble-design，处理双重翻车：(1) 异质模型概率混投须先校准再结合；(2) stacking 线下涨线上崩指向次级层泄露——必须用交叉验证产生的 held-out/OOF 预测训练次级学习器，不能用初级学习器的训练集直接产生次级训练集。",
+      "notes": "正面场景: 竞赛融合典型翻车组合（A2 场景 4，命中『概率不可比/校准/stacking 泄露/OOF』信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我单个 XGBoost 模型验证集 AUC 只有 0.71，调了几轮深度和 learning_rate 都没起色，帮我看看这个单模型到底哪里出了问题？",
+      "expected_behavior": "不应激活 ml-ensemble-design——description 明确排除『单模型诊断』，用户问的是单个已训模型的归因与修复，应激活 ml-diagnosis 做偏差-方差诊断。（集成设计只在其结论为偏差/方差主导后作为后续选项出现。）",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-diagnosis 的分界——本 skill 在『已决定要集成或怀疑集成无效』时接管，不负责单模型修复"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "少数类样本太少，我打算用 EasyEnsemble 把多数类切成几份分别训基分类器再合并——这种做法有没有坑？该怎么评估它？",
+      "expected_behavior": "不应激活 ml-ensemble-design 作为主 skill——EasyEnsemble 是『为不平衡而生』的重采样路线产物，SKILL.md 明示此类集成归 ml-imbalanced-learning；本 skill 只讲通用集成原理。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 字面满是集成词汇但问题域在不平衡——考察按问题归属而非关键词路由"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "公司团建要分组做拓展，教练让我们把人混着分队说这样各组实力更均衡。你觉得怎么分组合理？",
+      "expected_behavior": "不应激活任何 ML 方法论 skill——日常事务，与机器学习无关。（注: 『多个体组合更优』的表面结构不构成集成语义。）",
+      "notes": "诱饵: 完全无关场景(『多组混合更均衡』与集成思想表面同构)"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "老板问我：既然集成这么厉害，为什么不把公司所有模型都串起来搞个超级大 ensemble？我说不上来哪里不对，但感觉这么干有问题。",
+      "expected_behavior": "合理判断: 应激活 ml-ensemble-design 回应质疑——正确动作用『好而不同』框架解释：收益来自错误互斥的分歧而非数量；雷同个体白付 T 倍算力、一致地错且差反而更糟，且准确性与多样性本身冲突、对又强又稳的模型集成收益趋零。这是『值不值得集成』前提判断的建设性使用。",
+      "notes": "边界: 对集成的盲目崇拜式提问——不是动手设计而是判断边界，恰好落在 skill 第一步的职责内"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我们只有 200 条标注数据，想集成但连验证集都切不出来造不出不同的个体了，还有什么办法做出多样性吗？",
+      "expected_behavior": "合理判断: 应激活 ml-ensemble-design 处理小数据多样性来源问题（A2 场景 5 明确覆盖『数据太少没法切分造个体』）：可用 bootstrap 自助采样同时服务 Bagging 与包外估计等机制，并诚实评估小样本下集成收益的上限。",
+      "notes": "边界: 资源约束下的设计可行性问题——A2 场景 5 的正向覆盖，考察 description 之外 A2 细粒度场景的召回"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 单模型修复(ml-diagnosis)、不平衡专用集成(ml-imbalanced-learning)、效果验证协议(ml-evaluation-design)。should-not-trigger 全部必须通过。"
+}

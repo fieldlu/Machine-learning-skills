@@ -1,0 +1,73 @@
+{
+  "skill": "ml-evaluation-design",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 — 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我手里有 5000 条标注数据，下周要开始跑对比实验了。一直没想明白：该留多少做测试集？用留出法还是 10 折交叉验证？",
+      "expected_behavior": "应激活 ml-evaluation-design，进入第一层设计：按数据量与稳定性权衡讲解留出法（分层采样 + 多次随机划分取均值）与 k 折 CV 的适用域，并给出该场景的推荐切法。",
+      "notes": "正面场景: 实验前设计第一层『数据怎么切』，命中『留出还是交叉验证 / 几折』信号"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "我们风控模型的 accuracy 到了 98%，老板很满意，但我总觉得这个数有水分——欺诈样本占比才千分之五。这个指标到底还能不能信？该看什么指标？",
+      "expected_behavior": "应激活 ml-evaluation-design，进入第二层设计『选尺子』：指出不平衡场景下 accuracy 的隐藏前提（类别均衡）已破，按业务最怕哪种错引导到 precision/recall/Fβ 或代价敏感度量的选型推理链。",
+      "notes": "正面场景: 质疑评价指标（A2 场景 2/3），注意其与 ml-imbalanced-learning 的分工——此处先做度量层面判断，重采样细节归兄弟 skill"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我的方法比 baseline 高了 0.5 个点，审稿人问这个提升是不是显著的。我就跑了一次实验，这该怎么回答？要不要补显著性检验？",
+      "expected_behavior": "应激活 ml-evaluation-design，进入第三层设计『怎么比才可信』：说明单次运行差距可能是采样噪声，给出多次重复运行 + 统计检验的补救方案，并提示 k 折 CV 场景须用 5×2cv 校正而非普通 t 检验。",
+      "notes": "正面场景: 差距可信性判断（A2 场景 4），写论文/答辩高频"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "数据集就 80 条，train/test 一分训练就不够用了，这种小样本情况下的模型效果到底该怎么评估？听说 bootstrap 可以救急？",
+      "expected_behavior": "应激活 ml-evaluation-design，讲自助法适用域：小到难以划分时用 bootstrap，包外估计 OOB 约 36.8%，同时声明它改变分布引入估计偏差、数据充足时应让位给留出/CV。",
+      "notes": "正面场景: 小样本评估困境（A2 场景 5），命中『bootstrap/自助法』信号"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "模型训完发现验证集 loss 一路涨、训练集 loss 还在降，泛化差得离谱，我该加正则还是早停啊？",
+      "expected_behavior": "不应激活 ml-evaluation-design——实验已结束且尺子无争议，是典型的训后过拟合诊断，应激活 ml-diagnosis 做偏差-方差归因并给处置方案。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-diagnosis 的时序分界——实验还没跑/结果能不能信走本 skill；结果已经坏了怎么办走 ml-diagnosis"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "确认了是类别不平衡的问题，accuracy 确实不能看了。现在想具体动手：SMOTE 和 EasyEnsemble 到底怎么选？线上服务对延迟还挺敏感的。",
+      "expected_behavior": "不应激活 ml-evaluation-design——度量失守已确认，当前诉求是重采样路线的实施细节（再缩放三路线选型 + 部署约束匹配），应激活 ml-imbalanced-learning。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 本 skill 只负责识别度量失守并完成度量选型；SMOTE/EasyEnsemble 等重采样实现细节明确归 ml-imbalanced-learning（description 排除项）"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "Excel 里怎么算一组数的标准差来着？STDEV.S 和 STDEV.P 有什么区别？",
+      "expected_behavior": "不应激活任何 ML 方法论 skill——纯软件操作问题，与 ML 实验设计无关，直接回答。",
+      "notes": "诱饵: 完全无关场景(字面含『标准差』这一统计学词汇，考验语义域而非关键词)"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我复现了一篇论文，协议代码一行没改，但论文报 AUC 0.87 我只能跑到 0.83，是不是他们评估环节藏了什么猫腻？",
+      "expected_behavior": "合理判断: 应激活 ml-evaluation-design——A2 场景 5 明确覆盖『复现他人实验数字对不上、核查评估协议是否一致』。动作是逐层核对三层设计（切分方式/度量实现/比较协议）找出差异来源，而非直接指控造假。",
+      "notes": "边界: 复现核查表面像『结果诊断』，实际是评估协议审计，归本 skill；考察对 A2 覆盖面的把握"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我们 A/B 测试新推荐模型点击率涨了 2%，产品说可以全量了，我觉得好像还差点什么。",
+      "expected_behavior": "合理判断: 应激活 ml-evaluation-design——『怎么比才可信』同样适用于线上对比：2% 差距是否过了显著性检验、观测窗口是否够长、是否多重比较问题。虽非经典离线实验词汇，本质是第三层设计的线上版。",
+      "notes": "边界: A/B 测试语境下的统计比较——用户未说 CV/t 检验等触发词，靠问题结构识别；若对话只关心业务决策则可轻量处理"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有两条: 与 ml-diagnosis 的时序分界(实验前 vs 训完后)、与 ml-imbalanced-learning 的层次分界(度量选型 vs 重采样实施)。should-not-trigger 全部必须通过。"
+}

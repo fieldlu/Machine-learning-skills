@@ -1,0 +1,73 @@
+{
+  "skill": "ml-pitfall-audit",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 — 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "离线评估 AUC 涨了 5 个点，全组都很兴奋，结果上线一周效果跟老模型持平甚至略跌。数据没动、代码 diff 也查过没问题，到底哪里出鬼了？",
+      "expected_behavior": "应激活 ml-pitfall-audit，执行六问横向审查：采集事实底座（划分流程/度量/模型族/是否用未标注或集成/『好』指什么数字），逐问排查隐藏前提失效——典型嫌疑包括训练-线上分布漂移、无偏采样前提、信息泄露；定位病灶后转介对应专项 skill。",
+      "notes": "正面场景: 线下好线上崩（A2 场景 1，命中『offline 好线上差』信号）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "新来的实习生跑出来的模型准确率 99.6%，特征里有个 user_id 的 hash 列。我总觉得这数字好得不像话，帮我全面检查一下这个实验有没有问题？",
+      "expected_behavior": "应激活 ml-pitfall-audit：『too good to be true』+ ID 类特征是第六问的教科书信号（完美表现是不是信息泄露），执行六问清单给出诊断与修正（剔除泄露列、交叉验证复核）。",
+      "notes": "正面场景: 结果可疑 + 泄露红旗特征（A2 场景 2，命中『too good to be true / sanity check』信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "下周要接手另一个组的预测模型上线，交接文档就一页纸。我想在接手前把他们的整个评估流程审一遍，有没有系统的检查清单？",
+      "expected_behavior": "应激活 ml-pitfall-audit，以六问清单作为项目交接 review 框架：逐问核查数据来源/采样方式/划分流程/度量选择/特殊组件假设，输出每问的通过/待查结论。",
+      "notes": "正面场景: 项目交接前的健全性检查（A2 场景 5，本 skill 作为横向审计流程的核心用途）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "我们加了三百万条伪标签数据做自训练，本来指望涨点，结果验证集反而掉了两个点。未标注数据不是越多越好吗？这是什么原理？",
+      "expected_behavior": "应激活 ml-pitfall-audit，走第五问（半监督前提）：未标记数据的收益以『同分布 + 相似样本相似输出』桥接假设为抵押，生成式方法假设不准时海量未标记数据会把模型拽偏——加数据反而变差是该前提塌掉的标志症状，修正方向是验证桥接假设并保留纯监督基线对照。",
+      "notes": "正面场景: 伪标签反噬（A2 场景 4，命中『semi-supervised hurt performance』信号，x45 反转案例的现实版）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "审计发现我们欺诈模型的训练集全是已审批通过的贷款申请。我已经确定是采样偏差问题了，现在就想知道具体怎么修：重加权、代价敏感还是重新采一批对照样本？",
+      "expected_behavior": "不应激活 ml-pitfall-audit 作为主 skill——SKILL.md 明示其只负责横切第一步『判断数字是否建立在塌掉的前提上』，用户已完成定位并进入单一技术问题的深度修复，应激活 ml-imbalanced-learning（再缩放/代价敏感路线选型）执行修复。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与专项 skill 的分界——『定位后转介』是本 skill 的设计终点; 已定位到第一问的修复执行归不平衡专项"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "线上服务半夜报警，日志显示特征管道抛了 KeyError，导致一半请求的特征向量是空的，所以预测全歪了。这个怎么排查修复？",
+      "expected_behavior": "不应激活 ml-pitfall-audit——description 明确排除『纯工程 bug 排查、数据管道故障』。这是工程故障已定位到代码级原因，直接按工程问题处理。",
+      "notes": "诱饵: 工程故障伪装成『效果不好』(description 排除项, 与方法论层面的前提失效相区分)"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "帮我看下这段 SQL 为什么跑出来行数翻倍了？两个表 join 之后记录数不对劲，是不是 join key 选错了？",
+      "expected_behavior": "不应激活任何 ML 方法论 skill——纯 SQL/数据工程语法问题，直接回答。（注: 『数字不对劲要审查』句式与审计诉求同构。）",
+      "notes": "诱饵: 完全无关场景(SQL 调试借『审查异常』句式)"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "论文要投稿了，方法部分我自己反复检查都觉得挺扎实的，但导师说让我投前找个『魔鬼代言人』把所有可能被审稿人攻击的前提都列一遍。这种该用什么方式做？",
+      "expected_behavior": "合理判断: 应激活 ml-pitfall-audit——A2 场景 3 明确覆盖『论文投稿前自查』，六问清单正适合充当防御性自查框架（尤其审稿人常攻的 CV 显著性与采样前提）；动作是按六问逐项预演审稿人质疑并准备证据。",
+      "notes": "边界: 投稿自查是 A2 正向覆盖但用户措辞抽象(『魔鬼代言人』)，考察不依赖 trigger 词的问题结构识别"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "老板说竞品模型效果比我们好一大截，让我赶紧研究下人家论文复现个更强的出来。我还没开始动手，需要先注意什么吗？",
+      "expected_behavior": "合理判断: 可轻量激活 ml-pitfall-audit 提示风险面——『竞品数字更好』本身可能是对方评估协议不可比（六问中的独立采样/泄露问题），值得在动手前预警；但主诉求是复现与改进，属建设性工作，应以预警提示为主、把主流程交回选型/实验设计类 skill，而非展开完整六问审计。",
+      "notes": "边界: 防御性检查 vs 建设性任务的配比——本 skill 是防御性的，不该吞掉整个建设性诉求; 考察激活后的克制程度"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "本 skill 与全部六个专项 skill 存在『定位后转介』关系: 审计只到病灶定位, 深度修复一律转介。should-not-trigger-01 专门钉住这条边界。should-not-trigger 全部必须通过。"
+}

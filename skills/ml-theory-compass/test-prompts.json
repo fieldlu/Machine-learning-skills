@@ -1,0 +1,73 @@
+{
+  "skill": "ml-theory-compass",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 — 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "老板在会上放话：下季度模型准确率必须达到 99%。我当场就懵了——这种要求怎么接？总不能拿脑袋担保吧，有没有办法把它变成能讨论的东西？",
+      "expected_behavior": "应激活 ml-theory-compass，用 PAC 三问把点估计口号翻译成三元组契约：多大把握(δ)、多少误差(ε)、多少样本与算力预算——让模糊需求暴露内在矛盾、变成可谈判条款。",
+      "notes": "正面场景: 模糊性能需求改写为可谈判契约（A2 场景 1，f38 案例的现实版）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "一直想不通：GPT 这种模型参数量比训练 token 还多那么多，按理说早就该背题背死了，为什么实际泛化还那么好？VC 维那套理论在这儿是不是完全失效了？",
+      "expected_behavior": "应激活 ml-theory-compass，用容量三刻度回答悖论：VC 维（分布无关而松）在最左端必然失灵，往右走 Rademacher 复杂度/算法稳定性才能给出更紧的解释——先选尺子再谈解释。",
+      "notes": "正面场景: 过参数化泛化悖论（A2 场景 2，命中『overparametrization 为什么能泛化 / VC dimension 解释不了』信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "标注太贵了，预算只够标 2000 条。有没有理论能告诉我这个量到底够不够？还是说必须再加钱标注，拍脑袋决定我怕后面翻车。",
+      "expected_behavior": "应激活 ml-theory-compass，用样本复杂度/sample complexity 框架回答『多少数据才够』：给出理论边界作为决策参照，并声明理论给的是边界与提问姿势而非精确答案。",
+      "notes": "正面场景: 样本量够不够的理论判断（A2 场景 2，命中『how much data do I need / sample complexity』信号）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "我们公司每个季度搞一次复盘然后调整策略，但越调越乱，感觉每次都在过拟合上季度的问题。强化学习的策略迭代为啥能保证越迭代越好，我们的复盘差了什么？",
+      "expected_behavior": "应激活 ml-theory-compass，用单调性证书回答：策略评估-改进循环敢放心迭代是因为每步改进被证明单调不减；复盘-调整循环缺等价闸门，须外接 A/B 测试充当证书。",
+      "notes": "正面场景: 迭代流程安全性证书（A2 场景 4 + f44 案例迁移，命中『policy iteration 为什么收敛/复盘越改越乱』信号）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我的贝叶斯网节点一多推断就跑不动了，想问下变分推断和 MCMC 具体怎么选？最好能给个实操建议。",
+      "expected_behavior": "不应激活 ml-theory-compass——这是已明确定位的工程选型问题，应激活 ml-bayesian-thinking 的推断降级路线（SKILL.md 明示本 skill 不适用于已定位的工程修复；罗盘只管『假设换可行性』的一般原理）。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-bayesian-thinking 的分界——具体操作版归贝叶斯 skill; 本条与该 skill 的 should-trigger-04 几乎同文, 是最严苛的跨 skill 区分度测试"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "帮我看下这段代码：model.fit(X_train, y_train) 之后 train accuracy 一直卡在 0.6 上不去，是不是我学习率设太小了？",
+      "expected_behavior": "不应激活 ml-theory-compass——description 明确排除『具体算法实现调试』。欠拟合症状应走 ml-diagnosis 诊断。",
+      "notes": "诱饵: 实现调试伪装(字面出现 accuracy 卡住的『理论与实践差距』表象, 实质是训后诊断)"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我在准备数学系的研究生复试，能不能给我讲讲 PAC 可学习性的严格定义和那个定理的完整证明过程？要考试用的。",
+      "expected_behavior": "不应激活 ml-theory-compass——description 明确排除『纯数学证明辅导』。应试型定理讲解是知识问答，本 skill 服务于理论-实践的桥接决策。",
+      "notes": "诱饵: 纯理论学习场景(字面含 PAC learnable 这一核心 trigger 词, 但语境是应试而非实践桥接)"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "模型 A 用 10 条规则做到 95% 准确率，模型 B 用 3 条规则只有 93%。团队吵翻了：一边说简单可解释要紧，一边说效果为王。有没有什么讲道理的裁决办法？",
+      "expected_behavior": "合理判断: 应激活 ml-theory-compass——f23 案例的直接现实化：用 MDL 计算各自总码长（模型描述字节+残差纠错字节），数据量大时精度优势胜出、数据小时简洁者胜，把品味之争变成可计算评分。（若对话焦点滑向『两个模型打平怎么科学比较』则部分转介 ml-task-matching/ml-evaluation-design。）",
+      "notes": "边界: 与 ml-task-matching 选型争论的交界——本条的独特价值在于 MDL 提供了量化裁决工具, 属理论框架的建设性使用"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我们想优化 recall@50 这个指标，但它不可导没法直接当 loss。听说有什么替代损失的套路？靠不靠谱啊？",
+      "expected_behavior": "合理判断: 应激活 ml-theory-compass——替代损失推理正是其核心工具组：原目标不可优化换凸代理可行，但代理最优≠原指标最优，事后须做一致性检查。（A2 场景 3 后半句明确覆盖『想优化 recall@K 这类不可微指标』。）",
+      "notes": "边界: 工程诉求带方法论内核——trigger 词 surrogate loss 直接命中; 考察 description 排除项『具体算法实现调试』不吞掉这类合法场景"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴: 与 ml-bayesian-thinking 的『一般原理 vs 具体操作』分界(should-not-trigger-01 用近乎同文的 prompt 钉住)、与 ml-diagnosis 的调试分界、与应试学习的用途分界。should-not-trigger 全部必须通过。"
+}

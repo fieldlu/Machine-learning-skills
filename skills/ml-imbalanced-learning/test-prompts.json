@@ -1,0 +1,73 @@
+{
+  "skill": "ml-imbalanced-learning",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 — 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们的疾病筛查模型 accuracy 有 99.2%，但混淆矩阵一拉出来，阳性病人基本全漏掉了，recall 接近 0。这模型是不是废了？接下来该动数据还是动阈值？",
+      "expected_behavior": "应激活 ml-imbalanced-learning：先确认度量失守（全猜多数类也能达到接近的 accuracy），记录少数类数量级；再审查无偏采样前提，最后按部署约束在再缩放三路线（重采样/阈值移动/代价敏感）中选路并附禁令。",
+      "notes": "正面场景: 998 反例的现实版——accuracy 虚高 + 少数类召回为 0（A2 场景 1，description 核心触发语）"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "正例占比大概万分之一。线上服务延迟卡得很死不能重训模型，这种情况下 SMOTE、class_weight、阈值移动到底选哪个？各有什么坑？",
+      "expected_behavior": "应激活 ml-imbalanced-learning，按部署约束选路：延迟敏感、不可重训 → 阈值移动（零训练成本）；同时讲清各路线隐藏前提与禁令（如 SMOTE 插值而非随机复制），并用查准/查全/Fβ 复评。",
+      "notes": "正面场景: 重采样三路线选型 + 部署约束匹配（A2 场景 2，命中『过采样还是欠采样/class_weight/阈值移动』信号）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我把少数类样本直接复制了几遍喂给模型，验证集 F1 直接从 0.4 涨到 0.85！这也太容易了吧，总觉得哪里不对劲。",
+      "expected_behavior": "应激活 ml-imbalanced-learning：识别复制式过采样的过拟合陷阱（对初始正例重复采样会招致严重过拟合），解释指标暴涨可能是记住了复制的少数类样本，改用 SMOTE 插值或 EasyEnsemble 并换度量复评。",
+      "notes": "正面场景: 复制式过采样后的可疑暴涨（A2 场景 3，『怀疑出了问题又说不清原因』）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "训练数据只有已经报警的案件，没报过警的正常交易里其实也藏着欺诈。用这种数据训出来的检测模型，阈值怎么调感觉都不太对劲，是数据本身有问题吗？",
+      "expected_behavior": "应激活 ml-imbalanced-learning：审查无偏采样前提——选择性上报数据使观测几率≠真实几率且真实几率无法估计，按判停条件禁止直接套再缩放公式，改走领域代价设定或验证集校准，并标注偏差方向。",
+      "notes": "正面场景: 无偏采样前提塌掉（A2 场景 4，考察步骤 2 的判停条件而非机械套三路线）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "我们数据两类比例差不多五五开，但我拿不准这个风控场景该看 precision 还是 recall——漏放一笔坏账和误拦一个正常客户代价完全不一样。",
+      "expected_behavior": "不应激活 ml-imbalanced-learning——类别比例尚可，问题纯粹在度量选择与代价不对称的编码上，应激活 ml-evaluation-design 的度量层（Fβ/代价敏感度量选型推理链）。description 明确排除『类别比例尚可只是指标选择问题』。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-evaluation-design 的分界——比例尚可只动尺子走评估设计；本 skill 管比例失衡引发的判决失真"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "我 n=300 但特征有两万多个，样本又稀疏得要命，kNN 完全没法用了。这种情况第一步该干嘛？",
+      "expected_behavior": "不应激活 ml-imbalanced-learning——这是高维小样本的结构问题（维数灾难），不是类别比例失衡，应激活 ml-dimensionality 做 p≫n 的诊断链与降维/特征选择选路。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-dimensionality 的区分——SKILL.md 明示『那是高维小样本下的结构问题; 本 skill 只管类别比例失衡』"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "食堂今天三个菜都卖完了只剩一个，虽然不太想吃但也就它了，你说我要不要再等等看有没有新的？",
+      "expected_behavior": "不应激活任何 ML 方法论 skill——日常琐事，与机器学习无关。（注: 『少数选项 vs 多数偏好』的表面结构不构成类别不平衡语义。）",
+      "notes": "诱饵: 完全无关场景(含『少数』式选择的表面相似性)"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "做的是排序推荐不是分类，负样本是采出来的所以天然很多，正负比大概 1:100。这种算不算类别不平衡？要不要也上 SMOTE？",
+      "expected_behavior": "合理判断: 应激活 ml-imbalanced-learning 但走其边界判定而非照搬处方——description 明确排除『纯排序场景』；正确动作是指出负采样造成的观测分布失真确实值得审查（无偏采样前提），但 SMOTE 类重采样不适用于排序目标，应讨论采样策略与排序度量的匹配，必要时转介评估设计层。",
+      "notes": "边界: 不平衡信号出现在被排除的排序任务里——既不能因『排除排序』而无视真实的采样偏差，也不能机械套分类的三路线"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "多标签任务里有个标签特别稀少，其他标签都挺均衡的。这种单标签极度不平衡的情况，处理思路和二分类不平衡一样吗？",
+      "expected_behavior": "合理判断: 可激活 ml-imbalanced-learning 做原则级回答——再缩放/代价敏感的核心思想可迁移到单个稀疏标签上，但 description 将范围锚定在类别不平衡的经典设定；合理行为是给出核心原理适用性的判断，并明确声明多标签细节超出本 skill 展开范围，避免过度承诺。",
+      "notes": "边界: 经典二分类框架外的稀有类别问题——考察 skill 是否诚实声明覆盖边界而非硬套"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有两条: 度量层(ml-evaluation-design)与结构层(ml-dimensionality)。判停条件(无偏采样前提)是本 skill 区别于通用调参建议的关键行为, 应在 should-trigger-04 中重点盲测。should-not-trigger 全部必须通过。"
+}

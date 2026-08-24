@@ -1,0 +1,73 @@
+{
+  "skill": "ml-methodology-router",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 — 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我们组为新项目吵了一个星期：一半人主张上 XGBoost，一半人主张直接上深度学习，谁也说服不了谁。你来评评理，到底该听谁的？",
+      "expected_behavior": "应最先激活 ml-methodology-router，判定问题处于『选型前思考』阶段，随后派发到 ml-task-matching 并说明理由（NFL：优劣绑定任务，须先刻画任务画像）；router 自身只定位与派发，不亲自展开分析。",
+      "notes": "正面场景: 团队选型争论，命中语言信号『该用什么算法 / X 和 Y 哪个好』"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "下周我们的模型就要上线了，产品那边拍板要求准确率必须做到 99%，我总觉得这个数是拍脑袋来的，该怎么跟他们谈？",
+      "expected_behavior": "应激活 ml-methodology-router，判定为『上线/信任关口』横向信号：派发 ml-theory-compass（把 99% 点估计口号翻译成 PAC 式可谈判契约），并按 router 设计主动追加 ml-pitfall-audit 提示（即将上线的横向检查）。",
+      "notes": "正面场景: 上线关口 + 模糊需求，同时命中『要上线了』与『99% 精度』两个信号，考察 router 的派发 + 追加双重行为"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "我的欺诈检测模型 accuracy 有 99%，但混淆矩阵里欺诈单子几乎全放行了。这模型到底算好还是坏？下一步该干嘛？",
+      "expected_behavior": "应激活 ml-methodology-router，识别『结构性特殊场景』信号（类别不平衡 + accuracy 失守），派发 ml-imbalanced-learning；因结果同时带可疑色彩，可追加提示 ml-pitfall-audit。",
+      "notes": "正面场景: 复合症状路由，考察 router 从症状中选出正确的子 skill 而不是亲自下场诊断"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "毕业论文要开始跑实验了，手里就 800 条标注数据，不知道该留多少做测试、要不要交叉验证，评价指标也不知道用 accuracy 还是 F1。",
+      "expected_behavior": "应激活 ml-methodology-router，判定为『实验设计』阶段，派发 ml-evaluation-design（三层设计: 切数据 / 选度量 / 定比较协议）。",
+      "notes": "正面场景: 实验开工前设计，命中『数据怎么划分 / 用什么指标』信号"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "sklearn 跑 GridSearchCV 一直报 ValueError: Invalid parameter n_estimators for estimator LogisticRegression，这行代码怎么改？",
+      "expected_behavior": "不应激活 ml-methodology-router，也不应路由到任何子 skill——纯代码报错问题，description 明确『不路由』，直接定位参数与估计器不匹配的原因并回答。",
+      "notes": "诱饵(本 skill 任务书指定专属诱饵): 纯代码语法/报错栈场景，考察 router 不对一切 ML 相关字样开路由"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "XGBoost 的 learning_rate 默认值是多少来着？n_estimators 一般大家设多大？",
+      "expected_behavior": "不应激活本路由。API 用法/默认参数查询属于事实查询，直接回答即可，不走方法论路由。",
+      "notes": "诱饵: API 用法类（description 明确排除项），字面含模型名与超参词，考验语义而非关键词匹配"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "刚入门想补基础：到底什么是过拟合啊？能不能举个通俗点的例子？",
+      "expected_behavior": "不应激活 ml-methodology-router 做阶段定位与派发——概念科普问答不存在待决策的工作流卡点，直接讲解概念即可。",
+      "notes": "诱饵: 科普问答。『过拟合』与语言信号字面完全相同，但语境是求知而非决策求助——最典型的字面命中、语义落空陷阱"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "我在纠结要不要转行做算法工程师，听说机器学习方向前景不错，但我本科不是计算机的。",
+      "expected_behavior": "合理判断: 不应激活本路由。虽出现『机器学习』且形式上是决策，但它不属于 ML 工作流（选型/实验/诊断/特殊场景）中的任何一段，属职业规划对话，按日常对话处理。",
+      "notes": "边界: 区分『关于机器学习的决策』与『ML 方法论工作流内的决策』——router 只管后者"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我把 C 从 0.1 调到 100 训练精度还是上不去，是不是我这任务压根不适合 SVM，得换个思路？",
+      "expected_behavior": "合理判断: 应激活本路由。虽以调参字面开头，实质是方法论判断（模型能力不足还是任务不匹配），不属于『纯语法/API 用法』豁免范围；应定位到结果诊断阶段并派发 ml-diagnosis（辅以 ml-task-matching 视角）。",
+      "notes": "边界: 划清『纯代码问题不路由』与『带方法论内核的调参困惑要路由』——判据是有无待归因的方法论问题，而非有无超参字样"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "本 skill 为九个子 skill 的父级路由器（父子关系而非竞争关系）：凡子 skill 的正当场景按设计都应先经 router 定位派发，故『应触发兄弟 skill 而不触发本 skill』的跨 skill 混淆诱饵对本 skill 结构性不适用；按任务书指示，改以『纯代码语法/事实查询不路由』专属诱饵组（should-not-trigger-01/02/03）承担防误触职责，并在 edge-02 反向钉住分界线。子 skill 侧的跨 skill 混淆硬性要求由其余九份 test-prompts.json 各自承担。"
+}

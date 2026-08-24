@@ -1,0 +1,73 @@
+{
+  "skill": "ml-diagnosis",
+  "version": "0.1.0",
+  "source_book": "《机器学习》 — 周志华",
+  "darwin_compatible": true,
+  "test_cases": [
+    {
+      "id": "should-trigger-01",
+      "type": "should_trigger",
+      "prompt": "我的模型效果不好，但我也说不清是怎么个不好法：训练集上准确率才 70%，验证集 68%，俩都低。这是不是没救了？",
+      "expected_behavior": "应激活 ml-diagnosis，先采集症状数据（训练误差/验证误差/间隙），用偏差-方差分解归类为偏差主导（欠拟合），处方指向增强学习能力（更强模型/加特征/降正则）而非加数据。",
+      "notes": "正面场景: 症状模糊的『效果不好』，A2 场景 1——需要有人带他把症状归类"
+    },
+    {
+      "id": "should-trigger-02",
+      "type": "should_trigger",
+      "prompt": "验证精度卡在 85% 就不动了，学习曲线早就平了。再标一倍数据值不值啊？还是说我该换个更大的模型？",
+      "expected_behavior": "应激活 ml-diagnosis，判读学习曲线封顶形态：区分方差主导（加数据有效，配正则/集成）与偏差主导（加数据无用，须增强模型容量/特征），给出『值不值』的判定依据。",
+      "notes": "正面场景: 学习曲线封顶 + 加数据还是加模型的纠结（A2 场景 2，命中语言信号『该加数据还是加模型』）"
+    },
+    {
+      "id": "should-trigger-03",
+      "type": "should_trigger",
+      "prompt": "报告个好消息：加了 RBF 核之后训练集上完美分开了，训练精度 100%，一个错都没有！是不是可以写总结汇报了？",
+      "expected_behavior": "应激活 ml-diagnosis，触发『太好了』警报：把训练精度 100% 当红旗而非捷报，检查训练-验证差距、是否混入 ID 类高基数特征或泄露特征，判定是『真优秀』还是『记住了噪声/泄了答案』。",
+      "notes": "正面场景: 完美可分假象（A2 场景 3，本 skill 核心纪律『训练集满分是红旗』的典型话术）"
+    },
+    {
+      "id": "should-trigger-04",
+      "type": "should_trigger",
+      "prompt": "GridSearchCV 跑完了，cv 上最好 0.81。我现在是直接把这个 best_estimator_ 拿去给业务方用吗？还是要做点别的？",
+      "expected_behavior": "应激活 ml-diagnosis，执行调参后全量重训纪律：折上训练的 best_estimator_ 只见过部分数据，须在全量训练集上重训后再交付，并说明原因。",
+      "notes": "正面场景: GridSearchCV 后的全量重训盲区（A2 场景 5，容易被忽视的操作纪律类触发）"
+    },
+    {
+      "id": "should-not-trigger-01",
+      "type": "should_not_trigger",
+      "prompt": "下周要跟另一家公司的方案做对比测试了，他们的模型和我们的都在同一个测试集上跑过。想问下怎么设计这次对比才公平？跑几次取平均够不够？",
+      "expected_behavior": "不应激活 ml-diagnosis——模型已训完且没有『效果不好』诉求，问的是实验前比较协议设计（重复运行次数/统计检验），应激活 ml-evaluation-design。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-evaluation-design 的分界——『怎么比才可信』走评估设计，『数字可信之后为什么是这个数、下一步动什么』才走本 skill"
+    },
+    {
+      "id": "should-not-trigger-02",
+      "type": "should_not_trigger",
+      "prompt": "项目还没定技术栈，就是想先问问：图像分类这种任务现在一般都用什么模型入门比较好？",
+      "expected_behavior": "不应激活 ml-diagnosis——还没有任何已训完的模型和结果，属于训练前的选型咨询，应激活 ml-task-matching。",
+      "notes": "跨 skill 混淆诱饵(硬性要求): 与 ml-task-matching 的时序分界——description 明确排除『还没选模型的选型阶段』"
+    },
+    {
+      "id": "should-not-trigger-03",
+      "type": "should_not_trigger",
+      "prompt": "我家猫最近食欲不太好，饭吃两口就走了，是不是生病了要不要带去看医生？",
+      "expected_behavior": "不应激活任何 ML 方法论 skill——日常生活问题，与机器学习无关。（注: 『效果不好要诊断』的句式结构不构成 ML 语义。）",
+      "notes": "诱饵: 完全无关场景(『不好+帮我看看怎么办』句式与诊断求助同构，考验语义域判断)"
+    },
+    {
+      "id": "edge-01",
+      "type": "edge_case",
+      "prompt": "不平衡数据上 accuracy 虚高我知道是指标不对，换成 F1 之后发现少数类 recall 还是只有 0.3——这个数本身是不是也有问题？还是模型真的就这么烂？",
+      "expected_behavior": "合理判断: 应激活 ml-diagnosis 但按其前置纪律先确认尺子已合理——用户已换用 F1，度量层面成立，此时进入正常的偏差-方差诊断流程评估真实差距；若用户仍在纠结换什么指标则应先转介 ml-evaluation-design。",
+      "notes": "边界: 本 skill 默认度量已合理，而尺子未定的场景归评估设计——此 prompt 恰好骑在分界线上且已跨到本 skill 一侧，考察对『默认前提』的处理顺序"
+    },
+    {
+      "id": "edge-02",
+      "type": "edge_case",
+      "prompt": "我训了 10 个不同种子的 XGBoost 投票，结果比单模型还差了一点，是不是我哪里搞错了？",
+      "expected_behavior": "合理判断: 可激活 ml-diagnosis 先做基础排查，但更精准的归宿是转介/串联 ml-ensemble-design——『堆模型反而变差』是集成的典型翻车模式（成员高度雷同零收益或一致地错负收益），ml-ensemble-design 的 description 明确覆盖『集成后没有收益甚至变差』。合理行为是识别问题归属并派发，而非困在单模型偏差-方差框架里。",
+      "notes": "边界: 单模型诊断与集成翻车的交界——症状以『变差』呈现但病根在集成结构；考察 agent 是否会把问题路由给更专业的兄弟 skill"
+    }
+  ],
+  "minimum_pass_rate": 0.8,
+  "notes": "核心混淆轴有三条: 时序上游(ml-task-matching)、时序下游协议层(ml-evaluation-design)、结构下游(ml-ensemble-design)。should-not-trigger 全部必须通过。"
+}

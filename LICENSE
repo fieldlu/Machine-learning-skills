@@ -1,0 +1,37 @@
+MIT License
+
+Copyright (c) 2026 fieldlu
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Attribution Notice (非许可部分 / Beyond-the-license note):
+
+The methodological content distilled in the `skills/` directory and
+`GLOSSARY.md` / `DIGEST.md` derives from the book 《机器学习》(Machine Learning,
+a.k.a. the "Watermelon Book") by Zhi-Hua Zhou (周志华), Tsinghua University
+Press, 2016. Short quotations (≤150 characters each) are reproduced under
+fair-use for commentary and methodology organization. This repository is an
+independent secondary work and is not affiliated with or endorsed by the
+author or the publisher. If you use these skills in academic work, please cite
+the original book:
+
+周志华. 机器学习. 清华大学出版社, 2016.
+Zhou, Z.-H. Machine Learning. Tsinghua University Press, 2016.

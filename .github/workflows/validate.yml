@@ -1,0 +1,68 @@
+name: validate-skills
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Validate skill structure
+        run: |
+          python - <<'PYEOF'
+          import yaml, re, sys, glob, os, json
+
+          failed = []
+
+          for p in sorted(glob.glob("skills/*/SKILL.md")):
+              d = os.path.dirname(p)
+              txt = open(p, encoding="utf-8").read()
+
+              # 1. frontmatter 存在且六字段齐全、可解析
+              m = re.match(r"^---\n(.*?)\n---", txt, re.S)
+              if not m:
+                  failed.append(f"{p}: no frontmatter"); continue
+              try:
+                  fm = yaml.safe_load(m.group(1))
+              except yaml.YAMLError as e:
+                  failed.append(f"{p}: YAML error {e}"); continue
+              for k in ["name","description","source_book","source_chapter","tags","related_skills"]:
+                  if k not in fm:
+                      failed.append(f"{p}: missing {k}")
+              if fm.get("name") != os.path.basename(d):
+                  failed.append(f"{p}: name != dirname")
+
+              # 2. 目录名与 test-prompts.json 的 skill 字段一致 + JSON 合法
+              tp = os.path.join(d, "test-prompts.json")
+              if not os.path.exists(tp):
+                  failed.append(f"{d}: missing test-prompts.json"); continue
+              data = json.load(open(tp, encoding="utf-8"))
+              if data.get("skill") != fm.get("name"):
+                  failed.append(f"{tp}: skill field mismatch")
+              types = [tc["type"] for tc in data["test_cases"]]
+              if types.count("should_not_trigger") < 2:
+                  failed.append(f"{tp}: needs >=2 decoys")
+
+              # 3. 六段齐全（R/I/A1/A2/E/B 标题）
+              for sec in ["## R ", "## I ", "## A1 ", "## A2 ", "## E ", "## B "]:
+                  if sec not in txt:
+                      failed.append(f"{p}: missing section {sec.strip()}")
+
+          if failed:
+              print("\n".join(f"FAIL: {f}" for f in failed))
+              sys.exit(1)
+          n = len(glob.glob("skills/*/SKILL.md"))
+          print(f"All {n} skills valid.")
+          PYEOF
